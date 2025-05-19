@@ -1,0 +1,184 @@
+
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+
+const AboutPage = () => {
+  const teamMembers = [
+    {
+      name: "Seamus O'Connor",
+      position: "Owner & Founder",
+      image: "https://randomuser.me/api/portraits/men/40.jpg",
+      bio: "With over 30 years in the hospitality industry, Seamus brought his vision of an authentic Irish pub to life when he opened D'Arcy McGee's in 1998. Born and raised in Dublin, he's passionate about sharing Irish culture and hospitality."
+    },
+    {
+      name: "Fiona Murphy",
+      position: "Head Chef",
+      image: "https://randomuser.me/api/portraits/women/43.jpg",
+      bio: "Chef Fiona combines traditional Irish recipes with modern culinary techniques. Trained at the Culinary Institute of Ireland, she has worked in renowned kitchens across Europe before bringing her talents to D'Arcy McGee's."
+    },
+    {
+      name: "Liam Byrne",
+      position: "Bar Manager",
+      image: "https://randomuser.me/api/portraits/men/36.jpg",
+      bio: "A certified master of whiskey with an encyclopedic knowledge of Irish spirits, Liam ensures our bar offers the finest selection of drinks. His creative cocktails and perfect pours have won numerous local awards."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
+      <main className="flex-grow pt-24">
+        <section className="bg-irish-green py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">About Us</h1>
+            <p className="text-white text-xl max-w-2xl mx-auto">
+              Discover the story behind D'Arcy McGee's and what makes our Irish pub truly special.
+            </p>
+          </div>
+        </section>
+        
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center mb-16">
+              <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0">
+                <h2 className="text-3xl font-serif font-bold mb-6 text-irish-green">Our Story</h2>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  D'Arcy McGee's was founded in 1998 by Dublin native Seamus O'Connor, who dreamed of creating 
+                  an authentic Irish pub experience. Named after Thomas D'Arcy McGee, a father of Canadian 
+                  confederation with proud Irish roots, our pub honors the rich cultural connections between 
+                  Ireland and North America.
+                </p>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  What began as a small neighborhood pub has grown into a beloved institution, known for its 
+                  warm hospitality, excellent food and drinks, and vibrant entertainment. Throughout our history, 
+                  we've remained committed to providing an authentic taste of Ireland and creating a welcoming 
+                  community gathering place.
+                </p>
+                <p className="text-gray-700 leading-relaxed">
+                  Today, D'Arcy McGee's continues to honor Irish traditions while embracing modern tastes. 
+                  Whether you're joining us for a quiet pint, a family meal, or a night of music and entertainment, 
+                  you'll experience the very best of Irish hospitality.
+                </p>
+              </div>
+              <div className="md:w-1/2">
+                <div className="grid grid-cols-2 gap-4">
+                  <img 
+                    src="https://images.unsplash.com/photo-1594078187747-21566b45ea44?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" 
+                    alt="D'Arcy McGee's early days" 
+                    className="rounded-lg shadow-md mb-4"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1560840881-4bbcd415a9ab?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" 
+                    alt="D'Arcy McGee's bar" 
+                    className="rounded-lg shadow-md"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1575444758702-4a6b9222336e?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGlyaXNoJTIwcHVifGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" 
+                    alt="D'Arcy McGee's interior" 
+                    className="rounded-lg shadow-md"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1574096079513-d8259312b785?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" 
+                    alt="D'Arcy McGee's live music" 
+                    className="rounded-lg shadow-md mb-4"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="py-12 border-t border-gray-200">
+              <h2 className="text-3xl font-serif font-bold mb-8 text-irish-green text-center">Our Values</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="w-16 h-16 bg-irish-green/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-irish-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-serif font-semibold mb-3 text-irish-brown text-center">Hospitality</h3>
+                  <p className="text-gray-600 text-center">
+                    We believe in the Irish tradition of céad míle fáilte - a hundred thousand welcomes. Every guest is treated like family from the moment they walk through our doors.
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="w-16 h-16 bg-irish-green/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-irish-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-serif font-semibold mb-3 text-irish-brown text-center">Quality</h3>
+                  <p className="text-gray-600 text-center">
+                    We're committed to serving the finest food and drinks. From our carefully sourced ingredients to our perfectly poured pints, quality is at the heart of everything we do.
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="w-16 h-16 bg-irish-green/20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-irish-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-serif font-semibold mb-3 text-irish-brown text-center">Heritage</h3>
+                  <p className="text-gray-600 text-center">
+                    We honor and celebrate Irish culture through our food, music, and atmosphere. We take pride in sharing authentic Irish traditions with our community.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-serif font-bold mb-12 text-irish-green text-center">Meet Our Team</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {teamMembers.map((member) => (
+                <div key={member.name} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  <div className="h-64 overflow-hidden">
+                    <img 
+                      src={member.image} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-serif font-bold mb-1 text-irish-green">{member.name}</h3>
+                    <p className="text-irish-gold font-medium mb-4">{member.position}</p>
+                    <p className="text-gray-600">{member.bio}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        <section className="py-16 bg-irish-green">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-serif font-bold mb-6 text-irish-gold">Come Visit Us</h2>
+            <p className="text-white text-xl mb-8 max-w-2xl mx-auto">
+              Experience the warmth and hospitality of D'Arcy McGee's for yourself. 
+              We look forward to welcoming you soon!
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button asChild size="lg" className="bg-irish-gold hover:bg-irish-gold/80 text-irish-green">
+                <Link to="/menu">View Our Menu</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Link to="/contact">Find Us</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
+
+export default AboutPage;

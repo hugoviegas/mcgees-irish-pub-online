@@ -1,0 +1,44 @@
+
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+const AboutSection = () => {
+  return (
+    <section id="welcome" className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center">
+          <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+            <img 
+              src="https://images.unsplash.com/photo-1577979538850-f573337c82b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80" 
+              alt="D'Arcy McGee's pub interior" 
+              className="rounded-lg shadow-xl"
+            />
+          </div>
+          
+          <div className="md:w-1/2">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 font-serif text-irish-green">Welcome to <span className="text-irish-gold">D'Arcy McGee's</span></h2>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Nestled in the heart of the city, D'Arcy McGee's brings authentic Irish hospitality to life. 
+              Our pub is named after Thomas D'Arcy McGee, a father of Canadian confederation with proud Irish roots.
+            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Step through our doors and experience the warm embrace of a traditional Irish pub, 
+              where every guest is treated like family. Our classic wooden interiors, 
+              comfortable seating, and friendly staff create the perfect atmosphere for any occasion.
+            </p>
+            <p className="text-gray-700 mb-8 leading-relaxed">
+              Whether you're joining us for a hearty Irish breakfast, a business lunch, 
+              dinner with family, or a pint with friends, we promise an experience that will 
+              keep you coming back.
+            </p>
+            <Button asChild className="bg-irish-green hover:bg-irish-green/90 text-white">
+              <Link to="/about">Learn More About Us</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default AboutSection;
