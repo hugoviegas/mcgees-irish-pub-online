@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import MenuPage from "./pages/MenuPage";
 import EventsPage from "./pages/EventsPage";
 import AboutPage from "./pages/AboutPage";
+import ReservationsPage from "./pages/ReservationsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/reservations" element={<ReservationsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

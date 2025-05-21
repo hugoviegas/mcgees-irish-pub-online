@@ -25,7 +25,7 @@ const MenuPreview = () => {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-irish-green">Our Menu</h2>
+          <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-irish-red">Our Menu</h2>
           <p className="text-gray-600 max-w-xl mx-auto">
             Authentic Irish cuisine prepared with love and tradition. 
             From hearty stews to fresh seafood, our menu offers something for everyone.
@@ -45,7 +45,7 @@ const MenuPreview = () => {
               <div className="p-6">
                 <h3 className="text-xl font-bold font-serif mb-2 text-irish-brown">{category.name}</h3>
                 <p className="text-gray-600 mb-4">{category.description}</p>
-                <Button asChild variant="outline" className="border-irish-green text-irish-green hover:bg-irish-green hover:text-white">
+                <Button asChild variant="outline" className="border-irish-red text-irish-red hover:bg-irish-red hover:text-white">
                   <Link to="/menu">Explore {category.name}</Link>
                 </Button>
               </div>
@@ -54,7 +54,7 @@ const MenuPreview = () => {
         </div>
         
         <div className="text-center">
-          <Button asChild size="lg" className="bg-irish-gold hover:bg-irish-gold/80 text-irish-green">
+          <Button asChild size="lg" className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red">
             <Link to="/menu">View Full Menu</Link>
           </Button>
         </div>

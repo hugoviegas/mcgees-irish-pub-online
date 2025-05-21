@@ -16,10 +16,16 @@ const Hero = () => {
       
       <div className="container mx-auto px-4 z-20">
         <div className="text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 font-serif">D'Arcy McGee's</h1>
+          <div className="mb-6 flex justify-center">
+            <img 
+              src="/lovable-uploads/e9bd7771-e8bb-4b44-be79-0aecc718cd57.png" 
+              alt="D'Arcy McGee's" 
+              className="h-32 md:h-40"
+            />
+          </div>
           <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">Traditional Irish pub and restaurant bringing the spirit of Ireland to your neighborhood since 1998.</p>
           <div className="space-x-4">
-            <Button asChild size="lg" className="bg-irish-gold hover:bg-irish-gold/80 text-irish-green">
+            <Button asChild size="lg" className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red">
               <Link to="/menu">View Menu</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">

@@ -59,6 +59,8 @@ export default {
 					'brown': '#8B4513',
 					'brown-light': '#A0522D',
 					'gold': '#D4AF37',
+					'red': '#9B2335',
+					'red-light': '#B33A4D',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
