@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
 import { useMenuData } from "../hooks/useMenuData";
 
 const AdminMenuPage = () => {
+  const { logout } = useAuth();
   const { menuData, addCategory, updateCategory, deleteCategory, addMenuItem, updateMenuItem, deleteMenuItem } = useMenuData();
   const [activeTab, setActiveTab] = useState("categories");
   const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(null);
@@ -41,8 +43,20 @@ const AdminMenuPage = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-irish-red mb-2">Menu Administration</h1>
-          <p className="text-gray-600">Manage your restaurant's menu categories and items</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-irish-red mb-2">Menu Administration</h1>
+              <p className="text-gray-600">Manage your restaurant's menu categories and items</p>
+            </div>
+            <Button
+              onClick={logout}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
