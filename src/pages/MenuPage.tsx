@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -284,7 +283,7 @@ const MenuPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-24">
+      <main className="flex-grow pt-16">
         <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">Our Menu</h1>
@@ -310,12 +309,12 @@ const MenuPage = () => {
             </div>
 
             <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mb-8">
-              <TabsList className="flex flex-wrap justify-center mb-8 bg-transparent">
+              <TabsList className="flex flex-wrap justify-center mb-8 bg-transparent w-full overflow-x-auto p-2 md:p-0">
                 {menuData.map((category) => (
                   <TabsTrigger 
                     key={category.id} 
                     value={category.id}
-                    className={`px-6 py-3 text-lg font-serif ${activeCategory === category.id ? 'bg-irish-red text-white' : 'bg-gray-200 text-gray-700'} m-2 rounded-md hover:bg-irish-red hover:text-white transition-colors`}
+                    className={`px-4 py-3 text-sm md:text-lg font-serif ${activeCategory === category.id ? 'bg-irish-red text-white' : 'bg-gray-200 text-gray-700'} m-1 md:m-2 rounded-md hover:bg-irish-red hover:text-white transition-colors whitespace-nowrap flex-shrink-0`}
                   >
                     {category.name}
                   </TabsTrigger>
@@ -383,7 +382,7 @@ const MenuPage = () => {
                 </div>
               </div>
               <Button asChild className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red">
-                <a href="tel:+35312345678">Contact Us</a>
+                <a href="tel:+35314907727">Contact Us</a>
               </Button>
             </div>
 
