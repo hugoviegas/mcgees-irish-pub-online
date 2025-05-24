@@ -1,0 +1,38 @@
+
+export type MenuItem = {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  image?: string;
+  tags?: string[];
+  allergens?: string[];
+};
+
+export type MenuCategory = {
+  id: string;
+  name: string;
+  items: MenuItem[];
+};
+
+export type AllergenInfo = {
+  id: string;
+  name: string;
+};
+
+export const ALLERGEN_LIST: AllergenInfo[] = [
+  { id: "1", name: "GLUTEN/WHEAT" },
+  { id: "2", name: "EGGS" },
+  { id: "3", name: "FISH" },
+  { id: "4", name: "PEANUTS" },
+  { id: "5", name: "SOYA BEANS" },
+  { id: "6", name: "MILK" },
+  { id: "7", name: "NUTS" },
+  { id: "8", name: "CELERY" },
+  { id: "9", name: "MUSTARD" },
+  { id: "10", name: "SESAME SEEDS" },
+  { id: "11", name: "SULPHUR DIOXIDE" },
+  { id: "12", name: "LUPIN" },
+  { id: "13", name: "MOLLUSCS" },
+  { id: "14", name: "CRUSTACEANS" },
+];
