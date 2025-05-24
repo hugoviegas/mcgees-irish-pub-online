@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-irish-green pt-12 pb-8 text-white">
+    <footer className="bg-irish-red pt-12 pb-8 text-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
@@ -32,18 +32,20 @@ const Footer = () => {
           
           <div>
             <h4 className="text-xl font-serif font-semibold text-irish-gold mb-4">Hours</h4>
-            <p className="mb-2">Monday - Thursday: 11am - 11pm</p>
-            <p className="mb-2">Friday: 11am - 1am</p>
-            <p className="mb-2">Saturday: 10am - 1am</p>
-            <p>Sunday: 10am - 10pm</p>
+            <p className="mb-2">Monday - Wednesday: 09:00 - 23:00</p>
+            <p className="mb-2">Thursday: 09:00 - 23:00</p>
+            <p className="mb-2">Friday: 09:00 - 23:30</p>
+            <p className="mb-2">Saturday: 10:00 - 00:30</p>
+            <p>Sunday: 10:00 - 23:30</p>
           </div>
           
           <div>
             <h4 className="text-xl font-serif font-semibold text-irish-gold mb-4">Contact</h4>
-            <p className="mb-2">123 Irish Street</p>
-            <p className="mb-2">Dublin, D01 F9C9</p>
-            <p className="mb-2">Phone: (01) 123-4567</p>
-            <p>Email: info@darcymcgees.com</p>
+            <p className="mb-2">Spawell Complex</p>
+            <p className="mb-2">Templeogue</p>
+            <p className="mb-2">Dublin 6W, Ireland</p>
+            <p className="mb-2">Phone: (01) 490 7727</p>
+            <p>Email: info@darcymcgees.ie</p>
           </div>
         </div>
         

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Calendar, Music, Heart, Users, Headphones } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -146,7 +147,7 @@ const EventsPage = () => {
                       
                       <div className="flex flex-wrap gap-3">
                         <Button asChild className="bg-irish-red hover:bg-irish-red/90 text-white">
-                          <a href={`tel:+35312345678`}>Reserve a Spot</a>
+                          <a href={`tel:+35314907727`}>Reserve a Spot</a>
                         </Button>
                         <Button asChild variant="outline" className="border-irish-red text-irish-red hover:bg-irish-red hover:text-white">
                           <a href={`/event/${event.id}`}>Event Details</a>
