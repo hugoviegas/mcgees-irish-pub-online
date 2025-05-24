@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Calendar, Music, Heart, Users, Headphones } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -92,7 +91,7 @@ const EventsPage = () => {
       <Navbar />
       
       <main className="flex-grow pt-24">
-        <section className="bg-irish-green py-16">
+        <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">Events & Entertainment</h1>
             <p className="text-white text-xl max-w-2xl mx-auto">
@@ -104,7 +103,7 @@ const EventsPage = () => {
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto mb-12 text-center">
-              <h2 className="text-3xl font-serif font-bold mb-4 text-irish-green">Upcoming Events</h2>
+              <h2 className="text-3xl font-serif font-bold mb-4 text-irish-red">Upcoming Events</h2>
               <p className="text-gray-600">
                 From live music to special celebrations, there's always something happening at D'Arcy McGee's.
                 Join us for these upcoming events and experience the best of Irish hospitality.
@@ -127,7 +126,7 @@ const EventsPage = () => {
                         <div className="mr-3 bg-irish-gold/20 text-irish-gold p-2 rounded-full">
                           {getIcon(event.icon)}
                         </div>
-                        <h3 className="text-2xl font-serif font-bold text-irish-green">{event.title}</h3>
+                        <h3 className="text-2xl font-serif font-bold text-irish-red">{event.title}</h3>
                       </div>
                       
                       <div className="flex flex-wrap items-center mb-4 text-gray-600">
@@ -146,10 +145,10 @@ const EventsPage = () => {
                       <p className="text-gray-600 mb-6">{event.description}</p>
                       
                       <div className="flex flex-wrap gap-3">
-                        <Button asChild className="bg-irish-green hover:bg-irish-green/90 text-white">
+                        <Button asChild className="bg-irish-red hover:bg-irish-red/90 text-white">
                           <a href={`tel:+35312345678`}>Reserve a Spot</a>
                         </Button>
-                        <Button asChild variant="outline" className="border-irish-green text-irish-green hover:bg-irish-green hover:text-white">
+                        <Button asChild variant="outline" className="border-irish-red text-irish-red hover:bg-irish-red hover:text-white">
                           <a href={`/event/${event.id}`}>Event Details</a>
                         </Button>
                       </div>
@@ -160,13 +159,13 @@ const EventsPage = () => {
             </div>
             
             <div className="bg-gray-50 rounded-lg p-8 text-center max-w-2xl mx-auto">
-              <h3 className="text-2xl font-serif font-bold mb-4 text-irish-green">Private Events</h3>
+              <h3 className="text-2xl font-serif font-bold mb-4 text-irish-red">Private Events</h3>
               <p className="text-gray-600 mb-6">
                 Looking to host a private event? D'Arcy McGee's offers private spaces for parties, 
                 corporate events, celebrations, and more. Our team will work with you to create a 
                 memorable experience for you and your guests.
               </p>
-              <Button asChild className="bg-irish-gold hover:bg-irish-gold/80 text-irish-green">
+              <Button asChild className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red">
                 <a href="/contact">Enquire About Private Events</a>
               </Button>
             </div>
