@@ -1,14 +1,15 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Plus, Edit2, Trash2, LogOut } from "lucide-react";
+import { Plus, Edit2, Trash2, LogOut, AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
+import { toast } from "sonner";
 
 const AdminMenuPage = () => {
   const { logout } = useAuth();
@@ -28,19 +29,42 @@ const AdminMenuPage = () => {
   const [editingItem, setEditingItem] = useState<{ item: MenuItem; categoryId: string } | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showItemForm, setShowItemForm] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+      console.log('Authentication status:', !!user);
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session?.user);
+      console.log('Auth state changed:', event, !!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSaveCategory = async (category: MenuCategory) => {
     try {
       if (editingCategory) {
         await updateCategory(category);
+        toast.success("Category updated successfully!");
       } else {
         await addCategory(category);
+        toast.success("Category added successfully!");
       }
       setEditingCategory(null);
       setShowCategoryForm(false);
     } catch (err) {
       console.error('Error saving category:', err);
-      alert('Failed to save category. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save category. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -48,16 +72,69 @@ const AdminMenuPage = () => {
     try {
       if (editingItem) {
         await updateMenuItem(categoryId, item);
+        toast.success("Menu item updated successfully!");
       } else {
         await addMenuItem(categoryId, item);
+        toast.success("Menu item added successfully!");
       }
       setEditingItem(null);
       setShowItemForm(null);
     } catch (err) {
       console.error('Error saving item:', err);
-      alert('Failed to save menu item. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save menu item. Please try again.';
+      toast.error(errorMessage);
     }
   };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      await deleteCategory(categoryId);
+      toast.success("Category deleted successfully!");
+    } catch (err) {
+      console.error('Error deleting category:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete category. Please try again.';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleDeleteMenuItem = async (categoryId: string, itemId: number) => {
+    try {
+      await deleteMenuItem(categoryId, itemId);
+      toast.success("Menu item deleted successfully!");
+    } catch (err) {
+      console.error('Error deleting menu item:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete menu item. Please try again.';
+      toast.error(errorMessage);
+    }
+  };
+
+  // Show loading while checking authentication
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication error if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
+          <p className="text-gray-600 mb-4">You must be logged in to access the admin panel.</p>
+          <Button onClick={() => window.location.href = '/'}>
+            Go to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -74,6 +151,7 @@ const AdminMenuPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-600 mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
@@ -135,7 +213,7 @@ const AdminMenuPage = () => {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => deleteCategory(category.id)}
+                          onClick={() => handleDeleteCategory(category.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -199,7 +277,7 @@ const AdminMenuPage = () => {
                                   <Button
                                     size="sm"
                                     variant="destructive"
-                                    onClick={() => deleteMenuItem(category.id, item.id)}
+                                    onClick={() => handleDeleteMenuItem(category.id, item.id)}
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
