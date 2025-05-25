@@ -1,29 +1,44 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useMenuData } from "../hooks/useMenuData";
-
-type MenuItem = {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  image?: string;
-  tags?: string[];
-  allergens?: string[];
-};
-
-type MenuCategory = {
-  id: string;
-  name: string;
-  items: MenuItem[];
-};
+import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 
 const MenuPage = () => {
-  const { menuData } = useMenuData();
+  const { menuData, loading, error } = useSupabaseMenuData();
   const [activeCategory, setActiveCategory] = useState("starters");
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow pt-16 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading menu...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow pt-16 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

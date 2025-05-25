@@ -8,36 +8,78 @@ import { useAuth } from "../contexts/AuthContext";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
-import { useMenuData } from "../hooks/useMenuData";
+import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 
 const AdminMenuPage = () => {
   const { logout } = useAuth();
-  const { menuData, addCategory, updateCategory, deleteCategory, addMenuItem, updateMenuItem, deleteMenuItem } = useMenuData();
+  const { 
+    menuData, 
+    loading, 
+    error,
+    addCategory, 
+    updateCategory, 
+    deleteCategory, 
+    addMenuItem, 
+    updateMenuItem, 
+    deleteMenuItem 
+  } = useSupabaseMenuData();
   const [activeTab, setActiveTab] = useState("categories");
   const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(null);
   const [editingItem, setEditingItem] = useState<{ item: MenuItem; categoryId: string } | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showItemForm, setShowItemForm] = useState<string | null>(null);
 
-  const handleSaveCategory = (category: MenuCategory) => {
-    if (editingCategory) {
-      updateCategory(category);
-    } else {
-      addCategory(category);
+  const handleSaveCategory = async (category: MenuCategory) => {
+    try {
+      if (editingCategory) {
+        await updateCategory(category);
+      } else {
+        await addCategory(category);
+      }
+      setEditingCategory(null);
+      setShowCategoryForm(false);
+    } catch (err) {
+      console.error('Error saving category:', err);
+      alert('Failed to save category. Please try again.');
     }
-    setEditingCategory(null);
-    setShowCategoryForm(false);
   };
 
-  const handleSaveItem = (item: MenuItem, categoryId: string) => {
-    if (editingItem) {
-      updateMenuItem(categoryId, item);
-    } else {
-      addMenuItem(categoryId, item);
+  const handleSaveItem = async (item: MenuItem, categoryId: string) => {
+    try {
+      if (editingItem) {
+        await updateMenuItem(categoryId, item);
+      } else {
+        await addMenuItem(categoryId, item);
+      }
+      setEditingItem(null);
+      setShowItemForm(null);
+    } catch (err) {
+      console.error('Error saving item:', err);
+      alert('Failed to save menu item. Please try again.');
     }
-    setEditingItem(null);
-    setShowItemForm(null);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading menu data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

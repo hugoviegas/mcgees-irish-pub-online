@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { MenuCategory, MenuItem } from "../types/menu";
 
@@ -259,69 +258,4 @@ const initialMenuData: MenuCategory[] = [
   },
 ];
 
-export const useMenuData = () => {
-  const [menuData, setMenuData] = useState<MenuCategory[]>(initialMenuData);
-
-  const addCategory = (category: MenuCategory) => {
-    setMenuData(prev => [...prev, category]);
-  };
-
-  const updateCategory = (updatedCategory: MenuCategory) => {
-    setMenuData(prev => 
-      prev.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat)
-    );
-  };
-
-  const deleteCategory = (categoryId: string) => {
-    if (confirm("Are you sure you want to delete this category? All items in it will be lost.")) {
-      setMenuData(prev => prev.filter(cat => cat.id !== categoryId));
-    }
-  };
-
-  const addMenuItem = (categoryId: string, item: MenuItem) => {
-    setMenuData(prev => 
-      prev.map(cat => 
-        cat.id === categoryId 
-          ? { ...cat, items: [...cat.items, item] }
-          : cat
-      )
-    );
-  };
-
-  const updateMenuItem = (categoryId: string, updatedItem: MenuItem) => {
-    setMenuData(prev => 
-      prev.map(cat => 
-        cat.id === categoryId 
-          ? { 
-              ...cat, 
-              items: cat.items.map(item => 
-                item.id === updatedItem.id ? updatedItem : item
-              )
-            }
-          : cat
-      )
-    );
-  };
-
-  const deleteMenuItem = (categoryId: string, itemId: number) => {
-    if (confirm("Are you sure you want to delete this menu item?")) {
-      setMenuData(prev => 
-        prev.map(cat => 
-          cat.id === categoryId 
-            ? { ...cat, items: cat.items.filter(item => item.id !== itemId) }
-            : cat
-        )
-      );
-    }
-  };
-
-  return {
-    menuData,
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    addMenuItem,
-    updateMenuItem,
-    deleteMenuItem,
-  };
-};
+export { useSupabaseMenuData as useMenuData } from './useSupabaseMenuData';

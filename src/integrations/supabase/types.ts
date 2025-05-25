@@ -9,7 +9,77 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      menu_categories: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      menu_items: {
+        Row: {
+          allergens: string[] | null
+          category_id: string
+          created_at: string | null
+          description: string
+          id: number
+          image: string | null
+          name: string
+          price: string
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          category_id: string
+          created_at?: string | null
+          description: string
+          id?: number
+          image?: string | null
+          name: string
+          price: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          allergens?: string[] | null
+          category_id?: string
+          created_at?: string | null
+          description?: string
+          id?: number
+          image?: string | null
+          name?: string
+          price?: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +88,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      menu_item_tag:
+        | "Vegetarian Option"
+        | "Vegan"
+        | "Gluten Free"
+        | "Spicy"
+        | "Popular"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +208,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      menu_item_tag: [
+        "Vegetarian Option",
+        "Vegan",
+        "Gluten Free",
+        "Spicy",
+        "Popular",
+      ],
+    },
   },
 } as const
