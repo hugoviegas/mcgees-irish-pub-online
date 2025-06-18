@@ -1,22 +1,31 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MenuCategory } from "../../types/menu";
+import { MenuCategory } from "@/types/menu";
 import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CategoryFormProps {
-  category?: MenuCategory | null;
-  onSave: (category: MenuCategory) => void;
+  category?: Partial<MenuCategory>;
+  onSubmit: (category: Partial<MenuCategory>) => void;
   onCancel: () => void;
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSave, onCancel }) => {
-  const [formData, setFormData] = useState<MenuCategory>({
-    id: "",
-    name: "",
-    items: [],
+const CategoryForm: React.FC<CategoryFormProps> = ({
+  category,
+  onSubmit,
+  onCancel,
+}) => {
+  const [formData, setFormData] = useState<Partial<MenuCategory>>({
+    name: category?.name || "",
+    menu_type: category?.menu_type || "aLaCarte",
   });
 
   useEffect(() => {
@@ -24,26 +33,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSave, onCancel 
       setFormData(category);
     } else {
       setFormData({
-        id: "",
         name: "",
-        items: [],
+        menu_type: "aLaCarte",
       });
     }
   }, [category]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name) {
-      alert("Please enter a category name");
-      return;
-    }
-
-    const categoryToSave = {
-      ...formData,
-      id: formData.id || formData.name.toLowerCase().replace(/\s+/g, "-"),
-    };
-
-    onSave(categoryToSave);
+    onSubmit(formData);
   };
 
   return (
@@ -60,20 +58,56 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, onSave, onCancel 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Category Name *</label>
+              <label htmlFor="name" className="block text-sm font-medium mb-2">
+                Category Name
+              </label>
               <Input
+                id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="e.g., Starters, Main Courses"
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 required
+                className="mt-1"
               />
             </div>
 
+            <div>
+              <label
+                htmlFor="menuType"
+                className="block text-sm font-medium mb-2"
+              >
+                Menu Type
+              </label>
+              <Select
+                value={formData.menu_type}
+                onValueChange={(value: "aLaCarte" | "breakfast" | "drinks") =>
+                  setFormData((prev) => ({ ...prev, menu_type: value }))
+                }
+              >
+                <SelectTrigger id="menuType" className="mt-1">
+                  <SelectValue placeholder="Select menu type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="aLaCarte">A La Carte</SelectItem>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="drinks">Drinks</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button
+                type="button"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+                onClick={onCancel}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-irish-red hover:bg-irish-red/90">
+              <Button
+                type="submit"
+                className="bg-irish-red hover:bg-irish-red/90 text-white"
+              >
                 {category ? "Update Category" : "Add Category"}
               </Button>
             </div>

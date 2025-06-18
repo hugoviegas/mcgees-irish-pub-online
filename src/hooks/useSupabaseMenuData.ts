@@ -7,6 +7,8 @@ export const useSupabaseMenuData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const activeMenu = "dine_in"; // Example: set your active menu type here
+
   const fetchMenuData = async () => {
     try {
       setLoading(true);
@@ -25,10 +27,11 @@ export const useSupabaseMenuData = () => {
 
       console.log("Categories fetched:", categories);
 
-      // Fetch menu items
+      // Fetch menu items with menu_type filter
       const { data: items, error: itemsError } = await supabase
         .from("menu_items")
-        .select("*")
+        .select("*, menu_categories!inner(*)")
+        .eq("menu_categories.menu_type", activeMenu) // Filter by menu type
         .order("id");
 
       if (itemsError) {
@@ -38,12 +41,13 @@ export const useSupabaseMenuData = () => {
 
       console.log("Items fetched:", items);
 
-      // Combine categories with their items
-      // Ensure image field is included and processed
-      const menuWithItems: MenuCategory[] = (categories || []).map(
-        (category) => ({
+      // Update the menuWithItems to include menu_type
+      const menuWithItems: MenuCategory[] = (categories || [])
+        .filter((category) => category.menu_type === activeMenu) // Filter categories by menu type
+        .map((category) => ({
           id: category.id,
           name: category.name,
+          menu_type: category.menu_type,
           items: (items || [])
             .filter((item) => item.category_id === category.id)
             .map((item) => ({
@@ -55,8 +59,7 @@ export const useSupabaseMenuData = () => {
               tags: item.tags || [],
               allergens: item.allergens || [],
             })),
-        })
-      );
+        }));
 
       console.log("Final menu data:", menuWithItems);
       setMenuData(menuWithItems);
@@ -69,7 +72,7 @@ export const useSupabaseMenuData = () => {
     }
   };
 
-  const addCategory = async (category: MenuCategory) => {
+  const addCategory = async (category: Partial<MenuCategory>) => {
     try {
       console.log("Adding category:", category);
 
@@ -82,8 +85,9 @@ export const useSupabaseMenuData = () => {
       }
 
       const { error } = await supabase.from("menu_categories").insert({
-        id: category.id,
+        id: crypto.randomUUID(), // Generate a new UUID for the category
         name: category.name,
+        menu_type: category.menu_type || "aLaCarte",
         display_order: menuData.length + 1,
       });
 
@@ -100,7 +104,7 @@ export const useSupabaseMenuData = () => {
     }
   };
 
-  const updateCategory = async (updatedCategory: MenuCategory) => {
+  const updateCategory = async (updatedCategory: Partial<MenuCategory>) => {
     try {
       console.log("Updating category:", updatedCategory);
 
@@ -114,7 +118,10 @@ export const useSupabaseMenuData = () => {
 
       const { error } = await supabase
         .from("menu_categories")
-        .update({ name: updatedCategory.name })
+        .update({
+          name: updatedCategory.name,
+          menu_type: updatedCategory.menu_type,
+        })
         .eq("id", updatedCategory.id);
 
       if (error) {

@@ -6,12 +6,14 @@ import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 
 const MenuPage = () => {
   const { menuData, loading, error } = useSupabaseMenuData();
-  const [activeMenu, setActiveMenu] = useState("aLaCarte");
+  const [activeMenu, setActiveMenu] = useState<
+    "aLaCarte" | "breakfast" | "drinks"
+  >("aLaCarte");
 
   const menus = [
-    { id: "aLaCarte", name: "A La Carte" },
-    { id: "breakfast", name: "Breakfast" },
-    { id: "drinks", name: "Drinks" },
+    { id: "aLaCarte" as const, name: "A La Carte" },
+    { id: "breakfast" as const, name: "Breakfast" },
+    { id: "drinks" as const, name: "Drinks" },
   ];
 
   if (loading) {
@@ -79,24 +81,28 @@ const MenuPage = () => {
             </div>
 
             {menuData
-              .filter((menu) => menu.id === activeMenu)
-              .map((menu) => (
-                <div key={menu.id} className="mb-12">
+              .filter((category) => category.menu_type === activeMenu)
+              .map((category) => (
+                <div key={category.id} className="mb-12">
                   <h2 className="text-2xl font-serif font-bold mb-4 text-irish-red">
-                    {menu.name}
+                    {category.name}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {menu.items.map((item) => (
+                    {category.items.map((item) => (
                       <div
                         key={item.id}
                         className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col md:flex-row"
                       >
-                        <img
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          className="h-24 w-24 object-cover rounded-md mr-4"
-                        />
-                        <div className="p-6 w-full">
+                        {item.image && (
+                          <div className="w-24 h-24 flex-shrink-0">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="p-6 flex-grow">
                           <div className="flex justify-between items-start">
                             <h3 className="text-xl font-bold font-serif text-irish-brown">
                               {item.name}
@@ -108,6 +114,28 @@ const MenuPage = () => {
                           <p className="text-gray-600 mt-2 mb-4">
                             {item.description}
                           </p>
+                          {(item.allergens?.length > 0 ||
+                            item.tags?.length > 0) && (
+                            <div className="mt-2">
+                              {item.allergens?.length > 0 && (
+                                <div className="text-xs text-gray-500">
+                                  Allergens: {item.allergens.join(", ")}
+                                </div>
+                              )}
+                              {item.tags?.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {item.tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

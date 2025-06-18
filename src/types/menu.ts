@@ -1,4 +1,3 @@
-
 export type MenuItem = {
   id: number;
   name: string;
@@ -12,6 +11,7 @@ export type MenuItem = {
 export type MenuCategory = {
   id: string;
   name: string;
+  menu_type: "aLaCarte" | "breakfast" | "drinks";
   items: MenuItem[];
 };
 
