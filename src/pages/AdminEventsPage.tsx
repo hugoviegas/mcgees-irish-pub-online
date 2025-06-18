@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEventsData } from "../hooks/useEventsData";
 import { Event } from "../types/events";
@@ -78,3 +79,4 @@ export default function AdminEventsPage() {
       </div>
     </div>
   );
+}

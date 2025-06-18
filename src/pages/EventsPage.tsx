@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Calendar, Music } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -7,76 +8,6 @@ import { format } from "date-fns";
 
 const EventsPage = () => {
   const { events, loading, error } = useEventsData();
-    {
-      id: 1,
-      title: "Live Music: The Dublin Rogues",
-      date: "May 22, 2025",
-      time: "8:00 PM - 11:00 PM",
-      description: "Join us for a night of traditional Irish folk music with The Dublin Rogues. Enjoy their energetic performances of classic Irish ballads, jigs, and reels that will have you dancing and singing along.",
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
-      icon: "music"
-    },
-    {
-      id: 2,
-      title: "Live Music: Celtic Whispers",
-      date: "May 29, 2025",
-      time: "8:00 PM - 11:00 PM",
-      description: "Experience the haunting melodies and beautiful harmonies of Celtic Whispers. This talented duo combines traditional instruments with contemporary arrangements for a magical evening of Irish music.",
-      image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aXJpc2glMjBtdXNpY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      icon: "music"
-    },
-    {
-      id: 3,
-      title: "St. Patrick's Day Celebration",
-      date: "March 17, 2026",
-      time: "12:00 PM - 2:00 AM",
-      description: "Our biggest event of the year! Join us for a full day of Irish celebration featuring live music, traditional dance performances, special menu items, and of course, plenty of Guinness. Wear your green and celebrate with us!",
-      image: "https://images.unsplash.com/photo-1553376419-ef94dc29326f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c3QlMjBwYXRyaWNrJ3MlMjBkYXl8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      icon: "heart"
-    },
-    {
-      id: 4,
-      title: "Irish Whiskey Tasting",
-      date: "Last Thursday of every month",
-      time: "7:00 PM - 9:00 PM",
-      description: "Expand your whiskey knowledge with our expert-led tasting sessions. Sample premium Irish whiskeys while learning about distilling methods, flavor profiles, and the rich history behind each bottle.",
-      image: "https://images.unsplash.com/photo-1582819509237-d9c5f5f1b1c1?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8d2hpc2tleSUyMHRhc3Rpbmd8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      icon: "users"
-    },
-    {
-      id: 5,
-      title: "Traditional Irish Music Session",
-      date: "Every Sunday",
-      time: "4:00 PM - 7:00 PM",
-      description: "Our weekly informal music session welcomes musicians of all levels to join in playing traditional Irish tunes. Bring your instrument or just come to listen and enjoy the authentic Irish atmosphere.",
-      image: "https://images.unsplash.com/photo-1498038116800-4159eb9b2a62?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YWNvdXN0aUMyBtdXNpY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      icon: "headphones"
-    },
-    {
-      id: 6,
-      title: "Quiz Night",
-      date: "Every Tuesday",
-      time: "8:00 PM - 10:00 PM",
-      description: "Test your knowledge with our weekly quiz night covering a variety of topics including Irish history, culture, sports, and general trivia. Form a team and compete for prizes and pub bragging rights!",
-      image: "https://images.unsplash.com/photo-1606326608690-4e0281b1e588?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cXVpeiUyMG5pZ2h0fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      icon: "calendar"
-    }
-  ];
-
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case "music":
-        return <Music className="h-6 w-6" />;
-      case "heart":
-        return <Heart className="h-6 w-6" />;
-      case "users":
-        return <Users className="h-6 w-6" />;
-      case "headphones":
-        return <Headphones className="h-6 w-6" />;
-      default:
-        return <Calendar className="h-6 w-6" />;
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -142,7 +73,7 @@ const EventsPage = () => {
                           </span>
                         </div>
                       
-                      <p className="text-gray-600 mb-6">{event.description}</p>
+                      <p className="text-gray-600 mb-6">Add event description to display here.</p>
                       
                       <div className="flex flex-wrap gap-3">
                         <Button asChild className="bg-irish-red hover:bg-irish-red/90 text-white">

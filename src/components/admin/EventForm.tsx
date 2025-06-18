@@ -1,9 +1,10 @@
+
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Card } from "./ui/card";
-import { EventFormData } from "../types/events";
-import { useToast } from "../hooks/use-toast";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Card } from "../ui/card";
+import { EventFormData } from "../../types/events";
+import { useToast } from "../../hooks/use-toast";
 
 interface EventFormProps {
   onSubmit: (data: EventFormData) => Promise<void>;
