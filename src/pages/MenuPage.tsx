@@ -21,16 +21,17 @@ const MenuPage = () => {
     (category) => category.menu_type === activeMenu
   );
 
-  if (loading) {
-    return (
+  if (loading) {    return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-grow pt-16 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading menu...</p>
-          </div>
-        </main>
+        <div className="mt-[60px] md:mt-[72px]">
+          <main className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading menu...</p>
+            </div>
+          </main>
+        </div>
         <Footer />
       </div>
     );
@@ -39,13 +40,14 @@ const MenuPage = () => {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow pt-16 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </div>
-        </main>
+        <Navbar />        <div className="mt-[60px] md:mt-[72px]">
+          <main className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Try Again</Button>
+            </div>
+          </main>
+        </div>
         <Footer />
       </div>
     );
@@ -54,8 +56,9 @@ const MenuPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-16">
-        <section className="bg-irish-red py-16">
+      <div className="mt-[60px] md:mt-[72px]">
+        <main className="flex-grow">
+          <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">
               Our Menu

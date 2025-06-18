@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Calendar, Music, Heart, Users, Headphones } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -58,7 +57,7 @@ const EventsPage = () => {
       date: "Every Sunday",
       time: "4:00 PM - 7:00 PM",
       description: "Our weekly informal music session welcomes musicians of all levels to join in playing traditional Irish tunes. Bring your instrument or just come to listen and enjoy the authentic Irish atmosphere.",
-      image: "https://images.unsplash.com/photo-1498038116800-4159eb9b2a62?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YWNvdXN0aWMlMjBtdXNpY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      image: "https://images.unsplash.com/photo-1498038116800-4159eb9b2a62?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YWNvdXN0aUMyBtdXNpY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       icon: "headphones"
     },
     {
@@ -90,9 +89,9 @@ const EventsPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
-      <main className="flex-grow pt-24">
-        <section className="bg-irish-red py-16">
+      <div className="mt-[60px] md:mt-[72px]">
+        <main className="flex-grow">
+          <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">Events & Entertainment</h1>
             <p className="text-white text-xl max-w-2xl mx-auto">

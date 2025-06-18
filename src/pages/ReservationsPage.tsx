@@ -37,7 +37,8 @@ const ReservationsPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-grow pt-24">
+      <div className="mt-[60px] md:mt-[72px]">
+        <main className="flex-grow">
         <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">Make a Reservation</h1>
