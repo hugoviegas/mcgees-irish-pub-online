@@ -46,7 +46,9 @@ const MenuPage = () => {
           <main className="flex-grow flex items-center justify-center">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
-              <Button onClick={() => window.location.reload()}>Try Again</Button>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
             </div>
           </main>
         </div>

@@ -12,20 +12,25 @@ import { toast } from "sonner";
 
 const AdminMenuPage = () => {
   const { logout, isAuthenticated, loading: authLoading } = useAuth();
-  const { 
-    menuData, 
-    loading, 
+  const {
+    menuData,
+    loading,
     error,
-    addCategory, 
-    updateCategory, 
-    deleteCategory, 
-    addMenuItem, 
-    updateMenuItem, 
-    deleteMenuItem 
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
   } = useSupabaseMenuData();
   const [activeTab, setActiveTab] = useState("categories");
-  const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(null);
-  const [editingItem, setEditingItem] = useState<{ item: MenuItem; categoryId: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(
+    null
+  );
+  const [editingItem, setEditingItem] = useState<{
+    item: MenuItem;
+    categoryId: string;
+  } | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showItemForm, setShowItemForm] = useState<string | null>(null);
 
@@ -47,9 +52,13 @@ const AdminMenuPage = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
-          <p className="text-gray-600 mb-4">You must be logged in to access the admin panel.</p>
-          <Button onClick={() => window.location.href = '/'}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-4">
+            You must be logged in to access the admin panel.
+          </p>
+          <Button onClick={() => (window.location.href = "/")}>
             Go to Home
           </Button>
         </div>
@@ -69,8 +78,11 @@ const AdminMenuPage = () => {
       setEditingCategory(null);
       setShowCategoryForm(false);
     } catch (err) {
-      console.error('Error saving category:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save category. Please try again.';
+      console.error("Error saving category:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to save category. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -87,8 +99,11 @@ const AdminMenuPage = () => {
       setEditingItem(null);
       setShowItemForm(null);
     } catch (err) {
-      console.error('Error saving item:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save menu item. Please try again.';
+      console.error("Error saving item:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to save menu item. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -98,8 +113,11 @@ const AdminMenuPage = () => {
       await deleteCategory(categoryId);
       toast.success("Category deleted successfully!");
     } catch (err) {
-      console.error('Error deleting category:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete category. Please try again.';
+      console.error("Error deleting category:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to delete category. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -109,8 +127,11 @@ const AdminMenuPage = () => {
       await deleteMenuItem(categoryId, itemId);
       toast.success("Menu item deleted successfully!");
     } catch (err) {
-      console.error('Error deleting menu item:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete menu item. Please try again.';
+      console.error("Error deleting menu item:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to delete menu item. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -144,8 +165,12 @@ const AdminMenuPage = () => {
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-irish-red mb-2">Menu Administration</h1>
-              <p className="text-gray-600">Manage your restaurant's menu categories and items</p>
+              <h1 className="text-3xl font-bold text-irish-red mb-2">
+                Menu Administration
+              </h1>
+              <p className="text-gray-600">
+                Manage your restaurant's menu categories and items
+              </p>
             </div>
             <Button
               onClick={logout}
@@ -166,7 +191,7 @@ const AdminMenuPage = () => {
 
           <TabsContent value="categories">
             <div className="mb-6">
-              <Button 
+              <Button
                 onClick={() => setShowCategoryForm(true)}
                 className="bg-irish-red hover:bg-irish-red/90"
               >
@@ -177,7 +202,10 @@ const AdminMenuPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuData.map((category) => (
-                <Card key={category.id} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={category.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                       <span>{category.name}</span>
@@ -237,33 +265,51 @@ const AdminMenuPage = () => {
                   </CardHeader>
                   <CardContent>
                     {category.items.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">No items in this category</p>
+                      <p className="text-gray-500 text-center py-8">
+                        No items in this category
+                      </p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {category.items.map((item) => (
-                          <Card key={item.id} className="border border-gray-200">
+                          <Card
+                            key={item.id}
+                            className="border border-gray-200"
+                          >
                             <CardContent className="p-4">
                               <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-semibold text-irish-brown">{item.name}</h4>
+                                <h4 className="font-semibold text-irish-brown">
+                                  {item.name}
+                                </h4>
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => setEditingItem({ item, categoryId: category.id })}
+                                    onClick={() =>
+                                      setEditingItem({
+                                        item,
+                                        categoryId: category.id,
+                                      })
+                                    }
                                   >
                                     <Edit2 className="w-4 h-4" />
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="destructive"
-                                    onClick={() => handleDeleteMenuItem(category.id, item.id)}
+                                    onClick={() =>
+                                      handleDeleteMenuItem(category.id, item.id)
+                                    }
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
                                 </div>
                               </div>
-                              <p className="text-sm text-gray-600 mb-2">{item.description}</p>
-                              <p className="font-medium text-irish-red">{item.price}</p>
+                              <p className="text-sm text-gray-600 mb-2">
+                                {item.description}
+                              </p>
+                              <p className="font-medium text-irish-red">
+                                {item.price}
+                              </p>
                               {item.allergens && item.allergens.length > 0 && (
                                 <p className="text-xs text-gray-500 mt-2">
                                   Allergens: {item.allergens.join(", ")}
@@ -272,7 +318,10 @@ const AdminMenuPage = () => {
                               {item.tags && item.tags.length > 0 && (
                                 <div className="flex gap-1 mt-2">
                                   {item.tags.map((tag) => (
-                                    <span key={tag} className="px-2 py-1 text-xs bg-gray-100 rounded">
+                                    <span
+                                      key={tag}
+                                      className="px-2 py-1 text-xs bg-gray-100 rounded"
+                                    >
                                       {tag}
                                     </span>
                                   ))}
