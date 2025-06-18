@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 import Index from "./pages/Index";
 import MenuPage from "./pages/MenuPage";
 import AdminMenuPage from "./pages/AdminMenuPage";
+import AdminEventsPage from "./pages/AdminEventsPage";
 import EventsPage from "./pages/EventsPage";
 import AboutPage from "./pages/AboutPage";
 import ReservationsPage from "./pages/ReservationsPage";
@@ -25,12 +25,23 @@ const App = () => (
           <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/menu" element={<MenuPage />} />
-            <Route path="/admin/menu" element={
-              <ProtectedRoute>
-                <AdminMenuPage />
-              </ProtectedRoute>
-            } />
+            <Route path="/menu" element={<MenuPage />} />{" "}
+            <Route
+              path="/admin/menu"
+              element={
+                <ProtectedRoute>
+                  <AdminMenuPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/events"
+              element={
+                <ProtectedRoute>
+                  <AdminEventsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/reservations" element={<ReservationsPage />} />

@@ -1,20 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Calendar, Music, Heart, Users, Headphones } from "lucide-react";
+import { Calendar, Music } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
-type Event = {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  description: string;
-  image: string;
-  icon: "music" | "heart" | "users" | "headphones" | "calendar";
-};
+import { useEventsData } from "../hooks/useEventsData";
+import { format } from "date-fns";
 
 const EventsPage = () => {
-  const events: Event[] = [
+  const { events, loading, error } = useEventsData();
     {
       id: 1,
       title: "Live Music: The Dublin Rogues",
@@ -109,38 +101,46 @@ const EventsPage = () => {
                 Join us for these upcoming events and experience the best of Irish hospitality.
               </p>
             </div>
-            
-            <div className="space-y-8 mb-16">
-              {events.map((event) => (
-                <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="md:w-1/3 h-64 md:h-auto">
-                      <img 
-                        src={event.image} 
-                        alt={event.title} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="md:w-2/3 p-6">
-                      <div className="flex items-center mb-2">
-                        <div className="mr-3 bg-irish-gold/20 text-irish-gold p-2 rounded-full">
-                          {getIcon(event.icon)}
+              {loading ? (
+              <div className="text-center py-8">
+                <p>Loading events...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-600">
+                <p>{error}</p>
+              </div>
+            ) : (
+              <div className="space-y-8 mb-16">
+                {events.map((event) => (
+                  <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="md:w-1/3 h-64 md:h-auto">
+                        {event.image_url ? (
+                          <img 
+                            src={event.image_url} 
+                            alt={event.title} 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-irish-gold/20 flex items-center justify-center">
+                            <Music className="h-12 w-12 text-irish-gold" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="md:w-2/3 p-6">
+                        <div className="flex items-center mb-2">
+                          <div className="mr-3 bg-irish-gold/20 text-irish-gold p-2 rounded-full">
+                            <Music className="h-6 w-6" />
+                          </div>
+                          <h3 className="text-2xl font-serif font-bold text-irish-red">{event.title}</h3>
                         </div>
-                        <h3 className="text-2xl font-serif font-bold text-irish-red">{event.title}</h3>
-                      </div>
-                      
-                      <div className="flex flex-wrap items-center mb-4 text-gray-600">
-                        <span className="mr-4 flex items-center">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {event.date}
-                        </span>
-                        <span className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {event.time}
-                        </span>
-                      </div>
+                        
+                        <div className="flex flex-wrap items-center mb-4 text-gray-600">
+                          <span className="mr-4 flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            {format(new Date(event.date), "PPp")}
+                          </span>
+                        </div>
                       
                       <p className="text-gray-600 mb-6">{event.description}</p>
                       
