@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,8 +35,7 @@ const ReservationsPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
-      <div className="mt-[60px] md:mt-[72px]">
+      <div className="pt-16">
         <main className="flex-grow">
         <section className="bg-irish-red py-16">
           <div className="container mx-auto px-4 text-center">
@@ -180,6 +178,7 @@ const ReservationsPage = () => {
       </main>
       
       <Footer />
+      </div>
     </div>
   );
 };

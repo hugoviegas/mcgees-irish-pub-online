@@ -1,4 +1,3 @@
-
 import Hero from "../components/Hero";
 import AboutSection from "../components/AboutSection";
 import MenuPreview from "../components/MenuPreview";
@@ -13,15 +12,17 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <Hero />
-      <main>
-        <AboutSection />
-        <MenuPreview />
-        <EventsSection />
-        <TestimonialsSection />
-        <LocationSection />
-        <CTASection />
-      </main>
+      <div className="pt-16">
+        <Hero />
+        <main>
+          <AboutSection />
+          <MenuPreview />
+          <EventsSection />
+          <TestimonialsSection />
+          <LocationSection />
+          <CTASection />
+        </main>
+      </div>
       <Footer />
     </div>
   );
