@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Plus, Edit2, Trash2, LogOut, AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
@@ -12,7 +12,7 @@ import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { toast } from "sonner";
 
 const AdminMenuPage = () => {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated, loading: authLoading } = useAuth();
   const { 
     menuData, 
     loading, 
@@ -29,26 +29,34 @@ const AdminMenuPage = () => {
   const [editingItem, setEditingItem] = useState<{ item: MenuItem; categoryId: string } | null>(null);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showItemForm, setShowItemForm] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    // Check authentication status
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-      console.log('Authentication status:', !!user);
-    };
-    
-    checkAuth();
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session?.user);
-      console.log('Auth state changed:', event, !!session?.user);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Show authentication error if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
+          <p className="text-gray-600 mb-4">You must be logged in to access the admin panel.</p>
+          <Button onClick={() => window.location.href = '/'}>
+            Go to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const handleSaveCategory = async (category: MenuCategory) => {
     try {
@@ -107,34 +115,6 @@ const AdminMenuPage = () => {
       toast.error(errorMessage);
     }
   };
-
-  // Show loading while checking authentication
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show authentication error if not authenticated
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
-          <p className="text-gray-600 mb-4">You must be logged in to access the admin panel.</p>
-          <Button onClick={() => window.location.href = '/'}>
-            Go to Home
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (

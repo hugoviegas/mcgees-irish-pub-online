@@ -7,21 +7,24 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
 
 const LoginForm = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
-    const success = login(username, password);
-    if (!success) {
-      setError('Invalid username or password');
+    const result = await login(email, password);
+    if (result.error) {
+      setError(result.error);
       setPassword('');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -35,13 +38,14 @@ const LoginForm = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Username</label>
+              <label className="block text-sm font-medium mb-2">Email</label>
               <Input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -54,6 +58,7 @@ const LoginForm = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password"
                   required
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -61,6 +66,7 @@ const LoginForm = () => {
                   size="sm"
                   className="absolute right-0 top-0 h-full px-3"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
@@ -74,10 +80,17 @@ const LoginForm = () => {
             <Button 
               type="submit" 
               className="w-full bg-irish-red hover:bg-irish-red/90"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? 'Signing in...' : 'Login'}
             </Button>
           </form>
+          
+          <div className="mt-4 text-center text-sm text-gray-600">
+            <p>Demo credentials:</p>
+            <p>Email: admin@darcymcgees.ie</p>
+            <p>Password: admin123</p>
+          </div>
         </CardContent>
       </Card>
     </div>
