@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -13,16 +14,24 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
     
+    console.log('Attempting login with:', { email, password: '***' });
+    
     const result = await login(email, password);
     if (result.error) {
+      console.error('Login failed:', result.error);
       setError(result.error);
       setPassword('');
+    } else {
+      console.log('Login successful, redirecting to admin menu...');
+      // Force navigation to admin menu page
+      navigate('/admin/menu', { replace: true });
     }
     setIsLoading(false);
   };
@@ -88,7 +97,7 @@ const LoginForm = () => {
           
           <div className="mt-4 text-center text-sm text-gray-600">
             <p>Demo credentials:</p>
-            <p>Email: admin@darcymcgees.ie</p>
+            <p>Email: darcymcgeespub@gmail.com</p>
             <p>Password: admin123</p>
           </div>
         </CardContent>

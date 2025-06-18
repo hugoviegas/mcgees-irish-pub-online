@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from './LoginForm';
 
 interface ProtectedRouteProps {
@@ -9,6 +10,18 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log('ProtectedRoute: Auth state changed:', { isAuthenticated, loading, path: location.pathname });
+    
+    // If we're authenticated and on a login page, redirect to admin menu
+    if (isAuthenticated && !loading && location.pathname === '/admin/login') {
+      console.log('ProtectedRoute: Redirecting authenticated user to admin menu');
+      navigate('/admin/menu', { replace: true });
+    }
+  }, [isAuthenticated, loading, location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -22,9 +35,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    console.log('ProtectedRoute: User not authenticated, showing login form');
     return <LoginForm />;
   }
 
+  console.log('ProtectedRoute: User authenticated, showing protected content');
   return <>{children}</>;
 };
 
