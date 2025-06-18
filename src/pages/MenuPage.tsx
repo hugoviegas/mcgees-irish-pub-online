@@ -16,6 +16,11 @@ const MenuPage = () => {
     { id: "drinks" as const, name: "Drinks" },
   ];
 
+  // Filter categories based on active menu
+  const currentMenuCategories = menuData.filter(
+    (category) => category.menu_type === activeMenu
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -80,9 +85,8 @@ const MenuPage = () => {
               ))}
             </div>
 
-            {menuData
-              .filter((category) => category.menu_type === activeMenu)
-              .map((category) => (
+            {currentMenuCategories.length > 0 ? (
+              currentMenuCategories.map((category) => (
                 <div key={category.id} className="mb-12">
                   <h2 className="text-2xl font-serif font-bold mb-4 text-irish-red">
                     {category.name}
@@ -141,7 +145,12 @@ const MenuPage = () => {
                     ))}
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <p className="text-center text-gray-600">
+                No items available for this menu yet.
+              </p>
+            )}
           </div>
         </section>
 

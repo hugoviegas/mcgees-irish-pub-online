@@ -7,14 +7,12 @@ export const useSupabaseMenuData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const activeMenu = "dine_in"; // Example: set your active menu type here
-
   const fetchMenuData = async () => {
     try {
       setLoading(true);
       console.log("Fetching menu data from Supabase...");
 
-      // Fetch categories
+      // Fetch categories with their menu_type
       const { data: categories, error: categoriesError } = await supabase
         .from("menu_categories")
         .select("*")
@@ -25,13 +23,17 @@ export const useSupabaseMenuData = () => {
         throw categoriesError;
       }
 
-      console.log("Categories fetched:", categories);
-
-      // Fetch menu items with menu_type filter
+      // Fetch all menu items
       const { data: items, error: itemsError } = await supabase
         .from("menu_items")
-        .select("*, menu_categories!inner(*)")
-        .eq("menu_categories.menu_type", activeMenu) // Filter by menu type
+        .select(
+          `
+          *,
+          menu_categories (
+            menu_type
+          )
+        `
+        )
         .order("id");
 
       if (itemsError) {
@@ -39,29 +41,25 @@ export const useSupabaseMenuData = () => {
         throw itemsError;
       }
 
-      console.log("Items fetched:", items);
+      // Group items by menu type and category
+      const menuWithItems = categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        menu_type: category.menu_type,
+        items: items
+          .filter((item) => item.category_id === category.id)
+          .map((item) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            image: item.image || "/placeholder.svg",
+            tags: item.tags || [],
+            allergens: item.allergens || [],
+          })),
+      }));
 
-      // Update the menuWithItems to include menu_type
-      const menuWithItems: MenuCategory[] = (categories || [])
-        .filter((category) => category.menu_type === activeMenu) // Filter categories by menu type
-        .map((category) => ({
-          id: category.id,
-          name: category.name,
-          menu_type: category.menu_type,
-          items: (items || [])
-            .filter((item) => item.category_id === category.id)
-            .map((item) => ({
-              id: item.id,
-              name: item.name,
-              description: item.description,
-              price: item.price,
-              image: item.image || "/placeholder.svg", // Default image if none provided
-              tags: item.tags || [],
-              allergens: item.allergens || [],
-            })),
-        }));
-
-      console.log("Final menu data:", menuWithItems);
+      console.log("Processed menu data:", menuWithItems);
       setMenuData(menuWithItems);
       setError(null);
     } catch (err) {
