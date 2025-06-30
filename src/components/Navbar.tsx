@@ -32,6 +32,11 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center">
+          <img
+            src="/lovable-uploads/bar-img1.jpg"
+            alt="D'Arcy McGee's pub interior"
+            className="h-10 w-auto mr-3 rounded shadow-md object-cover"
+          />
           <h1 className="text-xl md:text-2xl font-bold text-irish-gold font-serif">
             D'Arcy McGee's
           </h1>
