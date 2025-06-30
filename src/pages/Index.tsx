@@ -12,17 +12,15 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="pt-16">
-        <Hero />
-        <main>
-          <AboutSection />
-          <MenuPreview />
-          <EventsSection />
-          <TestimonialsSection />
-          <LocationSection />
-          <CTASection />
-        </main>
-      </div>
+      <Hero />
+      <main>
+        <AboutSection />
+        <MenuPreview />
+        <EventsSection />
+        <TestimonialsSection />
+        <LocationSection />
+        <CTASection />
+      </main>
       <Footer />
     </div>
   );
