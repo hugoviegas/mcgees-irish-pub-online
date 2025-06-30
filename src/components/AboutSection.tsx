@@ -8,7 +8,7 @@ const AboutSection = () => {
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
             <img
-              src="/lovable-uploads/bar-img1.jpg"
+              src="/darcy-uploads/bar-img1.jpg"
               alt="D'Arcy McGee's pub interior"
               className="rounded-lg shadow-xl"
             />

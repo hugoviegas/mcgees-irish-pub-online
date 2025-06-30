@@ -7,7 +7,7 @@ const Hero = () => {
       <div
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{
-          backgroundImage: "url('/lovable-uploads/front-door.png')",
+          backgroundImage: "url('/darcy-uploads/front-door.png')",
         }}
       >
         <div className="absolute inset-0 bg-black/50 z-10"></div>
@@ -17,7 +17,7 @@ const Hero = () => {
         <div className="text-center">
           <div className="mb-6 flex justify-center">
             <img
-              src="/lovable-uploads/logo.png"
+              src="/darcy-uploads/logo.png"
               alt="D'Arcy McGee's"
               className="h-32 md:h-40"
             />

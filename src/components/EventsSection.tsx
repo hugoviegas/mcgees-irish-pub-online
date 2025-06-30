@@ -79,7 +79,7 @@ const EventsSection = () => {
                   />
                 ) : (
                   <img
-                    src="/lovable-uploads/bar-img1.jpg"
+                    src="/darcy-uploads/bar-img1.jpg"
                     alt="Live music at D'Arcy McGee's"
                     className="w-full h-full object-cover"
                   />
