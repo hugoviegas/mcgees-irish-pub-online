@@ -10,7 +10,6 @@ const ReservationsPage = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
     date: "",
     time: "",
@@ -64,18 +63,6 @@ const ReservationsPage = () => {
                         id="name"
                         name="name"
                         value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
                         onChange={handleChange}
                         required
                       />

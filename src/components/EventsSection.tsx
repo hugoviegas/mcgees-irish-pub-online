@@ -63,9 +63,9 @@ const EventsSection = () => {
                 </Button>
                 <Button
                   asChild
-                  className="border-irish-green text-irish-green hover:bg-irish-green hover:text-white border"
+                  className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red border-irish-gold border"
                 >
-                  <a href="tel:+35312345678">Book a Table: (01) 234-5678</a>
+                  <a href="tel:+35314907727">Book a Table: (01) 490 7727</a>
                 </Button>
               </div>
             </div>
