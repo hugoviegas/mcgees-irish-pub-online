@@ -69,7 +69,7 @@ const MenuPage = () => {
           <section className="bg-irish-red py-16">
             <div className="container mx-auto px-4 text-center">
               <h1 className="text-5xl md:text-6xl font-bold font-serif text-irish-gold mb-4 tracking-tight drop-shadow-lg">
-                IRISH STRAUT MENU
+                OUR MENU
               </h1>
               <p className="text-white text-xl max-w-2xl mx-auto font-light">
                 Authentic Irish food and drink made with the finest ingredients
@@ -123,7 +123,7 @@ const MenuPage = () => {
                                 {item.name}
                               </h3>
                               <span className="text-2xl font-semibold text-irish-red ml-2">
-                                €{item.price}
+                                {item.price}
                               </span>
                             </div>
                             <p className="text-gray-700 text-base mb-4 font-light min-h-[48px]">
