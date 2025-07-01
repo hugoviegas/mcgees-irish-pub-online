@@ -9,6 +9,10 @@ const MenuPage = () => {
   const [activeMenu, setActiveMenu] = useState<
     "aLaCarte" | "breakfast" | "drinks"
   >("aLaCarte");
+  const [allergyPopup, setAllergyPopup] = useState<null | {
+    name: string;
+    allergens: string[];
+  }>();
 
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
@@ -58,34 +62,34 @@ const MenuPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#f8f5f2]">
       <Navbar />
       <div className="pt-16">
         <main className="flex-grow">
           <section className="bg-irish-red py-16">
             <div className="container mx-auto px-4 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold font-serif text-irish-gold mb-6">
-                Our Menu
+              <h1 className="text-5xl md:text-6xl font-bold font-serif text-irish-gold mb-4 tracking-tight drop-shadow-lg">
+                IRISH STRAUT MENU
               </h1>
-              <p className="text-white text-xl max-w-2xl mx-auto">
+              <p className="text-white text-xl max-w-2xl mx-auto font-light">
                 Authentic Irish food and drink made with the finest ingredients
                 and traditional recipes.
               </p>
             </div>
           </section>
 
-          <section className="py-12 bg-gray-50">
+          <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
-              <div className="flex justify-center space-x-4 mb-8">
+              <div className="flex justify-center space-x-4 mb-10">
                 {menus.map((menu) => (
                   <button
                     key={menu.id}
                     onClick={() => setActiveMenu(menu.id)}
-                    className={`px-4 py-2 text-sm md:text-lg font-serif ${
+                    className={`px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold ${
                       activeMenu === menu.id
                         ? "bg-irish-red text-white"
-                        : "bg-gray-200 text-gray-700"
-                    } rounded-md hover:bg-irish-red hover:text-white transition-colors`}
+                        : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
+                    }`}
                   >
                     {menu.name}
                   </button>
@@ -94,59 +98,70 @@ const MenuPage = () => {
 
               {currentMenuCategories.length > 0 ? (
                 currentMenuCategories.map((category) => (
-                  <div key={category.id} className="mb-12">
-                    <h2 className="text-2xl font-serif font-bold mb-4 text-irish-red">
+                  <div key={category.id} className="mb-16">
+                    <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">
                       {category.name}
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                       {category.items.map((item) => (
                         <div
                           key={item.id}
-                          className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col md:flex-row"
+                          className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-2xl transition-shadow"
                         >
                           {item.image && (
-                            <div className="w-24 h-24 flex-shrink-0">
+                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>
                           )}
-                          <div className="p-6 flex-grow">
-                            <div className="flex justify-between items-start">
-                              <h3 className="text-xl font-bold font-serif text-irish-brown">
+                          <div className="p-6 flex flex-col flex-grow">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className="text-2xl font-bold font-serif text-irish-brown leading-tight">
                                 {item.name}
                               </h3>
-                              <span className="text-xl font-medium text-irish-red">
-                                {item.price}
+                              <span className="text-2xl font-semibold text-irish-red ml-2">
+                                €{item.price}
                               </span>
                             </div>
-                            <p className="text-gray-600 mt-2 mb-4">
+                            <p className="text-gray-700 text-base mb-4 font-light min-h-[48px]">
                               {item.description}
                             </p>
-                            {(item.allergens?.length > 0 ||
-                              item.tags?.length > 0) && (
-                              <div className="mt-2">
-                                {item.allergens?.length > 0 && (
-                                  <div className="text-xs text-gray-500">
-                                    Allergens: {item.allergens.join(", ")}
-                                  </div>
-                                )}
-                                {item.tags?.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 mt-2">
-                                    {item.tags.map((tag) => (
-                                      <span
-                                        key={tag}
-                                        className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700"
-                                      >
-                                        {tag}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            <div className="flex items-center gap-3 mt-auto">
+                              {item.allergens?.length > 0 && (
+                                <>
+                                  <span className="text-xs text-irish-red font-bold bg-irish-gold/20 rounded-full px-2 py-1 mr-1">
+                                    {item.allergens.join(", ")}
+                                  </span>
+                                  <button
+                                    className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
+                                    onClick={() =>
+                                      setAllergyPopup({
+                                        name: item.name,
+                                        allergens: item.allergens,
+                                      })
+                                    }
+                                    aria-label={`Show allergies for ${item.name}`}
+                                  >
+                                    Allergies
+                                  </button>
+                                </>
+                              )}
+                              {item.tags?.length > 0 && (
+                                <div className="flex flex-wrap gap-1 ml-2">
+                                  {item.tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -154,14 +169,37 @@ const MenuPage = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-600">
+                <p className="text-center text-gray-600 text-lg mt-12">
                   No items available for this menu yet.
                 </p>
               )}
             </div>
+
+            {/* Allergy Popup Modal */}
+            {allergyPopup && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in">
+                  <button
+                    className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
+                    onClick={() => setAllergyPopup(null)}
+                    aria-label="Close allergy popup"
+                  >
+                    ×
+                  </button>
+                  <h4 className="text-lg font-bold font-serif mb-4 text-irish-red">
+                    Allergens for {allergyPopup.name}
+                  </h4>
+                  <ul className="list-disc pl-5 text-gray-700 text-base">
+                    {allergyPopup.allergens.map((a, i) => (
+                      <li key={i}>{a}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </section>
 
-          <section className="py-12 bg-gray-50">
+          <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red">
                 Hours of Service
