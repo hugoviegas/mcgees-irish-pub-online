@@ -106,6 +106,16 @@ const Footer = () => {
               >
                 Privacy Policy
               </Link>
+              {/* Hidden Management Link */}
+              <Link
+                to="/admin"
+                className="text-sm text-gray-300 hover:text-irish-gold hidden md:inline-block"
+                tabIndex={-1}
+                aria-hidden="true"
+                style={{ opacity: 0.2 }}
+              >
+                Management
+              </Link>
             </div>
           </div>
         </div>

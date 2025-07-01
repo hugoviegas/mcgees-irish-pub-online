@@ -13,6 +13,7 @@ import EventsPage from "./pages/EventsPage";
 import AboutPage from "./pages/AboutPage";
 import ReservationsPage from "./pages/ReservationsPage";
 import NotFound from "./pages/NotFound";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminEventsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               }
             />
