@@ -6,16 +6,19 @@ const MENU_SHORTCUTS = [
     id: "aLaCarte",
     name: "A La Carte",
     to: "/menu#aLaCarte",
+    match: ["Starters", "Main Courses"],
   },
   {
     id: "breakfast",
     name: "Breakfast",
     to: "/menu#breakfast",
+    match: ["Breakfast"],
   },
   {
     id: "drinks",
     name: "Drinks",
     to: "/menu#drinks",
+    match: ["Drinks"],
   },
 ];
 
@@ -41,6 +44,14 @@ const MenuPreview = () => {
     },
   ];
 
+  // Helper to get the correct menu shortcut for each card
+  const getMenuShortcut = (categoryName: string) => {
+    return (
+      MENU_SHORTCUTS.find((menu) => menu.match.includes(categoryName)) ||
+      MENU_SHORTCUTS[0]
+    );
+  };
+
   return (
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -54,58 +65,36 @@ const MenuPreview = () => {
             everyone.
           </p>
         </div>
-
-        {/* Menu Shortcuts Row */}
-        <div className="flex flex-row items-center justify-center gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold mb-12 px-2 w-full">
-          {MENU_SHORTCUTS.map((menu) => (
-            <Button
-              asChild
-              key={menu.id}
-              className="px-6 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap bg-white text-irish-red hover:bg-irish-red hover:text-white transition-colors"
-            >
-              <Link to={menu.to}>{menu.name}</Link>
-            </Button>
-          ))}
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {menuCategories.map((category) => (
-            <div
-              key={category.name}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <div className="h-60 overflow-hidden">
-                <img
-                  src={category.image}
-                  alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                />
+          {menuCategories.map((category) => {
+            const shortcut = getMenuShortcut(category.name);
+            return (
+              <div
+                key={category.name}
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                <div className="h-60 overflow-hidden">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold font-serif mb-2 text-irish-brown">
+                    {category.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4">{category.description}</p>
+                  <Button
+                    asChild
+                    className="px-6 py-3 text-lg font-serif font-bold rounded-full shadow border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap bg-white text-irish-red hover:bg-irish-red hover:text-white transition-colors"
+                  >
+                    <Link to={shortcut.to}>{shortcut.name}</Link>
+                  </Button>
+                </div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold font-serif mb-2 text-irish-brown">
-                  {category.name}
-                </h3>
-                <p className="text-gray-600 mb-4">{category.description}</p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-irish-red text-irish-red hover:bg-irish-red hover:text-white"
-                >
-                  <Link to="/menu">Explore {category.name}</Link>
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <Button
-            asChild
-            size="lg"
-            className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red"
-          >
-            <Link to="/menu">View Full Menu</Link>
-          </Button>
+            );
+          })}
         </div>
       </div>
     </section>
