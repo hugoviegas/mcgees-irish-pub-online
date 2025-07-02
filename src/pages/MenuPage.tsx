@@ -39,6 +39,9 @@ const MenuPage = () => {
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
 
+  // Add refs for each menu button
+  const menuButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
     { id: "breakfast" as const, name: "Breakfast" },
@@ -148,7 +151,8 @@ const MenuPage = () => {
                     return (
                       <div key={menu.id} className="relative flex-shrink-0">
                         <button
-                          className={`min-w-[140px] max-w-[180px] w-full sm:w-[180px] px-4 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center ${
+                          ref={(el) => (menuButtonRefs.current[menu.id] = el)}
+                          className={`px-6 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
                             isActive
                               ? "bg-irish-red text-white"
                               : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
@@ -160,7 +164,6 @@ const MenuPage = () => {
                               activeMenu === menu.id ? !open : true
                             );
                           }}
-                          style={{ whiteSpace: "nowrap" }}
                         >
                           {menu.name}
                           {isActive && activeSectionName}
@@ -179,9 +182,9 @@ const MenuPage = () => {
                           </svg>
                         </button>
                         {isActive && dropdownOpen && (
-                          <div
-                            className="fixed left-1/2 top-[70px] z-[9999] w-[220px] sm:w-[260px] -translate-x-1/2 bg-white border border-gray-200 rounded shadow-lg"
-                            style={{ maxHeight: "60vh", overflowY: "auto" }}
+                          <DropdownMenu
+                            anchorRef={menuButtonRefs.current[menu.id]}
+                            onClose={() => setDropdownOpen(false)}
                           >
                             {menuCategories.map((category) => (
                               <button
@@ -201,7 +204,7 @@ const MenuPage = () => {
                                 {category.name}
                               </button>
                             ))}
-                          </div>
+                          </DropdownMenu>
                         )}
                       </div>
                     );
@@ -466,5 +469,59 @@ const MenuPage = () => {
     </div>
   );
 };
+
+// DropdownMenu component (add at the top of the file or in a components folder)
+function DropdownMenu({ anchorRef, children, onClose }) {
+  const menuRef = React.useRef(null);
+
+  React.useEffect(() => {
+    function handleClick(e) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target) &&
+        (!anchorRef || !anchorRef.contains(e.target))
+      ) {
+        onClose();
+      }
+    }
+    function handleScroll() {
+      onClose();
+    }
+    document.addEventListener("mousedown", handleClick);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [anchorRef, onClose]);
+
+  // Position dropdown below anchor
+  const [style, setStyle] = React.useState({});
+  React.useLayoutEffect(() => {
+    if (anchorRef && menuRef.current) {
+      const rect = anchorRef.getBoundingClientRect();
+      setStyle({
+        position: "fixed",
+        top: rect.bottom + 8,
+        left: rect.left + rect.width / 2,
+        transform: "translateX(-50%)",
+        zIndex: 9999,
+        minWidth: rect.width,
+        maxHeight: "60vh",
+        overflowY: "auto",
+        background: "white",
+        borderRadius: "0.75rem",
+        boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)",
+        border: "1px solid #e5e7eb",
+      });
+    }
+  }, [anchorRef]);
+
+  return (
+    <div ref={menuRef} style={style}>
+      {children}
+    </div>
+  );
+}
 
 export default MenuPage;
