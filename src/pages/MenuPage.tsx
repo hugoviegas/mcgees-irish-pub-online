@@ -128,37 +128,22 @@ const MenuPage = () => {
 
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
+              {/* Replace menu type buttons and section dropdown with a single dropdown */}
               <div className="sticky top-16 z-50 bg-[#f8f5f2] flex flex-col items-center mb-10 border-b border-irish-gold shadow-sm">
-                {/* Menu type buttons */}
-                <div className="flex justify-center space-x-4 w-full py-2">
-                  {menus.map((menu) => (
-                    <button
-                      key={menu.id}
-                      onClick={() => {
-                        setActiveMenu(menu.id);
-                        setActiveSection(""); // reset section on menu change
-                      }}
-                      className={`px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold ${
-                        activeMenu === menu.id
-                          ? "bg-irish-red text-white"
-                          : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
-                      }`}
-                    >
-                      {menu.name}
-                    </button>
-                  ))}
-                </div>
-                {/* Section dropdown for current menu */}
-                <div className="relative py-2">
+                <div className="relative py-4">
                   <button
-                    className="px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold bg-irish-red text-white flex items-center gap-2"
+                    className="px-8 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold bg-irish-red text-white flex items-center gap-2 min-w-[220px] justify-center"
                     onClick={() => setDropdownOpen((open) => !open)}
                   >
-                    {activeSection
-                      ? currentMenuCategories.find(
-                          (c) => c.id === activeSection
-                        )?.name || menus.find((m) => m.id === activeMenu)?.name
-                      : menus.find((m) => m.id === activeMenu)?.name}
+                    {menus.find((m) => m.id === activeMenu)?.name}
+                    {activeSection &&
+                    currentMenuCategories.find((c) => c.id === activeSection)
+                      ? ` — ${
+                          currentMenuCategories.find(
+                            (c) => c.id === activeSection
+                          )?.name
+                        }`
+                      : ""}
                     <svg
                       className="w-4 h-4 ml-2"
                       fill="none"
@@ -174,18 +159,56 @@ const MenuPage = () => {
                     </svg>
                   </button>
                   {dropdownOpen && (
-                    <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow-lg z-50">
-                      {currentMenuCategories.map((category) => (
-                        <button
-                          key={category.id}
-                          className="block w-full text-left px-4 py-2 hover:bg-irish-gold/20 text-irish-red font-serif"
-                          onClick={() => {
-                            handleSectionSelect(category.id);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          {category.name}
-                        </button>
+                    <div className="absolute left-0 right-0 mt-2 w-full min-w-[220px] bg-white border border-gray-200 rounded shadow-lg z-50">
+                      {/* Menu types */}
+                      {menus.map((menu) => (
+                        <div key={menu.id}>
+                          <button
+                            className={`block w-full text-left px-4 py-2 font-serif font-bold ${
+                              activeMenu === menu.id
+                                ? "text-irish-red bg-irish-gold/10"
+                                : "text-irish-red hover:bg-irish-gold/10"
+                            }`}
+                            onClick={() => {
+                              setActiveMenu(menu.id);
+                              setActiveSection("");
+                              setDropdownOpen(false);
+                              setTimeout(() => {
+                                window.scrollTo({
+                                  top:
+                                    sectionRefs.current[menu.id]?.offsetTop ||
+                                    0,
+                                  behavior: "smooth",
+                                });
+                              }, 100);
+                            }}
+                          >
+                            {menu.name}
+                          </button>
+                          {/* Sections for this menu */}
+                          {activeMenu === menu.id &&
+                            currentMenuCategories.length > 0 && (
+                              <div className="pl-4">
+                                {currentMenuCategories.map((category) => (
+                                  <button
+                                    key={category.id}
+                                    className={`block w-full text-left px-4 py-2 font-serif text-base ${
+                                      activeSection === category.id
+                                        ? "text-irish-red font-bold"
+                                        : "text-irish-brown hover:bg-irish-gold/20"
+                                    }`}
+                                    onClick={() => {
+                                      handleSectionSelect(category.id);
+                                      setActiveSection(category.id);
+                                      setDropdownOpen(false);
+                                    }}
+                                  >
+                                    {category.name}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                        </div>
                       ))}
                     </div>
                   )}
