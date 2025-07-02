@@ -129,78 +129,80 @@ const MenuPage = () => {
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               {/* Replace menu type buttons and section dropdown with a single dropdown */}
-              <div className="sticky top-16 z-50 bg-[#f8f5f2] flex flex-row items-center justify-center gap-6 mb-10 border-b border-irish-gold shadow-sm py-4">
-                {menus.map((menu) => {
-                  const isActive = activeMenu === menu.id;
-                  const menuCategories = menuData.filter(
-                    (cat) => cat.menu_type === menu.id
-                  );
-                  const activeSectionName =
-                    isActive &&
-                    activeSection &&
-                    menuCategories.find((c) => c.id === activeSection)
-                      ? ` — ${
-                          menuCategories.find((c) => c.id === activeSection)
-                            ?.name
-                        }`
-                      : "";
-                  return (
-                    <div key={menu.id} className="relative">
-                      <button
-                        className={`px-8 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 min-w-[180px] justify-center ${
-                          isActive
-                            ? "bg-irish-red text-white"
-                            : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
-                        }`}
-                        onClick={() => {
-                          setActiveMenu(menu.id);
-                          setActiveSection("");
-                          setDropdownOpen((open) =>
-                            activeMenu === menu.id ? !open : true
-                          );
-                        }}
-                      >
-                        {menu.name}
-                        {isActive && activeSectionName}
-                        <svg
-                          className="w-4 h-4 ml-2"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
+              <div className="sticky top-16 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-4">
+                <div className="flex flex-row items-center justify-start gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2">
+                  {menus.map((menu) => {
+                    const isActive = activeMenu === menu.id;
+                    const menuCategories = menuData.filter(
+                      (cat) => cat.menu_type === menu.id
+                    );
+                    const activeSectionName =
+                      isActive &&
+                      activeSection &&
+                      menuCategories.find((c) => c.id === activeSection)
+                        ? ` — ${
+                            menuCategories.find((c) => c.id === activeSection)
+                              ?.name
+                          }`
+                        : "";
+                    return (
+                      <div key={menu.id} className="relative">
+                        <button
+                          className={`px-8 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 min-w-[180px] justify-center ${
+                            isActive
+                              ? "bg-irish-red text-white"
+                              : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
+                          }`}
+                          onClick={() => {
+                            setActiveMenu(menu.id);
+                            setActiveSection("");
+                            setDropdownOpen((open) =>
+                              activeMenu === menu.id ? !open : true
+                            );
+                          }}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
-                      {isActive && dropdownOpen && (
-                        <div className="absolute left-0 right-0 mt-2 w-full min-w-[180px] bg-white border border-gray-200 rounded shadow-lg z-50">
-                          {menuCategories.map((category) => (
-                            <button
-                              key={category.id}
-                              className={`block w-full text-left px-4 py-2 font-serif text-base ${
-                                activeSection === category.id
-                                  ? "text-irish-red font-bold"
-                                  : "text-irish-brown hover:bg-irish-gold/20"
-                              }`}
-                              onClick={() => {
-                                setActiveMenu(menu.id);
-                                handleSectionSelect(category.id);
-                                setActiveSection(category.id);
-                                setDropdownOpen(false);
-                              }}
-                            >
-                              {category.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                          {menu.name}
+                          {isActive && activeSectionName}
+                          <svg
+                            className="w-4 h-4 ml-2"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                        {isActive && dropdownOpen && (
+                          <div className="absolute left-0 right-0 mt-2 w-full min-w-[180px] bg-white border border-gray-200 rounded shadow-lg z-50">
+                            {menuCategories.map((category) => (
+                              <button
+                                key={category.id}
+                                className={`block w-full text-left px-4 py-2 font-serif text-base ${
+                                  activeSection === category.id
+                                    ? "text-irish-red font-bold"
+                                    : "text-irish-brown hover:bg-irish-gold/20"
+                                }`}
+                                onClick={() => {
+                                  setActiveMenu(menu.id);
+                                  handleSectionSelect(category.id);
+                                  setActiveSection(category.id);
+                                  setDropdownOpen(false);
+                                }}
+                              >
+                                {category.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {currentMenuCategories.length > 0 ? (
