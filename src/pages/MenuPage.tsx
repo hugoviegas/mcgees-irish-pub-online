@@ -130,7 +130,7 @@ const MenuPage = () => {
             <div className="container mx-auto px-4">
               {/* Replace menu type buttons and section dropdown with a single dropdown */}
               <div className="sticky top-16 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-4">
-                <div className="flex flex-row items-center justify-start gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2">
+                <div className="flex flex-row items-center justify-center gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2 w-full">
                   {menus.map((menu) => {
                     const isActive = activeMenu === menu.id;
                     const menuCategories = menuData.filter(
@@ -146,9 +146,9 @@ const MenuPage = () => {
                           }`
                         : "";
                     return (
-                      <div key={menu.id} className="relative">
+                      <div key={menu.id} className="relative flex-shrink-0">
                         <button
-                          className={`px-8 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 min-w-[180px] justify-center ${
+                          className={`min-w-[140px] max-w-[180px] w-full sm:w-[180px] px-4 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center ${
                             isActive
                               ? "bg-irish-red text-white"
                               : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
@@ -160,6 +160,7 @@ const MenuPage = () => {
                               activeMenu === menu.id ? !open : true
                             );
                           }}
+                          style={{ whiteSpace: "nowrap" }}
                         >
                           {menu.name}
                           {isActive && activeSectionName}
@@ -178,7 +179,10 @@ const MenuPage = () => {
                           </svg>
                         </button>
                         {isActive && dropdownOpen && (
-                          <div className="absolute left-0 right-0 mt-2 w-full min-w-[180px] bg-white border border-gray-200 rounded shadow-lg z-50">
+                          <div
+                            className="fixed left-1/2 top-[70px] z-[9999] w-[220px] sm:w-[260px] -translate-x-1/2 bg-white border border-gray-200 rounded shadow-lg"
+                            style={{ maxHeight: "60vh", overflowY: "auto" }}
+                          >
                             {menuCategories.map((category) => (
                               <button
                                 key={category.id}
