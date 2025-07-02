@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import LocationSection from "../components/LocationSection";
 
 const AboutPage = () => {
   const teamMembers = [
@@ -76,23 +77,23 @@ const AboutPage = () => {
                 <div className="md:w-1/2">
                   <div className="grid grid-cols-2 gap-4">
                     <img
-                      src="https://images.unsplash.com/photo-1594078187747-21566b45ea44?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-                      alt="D'Arcy McGee's early days"
+                      src="/darcy-uploads/bar_pics/babyguinnes.jpg"
+                      alt="Baby Guinness shot at D'Arcy McGee's"
                       className="rounded-lg shadow-md mb-4"
                     />
                     <img
-                      src="https://images.unsplash.com/photo-1560840881-4bbcd415a9ab?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-                      alt="D'Arcy McGee's bar"
+                      src="/darcy-uploads/bar_pics/inside_area1.png"
+                      alt="Inside area 1 at D'Arcy McGee's"
                       className="rounded-lg shadow-md"
                     />
                     <img
-                      src="https://images.unsplash.com/photo-1575444758702-4a6b9222336e?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGlyaXNoJTIwcHVifGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-                      alt="D'Arcy McGee's interior"
+                      src="/darcy-uploads/bar_pics/inside_area2.png"
+                      alt="Inside area 2 at D'Arcy McGee's"
                       className="rounded-lg shadow-md"
                     />
                     <img
-                      src="https://images.unsplash.com/photo-1574096079513-d8259312b785?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8aXJpc2glMjBwdWJ8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-                      alt="D'Arcy McGee's live music"
+                      src="/darcy-uploads/bar_pics/bar_guinnes_tap.png"
+                      alt="Guinness tap at D'Arcy McGee's bar"
                       className="rounded-lg shadow-md mb-4"
                     />
                   </div>
@@ -189,40 +190,6 @@ const AboutPage = () => {
             </div>
           </section>
 
-          <section className="py-16 bg-gray-50">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-serif font-bold mb-12 text-irish-red text-center">
-                Meet Our Team
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {teamMembers.map((member) => (
-                  <div
-                    key={member.name}
-                    className="bg-white rounded-lg shadow-lg overflow-hidden"
-                  >
-                    <div className="h-64 overflow-hidden">
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-serif font-bold mb-1 text-irish-red">
-                        {member.name}
-                      </h3>
-                      <p className="text-irish-gold font-medium mb-4">
-                        {member.position}
-                      </p>
-                      <p className="text-gray-600">{member.bio}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           <section className="py-16 bg-irish-red">
             <div className="container mx-auto px-4 text-center">
               <h2 className="text-3xl font-serif font-bold mb-6 text-irish-gold">
@@ -251,6 +218,8 @@ const AboutPage = () => {
               </div>
             </div>
           </section>
+
+          <LocationSection />
         </main>
       </div>
 
