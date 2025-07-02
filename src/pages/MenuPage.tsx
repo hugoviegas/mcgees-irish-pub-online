@@ -3,6 +3,25 @@ import { Button } from "@/components/ui/button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
+import { ALLERGEN_LIST } from "../types/menu";
+
+// Allergen icon mapping (add icons as you get them)
+const ALLERGEN_ICONS: Record<string, string | null> = {
+  "1": "/icons/wheat/wheat.svg", // Example: gluten/wheat
+  "2": "/icons/egg.svg", // Example: eggs (add your icon if you have)
+  "3": "/icons/fish.svg", // Example: fish (add your icon if you have)
+  "4": null, // No icon yet
+  "5": null, // No icon yet
+  "6": null, // No icon yet
+  "7": null, // No icon yet
+  "8": null, // No icon yet
+  "9": null, // No icon yet
+  "10": null, // No icon yet
+  "11": null, // No icon yet
+  "12": null, // No icon yet
+  "13": null, // No icon yet
+  "14": null, // No icon yet
+};
 
 const MenuPage = () => {
   const { menuData, loading, error } = useSupabaseMenuData();
@@ -13,6 +32,9 @@ const MenuPage = () => {
     name: string;
     allergens: string[];
   }>();
+  const [selectedItem, setSelectedItem] = useState<
+    null | (typeof currentMenuCategories)[0]["items"][0]
+  >(null);
 
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
@@ -80,7 +102,7 @@ const MenuPage = () => {
 
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
-              <div className="flex justify-center space-x-4 mb-10">
+              <div className="sticky top-16 z-40 bg-[#f8f5f2] flex justify-center space-x-4 mb-10 py-4 border-b border-irish-gold shadow-sm">
                 {menus.map((menu) => (
                   <button
                     key={menu.id}
@@ -109,7 +131,11 @@ const MenuPage = () => {
                           className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-2xl transition-shadow"
                         >
                           {item.image && (
-                            <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                            <div
+                              className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
+                              onClick={() => setSelectedItem(item)}
+                              aria-label={`View details for ${item.name}`}
+                            >
                               <img
                                 src={item.image}
                                 alt={item.name}
@@ -189,11 +215,102 @@ const MenuPage = () => {
                   <h4 className="text-lg font-bold font-serif mb-4 text-irish-red">
                     Allergens for {allergyPopup.name}
                   </h4>
-                  <ul className="list-disc pl-5 text-gray-700 text-base">
-                    {allergyPopup.allergens.map((a, i) => (
-                      <li key={i}>{a}</li>
-                    ))}
-                  </ul>
+                  <div className="grid grid-cols-2 gap-4">
+                    {allergyPopup.allergens.map((id) => {
+                      const allergen = ALLERGEN_LIST.find((a) => a.id === id);
+                      const icon = ALLERGEN_ICONS[id] || null;
+                      return (
+                        <div key={id} className="flex items-center gap-2">
+                          {icon ? (
+                            <img
+                              src={icon}
+                              alt={allergen?.name}
+                              className="w-6 h-6"
+                            />
+                          ) : (
+                            <span className="inline-block w-6 h-6 bg-gray-200 rounded-full" />
+                          )}
+                          <span className="text-sm font-medium">
+                            {allergen?.name || id}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Item Details Popup Modal */}
+            {selectedItem && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-xl shadow-2xl p-6 md:p-10 min-w-[320px] max-w-lg w-full relative animate-fade-in flex flex-col items-center">
+                  <button
+                    className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
+                    onClick={() => setSelectedItem(null)}
+                    aria-label="Close item details popup"
+                  >
+                    ×
+                  </button>
+                  {selectedItem.image && (
+                    <img
+                      src={selectedItem.image}
+                      alt={selectedItem.name}
+                      className="w-full max-h-80 object-contain rounded mb-4"
+                    />
+                  )}
+                  <h3 className="text-2xl font-bold font-serif text-irish-brown mb-2 text-center">
+                    {selectedItem.name}
+                  </h3>
+                  <span className="text-xl font-semibold text-irish-red mb-2">
+                    {selectedItem.price}
+                  </span>
+                  <p className="text-gray-700 text-base mb-4 font-light text-center">
+                    {selectedItem.description}
+                  </p>
+                  {selectedItem.allergens?.length > 0 && (
+                    <div className="mb-4 w-full">
+                      <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">
+                        Allergens
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        {selectedItem.allergens.map((id) => {
+                          const allergen = ALLERGEN_LIST.find(
+                            (a) => a.id === id
+                          );
+                          const icon = ALLERGEN_ICONS[id] || null;
+                          return (
+                            <div key={id} className="flex items-center gap-2">
+                              {icon ? (
+                                <img
+                                  src={icon}
+                                  alt={allergen?.name}
+                                  className="w-6 h-6"
+                                />
+                              ) : (
+                                <span className="inline-block w-6 h-6 bg-gray-200 rounded-full" />
+                              )}
+                              <span className="text-sm font-medium">
+                                {allergen?.name || id}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {selectedItem.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                      {selectedItem.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
