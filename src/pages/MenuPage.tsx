@@ -128,8 +128,28 @@ const MenuPage = () => {
 
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
-              <div className="sticky top-16 z-40 bg-[#f8f5f2] flex justify-center mb-10 py-4 border-b border-irish-gold shadow-sm">
-                <div className="relative">
+              <div className="sticky top-16 z-50 bg-[#f8f5f2] flex flex-col items-center mb-10 border-b border-irish-gold shadow-sm">
+                {/* Menu type buttons */}
+                <div className="flex justify-center space-x-4 w-full py-2">
+                  {menus.map((menu) => (
+                    <button
+                      key={menu.id}
+                      onClick={() => {
+                        setActiveMenu(menu.id);
+                        setActiveSection(""); // reset section on menu change
+                      }}
+                      className={`px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold ${
+                        activeMenu === menu.id
+                          ? "bg-irish-red text-white"
+                          : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
+                      }`}
+                    >
+                      {menu.name}
+                    </button>
+                  ))}
+                </div>
+                {/* Section dropdown for current menu */}
+                <div className="relative py-2">
                   <button
                     className="px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold bg-irish-red text-white flex items-center gap-2"
                     onClick={() => setDropdownOpen((open) => !open)}
