@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -35,6 +35,9 @@ const MenuPage = () => {
   const [selectedItem, setSelectedItem] = useState<
     null | (typeof currentMenuCategories)[0]["items"][0]
   >(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [activeSection, setActiveSection] = useState<string>("");
 
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
@@ -46,6 +49,29 @@ const MenuPage = () => {
   const currentMenuCategories = menuData.filter(
     (category) => category.menu_type === activeMenu
   );
+
+  const handleSectionSelect = (sectionId: string) => {
+    const ref = sectionRefs.current[sectionId];
+    if (ref) {
+      ref.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const offsets = Object.entries(sectionRefs.current).map(([id, ref]) => {
+        if (!ref) return { id, top: Infinity };
+        const rect = ref.getBoundingClientRect();
+        return { id, top: Math.abs(rect.top - 120) }; // 120px offset for sticky header
+      });
+      offsets.sort((a, b) => a.top - b.top);
+      if (offsets[0] && offsets[0].id !== activeSection) {
+        setActiveSection(offsets[0].id);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeSection]);
 
   if (loading) {
     return (
@@ -102,25 +128,57 @@ const MenuPage = () => {
 
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
-              <div className="sticky top-16 z-40 bg-[#f8f5f2] flex justify-center space-x-4 mb-10 py-4 border-b border-irish-gold shadow-sm">
-                {menus.map((menu) => (
+              <div className="sticky top-16 z-40 bg-[#f8f5f2] flex justify-center mb-10 py-4 border-b border-irish-gold shadow-sm">
+                <div className="relative">
                   <button
-                    key={menu.id}
-                    onClick={() => setActiveMenu(menu.id)}
-                    className={`px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold ${
-                      activeMenu === menu.id
-                        ? "bg-irish-red text-white"
-                        : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
-                    }`}
+                    className="px-6 py-2 text-lg md:text-xl font-serif font-semibold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold bg-irish-red text-white flex items-center gap-2"
+                    onClick={() => setDropdownOpen((open) => !open)}
                   >
-                    {menu.name}
+                    {activeSection
+                      ? currentMenuCategories.find(
+                          (c) => c.id === activeSection
+                        )?.name || menus.find((m) => m.id === activeMenu)?.name
+                      : menus.find((m) => m.id === activeMenu)?.name}
+                    <svg
+                      className="w-4 h-4 ml-2"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </button>
-                ))}
+                  {dropdownOpen && (
+                    <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow-lg z-50">
+                      {currentMenuCategories.map((category) => (
+                        <button
+                          key={category.id}
+                          className="block w-full text-left px-4 py-2 hover:bg-irish-gold/20 text-irish-red font-serif"
+                          onClick={() => {
+                            handleSectionSelect(category.id);
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          {category.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {currentMenuCategories.length > 0 ? (
                 currentMenuCategories.map((category) => (
-                  <div key={category.id} className="mb-16">
+                  <div
+                    key={category.id}
+                    ref={(el) => (sectionRefs.current[category.id] = el)}
+                    className="mb-16"
+                  >
                     <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">
                       {category.name}
                     </h2>
@@ -243,8 +301,14 @@ const MenuPage = () => {
 
             {/* Item Details Popup Modal */}
             {selectedItem && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-xl shadow-2xl p-6 md:p-10 min-w-[320px] max-w-lg w-full relative animate-fade-in flex flex-col items-center">
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                onClick={() => setSelectedItem(null)}
+              >
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-6 md:p-10 min-w-[320px] max-w-2xl w-full relative animate-fade-in flex flex-col items-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setSelectedItem(null)}
