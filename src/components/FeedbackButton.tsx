@@ -37,8 +37,8 @@ const FeedbackButton = () => {
               We'd love your feedback!
             </h3>
             <p className="text-gray-700 mb-6 text-center">
-              Share your experience and help others discover D'Arcy McGee's. Your
-              review means a lot to us!
+              Share your experience and help others discover D'Arcy McGee's.
+              Your review means a lot to us!
             </p>
             <a
               href={GOOGLE_REVIEW_URL}

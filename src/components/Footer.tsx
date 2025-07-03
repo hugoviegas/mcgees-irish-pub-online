@@ -87,22 +87,13 @@ const Footer = () => {
         <div className="flex flex-col items-center md:items-end mt-4 md:mt-0 text-xs text-gray-300">
           <span>&copy; {currentYear} D'Arcy McGee's. All rights reserved.</span>
           <div className="flex space-x-4 mt-2">
-            <Link
-              to="/about"
-              className="hover:text-irish-gold"
-            >
+            <Link to="/about" className="hover:text-irish-gold">
               About
             </Link>
-            <Link
-              to="/menu"
-              className="hover:text-irish-gold"
-            >
+            <Link to="/menu" className="hover:text-irish-gold">
               Menu
             </Link>
-            <Link
-              to="/reservations"
-              className="hover:text-irish-gold"
-            >
+            <Link to="/reservations" className="hover:text-irish-gold">
               Reservations
             </Link>
           </div>
