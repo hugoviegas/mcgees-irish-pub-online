@@ -16,20 +16,20 @@ const LocationSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          <div className="lg:col-span-2 bg-gray-100 rounded-lg overflow-hidden h-[420px] flex items-stretch border-2 border-irish-gold shadow-lg">
+          <div className="lg:col-span-2 bg-gray-100 rounded-lg overflow-hidden">
             {/* Replace with your actual Google Maps embed code */}
             <iframe
               title="D'Arcy McGee's Location"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2384.781585371465!2d-6.326178322738812!3d53.293447472273904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48670b71ab9689ff%3A0x1de5e286e37a4eaa!2sD&#39;Arcy%20McGee&#39;s!5e0!3m2!1spt-BR!2sie!4v1751320446691!5m2!1spt-BR!2sie"
               width="100%"
               height="100%"
-              style={{ border: 0 }}
+              style={{ border: 0, minHeight: 420, height: "480px" }}
               allowFullScreen={true}
               loading="lazy"
             ></iframe>
           </div>
 
-          <div className="bg-irish-red text-white rounded-lg shadow-lg p-8 flex flex-col justify-between h-[420px] border-2 border-irish-gold">
+          <div className="bg-irish-red text-white rounded-lg shadow-lg p-8 flex flex-col justify-between">
             <div>
               <h3 className="text-2xl font-serif font-bold mb-6 text-irish-gold">
                 Contact Information
@@ -85,7 +85,7 @@ const LocationSection = () => {
             </div>
             <Button
               asChild
-              className="w-full bg-irish-gold hover:bg-irish-gold/80 text-irish-red text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-irish-red mt-8"
+              className="w-full bg-irish-gold hover:bg-irish-gold/80 text-irish-red mt-8"
             >
               <a href="tel:+35314907727">Call Now</a>
             </Button>

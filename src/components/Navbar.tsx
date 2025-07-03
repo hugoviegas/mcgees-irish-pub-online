@@ -29,6 +29,10 @@ const Navbar = () => {
       style={{
         minHeight: 72,
         borderBottom: shouldShowSolidBackground ? "3px solid #f5c518" : "none",
+        boxShadow: !shouldShowSolidBackground
+          ? "0 4px 24px 0 rgba(0,0,0,0.25), 0 1.5px 0 0 rgba(0,0,0,0.12)"
+          : undefined,
+        backdropFilter: !shouldShowSolidBackground ? "blur(6px)" : undefined,
       }}
     >
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-[72px]">
