@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 const images = [
-  "/darcy-uploads/hero/slideshow/slide1.jpg", // Add more images to this folder for the slideshow
+  "/darcy-uploads/hero/slideshow/slide1.jpg",
+  "/darcy-uploads/hero/slideshow/slide2.jpg",
   // Add more image paths here
 ];
 

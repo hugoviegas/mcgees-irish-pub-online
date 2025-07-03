@@ -54,16 +54,16 @@ const EventsSection = () => {
                   "Check back soon for upcoming events."
                 )}
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 mt-4">
                 <Button
                   asChild
-                  className="bg-irish-green hover:bg-irish-green/90 text-white"
+                  className="bg-irish-red hover:bg-irish-gold text-white hover:text-irish-red text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-irish-gold transition-colors"
                 >
                   <Link to="/events">View All Events</Link>
                 </Button>
                 <Button
                   asChild
-                  className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red border-irish-gold border"
+                  className="bg-irish-gold hover:bg-irish-gold/90 text-irish-red text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-irish-red transition-colors"
                 >
                   <a href="tel:+35314907727">Book a Table: (01) 490 7727</a>
                 </Button>

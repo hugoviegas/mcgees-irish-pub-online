@@ -15,8 +15,8 @@ const LocationSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-gray-100 rounded-lg overflow-hidden h-96">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          <div className="lg:col-span-2 bg-gray-100 rounded-lg overflow-hidden h-[420px] flex items-stretch border-2 border-irish-gold shadow-lg">
             {/* Replace with your actual Google Maps embed code */}
             <iframe
               title="D'Arcy McGee's Location"
@@ -29,65 +29,66 @@ const LocationSection = () => {
             ></iframe>
           </div>
 
-          <div className="bg-irish-red text-white rounded-lg shadow-lg p-8">
-            <h3 className="text-2xl font-serif font-bold mb-6 text-irish-gold">
-              Contact Information
-            </h3>
+          <div className="bg-irish-red text-white rounded-lg shadow-lg p-8 flex flex-col justify-between h-[420px] border-2 border-irish-gold">
+            <div>
+              <h3 className="text-2xl font-serif font-bold mb-6 text-irish-gold">
+                Contact Information
+              </h3>
 
-            <div className="space-y-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <MapPin className="h-5 w-5 text-irish-gold" />
+              <div className="space-y-6">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 mt-1">
+                    <MapPin className="h-5 w-5 text-irish-gold" />
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="font-medium">Address</h4>
+                    <p className="text-gray-200">
+                      Spawell Complex
+                      <br />
+                      Wellington Ln, Templeogue
+                      <br />
+                      Dublin 6W, Dublin
+                    </p>
+                  </div>
                 </div>
-                <div className="ml-3">
-                  <h4 className="font-medium">Address</h4>
-                  <p className="text-gray-200">
-                    Spawell Complex
-                    <br />
-                    Wellington Ln, Templeogue
-                    <br />
-                    Dublin 6W, Dublin
-                  </p>
+
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 mt-1">
+                    <Clock className="h-5 w-5 text-irish-gold" />
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="font-medium">Opening Hours</h4>
+                    <p className="text-gray-200">
+                      Monday - Wednesday: 09:00 - 23:00
+                      <br />
+                      Thursday: 09:00 - 23:00
+                      <br />
+                      Friday: 09:00 - 23:30
+                      <br />
+                      Saturday: 10:00 - 00:30
+                      <br />
+                      Sunday: 10:00 - 23:30
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 mt-1">
+                    <Phone className="h-5 w-5 text-irish-gold" />
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="font-medium">Phone</h4>
+                    <p className="text-gray-200">(01) 490 7727</p>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <Clock className="h-5 w-5 text-irish-gold" />
-                </div>
-                <div className="ml-3">
-                  <h4 className="font-medium">Opening Hours</h4>
-                  <p className="text-gray-200">
-                    Monday - Wednesday: 09:00 - 23:00
-                    <br />
-                    Thursday: 09:00 - 23:00
-                    <br />
-                    Friday: 09:00 - 23:30
-                    <br />
-                    Saturday: 10:00 - 00:30
-                    <br />
-                    Sunday: 10:00 - 23:30
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start">
-                <div className="flex-shrink-0 mt-1">
-                  <Phone className="h-5 w-5 text-irish-gold" />
-                </div>
-                <div className="ml-3">
-                  <h4 className="font-medium">Phone</h4>
-                  <p className="text-gray-200">(01) 490 7727</p>
-                </div>
-              </div>
-
-              <Button
-                asChild
-                className="w-full bg-irish-gold hover:bg-irish-gold/80 text-irish-red"
-              >
-                <a href="tel:+35314907727">Call Now</a>
-              </Button>
             </div>
+            <Button
+              asChild
+              className="w-full bg-irish-gold hover:bg-irish-gold/80 text-irish-red text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-irish-red mt-8"
+            >
+              <a href="tel:+35314907727">Call Now</a>
+            </Button>
           </div>
         </div>
       </div>

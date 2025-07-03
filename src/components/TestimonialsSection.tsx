@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const TestimonialsSection = () => {
   // TODO: In the future, fetch real 5-star reviews with comments from Google Maps API
@@ -40,6 +40,17 @@ const TestimonialsSection = () => {
 
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Auto-scroll testimonials every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  // TODO: In the future, fetch real 5-star reviews with comments from Google Maps API
+  // Google Maps reviews: https://g.co/kgs/Fj11EXP
+
   return (
     <section className="py-24 md:py-32 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -51,6 +62,14 @@ const TestimonialsSection = () => {
             Don't just take our word for it – hear from our wonderful customers
             about their experiences at D'Arcy McGee's.
           </p>
+          <a
+            href="https://g.co/kgs/Fj11EXP"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-4 text-irish-gold font-bold underline hover:text-irish-red text-lg"
+          >
+            See more reviews on Google Maps
+          </a>
         </div>
 
         <div className="max-w-4xl mx-auto">
