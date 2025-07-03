@@ -1,100 +1,71 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const MENU_SHORTCUTS = [
+const menuShortcuts = [
   {
-    id: "aLaCarte",
-    name: "A La Carte",
+    name: "A La Carte Menu",
+    image: "/darcy-uploads/bar_pics/inside_area1.png",
     to: "/menu#aLaCarte",
-    match: ["Starters", "Main Courses"],
+    description: "Traditional Irish dishes with modern flair.",
   },
   {
-    id: "breakfast",
     name: "Breakfast",
+    image: "/darcy-uploads/bar_pics/inside_area2.png",
     to: "/menu#breakfast",
-    match: ["Breakfast"],
+    description: "Start your day with a hearty Irish breakfast.",
   },
   {
-    id: "drinks",
     name: "Drinks",
+    image: "/darcy-uploads/bar_pics/bar_guinnes_tap.png",
     to: "/menu#drinks",
-    match: ["Drinks"],
+    description: "Enjoy our wide selection of Irish drinks and cocktails.",
   },
 ];
 
 const MenuPreview = () => {
-  const menuCategories = [
-    {
-      name: "Starters",
-      image:
-        "https://images.unsplash.com/photo-1577906096429-f73c2c4fec42?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=675&q=80",
-      description: "Perfect sharers to start your Irish feast",
-    },
-    {
-      name: "Main Courses",
-      image:
-        "https://images.unsplash.com/photo-1544025162-d76694265947?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1049&q=80",
-      description: "Traditional Irish dishes with modern flair",
-    },
-    {
-      name: "Drinks",
-      image:
-        "https://images.unsplash.com/photo-1571267272658-ebc6c0e79ab5?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80",
-      description: "Fine whiskies, beers, and cocktails",
-    },
-  ];
-
-  // Helper to get the correct menu shortcut for each card
-  const getMenuShortcut = (categoryName: string) => {
-    return (
-      MENU_SHORTCUTS.find((menu) => menu.match.includes(categoryName)) ||
-      MENU_SHORTCUTS[0]
-    );
-  };
-
   return (
-    <section className="py-20 bg-gray-50">
+    <section id="menu-preview" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-irish-red">
-            Our Menu
+            Our Menus
           </h2>
           <p className="text-gray-600 max-w-xl mx-auto">
-            Authentic Irish cuisine prepared with love and tradition. From
-            hearty stews to fresh seafood, our menu offers something for
-            everyone.
+            Explore our food and drink menus. Click below to view each section
+            in detail.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {menuCategories.map((category) => {
-            const shortcut = getMenuShortcut(category.name);
-            return (
-              <div
-                key={category.name}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="h-60 overflow-hidden">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold font-serif mb-2 text-irish-brown">
-                    {category.name}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{category.description}</p>
-                  <Button
-                    asChild
-                    className="px-6 py-3 text-lg font-serif font-bold rounded-full shadow border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap bg-white text-irish-red hover:bg-irish-red hover:text-white transition-colors"
-                  >
-                    <Link to={shortcut.to}>{shortcut.name}</Link>
-                  </Button>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+          {menuShortcuts.map((shortcut) => (
+            <div
+              key={shortcut.name}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow flex flex-col"
+            >
+              <div className="h-64 overflow-hidden">
+                <img
+                  src={shortcut.image}
+                  alt={shortcut.name}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                />
               </div>
-            );
-          })}
+              <div className="p-8 flex flex-col flex-grow justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold font-serif mb-2 text-irish-gold tracking-wide">
+                    {shortcut.name}
+                  </h3>
+                  <p className="text-gray-700 mb-6 text-lg">
+                    {shortcut.description}
+                  </p>
+                </div>
+                <Button
+                  asChild
+                  className="px-8 py-4 text-xl font-serif font-bold rounded-full shadow border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap bg-irish-red text-white hover:bg-irish-gold hover:text-irish-red transition-colors mt-4"
+                >
+                  <Link to={shortcut.to}>View {shortcut.name}</Link>
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

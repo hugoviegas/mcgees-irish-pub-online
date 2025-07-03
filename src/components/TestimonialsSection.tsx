@@ -1,57 +1,67 @@
-
-import { useState } from 'react';
+import { useState } from "react";
 
 const TestimonialsSection = () => {
+  // TODO: In the future, fetch real 5-star reviews with comments from Google Maps API
+  // and display them here. For now, these are static examples.
   const testimonials = [
     {
       id: 1,
       name: "Siobhan Murphy",
-      quote: "The most authentic Irish pub experience outside of Dublin! Amazing food and the weekend music acts are top-notch.",
+      quote:
+        "The most authentic Irish pub experience outside of Dublin! Amazing food and the weekend music acts are top-notch.",
       image: "https://randomuser.me/api/portraits/women/42.jpg",
       rating: 5,
     },
     {
       id: 2,
       name: "Michael O'Connor",
-      quote: "Best pint of Guinness in the city, hands down. The staff makes you feel like you're part of the family.",
+      quote:
+        "Best pint of Guinness in the city, hands down. The staff makes you feel like you're part of the family.",
       image: "https://randomuser.me/api/portraits/men/32.jpg",
       rating: 5,
     },
     {
       id: 3,
       name: "Emma Thompson",
-      quote: "We had our anniversary dinner here and it was perfect. The shepherd's pie is absolutely delicious!",
+      quote:
+        "We had our anniversary dinner here and it was perfect. The shepherd's pie is absolutely delicious!",
       image: "https://randomuser.me/api/portraits/women/26.jpg",
       rating: 4,
     },
     {
       id: 4,
       name: "James Wilson",
-      quote: "Great atmosphere, friendly staff, and excellent selection of whiskeys. The live music on Saturdays is always a treat.",
+      quote:
+        "Great atmosphere, friendly staff, and excellent selection of whiskeys. The live music on Saturdays is always a treat.",
       image: "https://randomuser.me/api/portraits/men/22.jpg",
       rating: 5,
     },
   ];
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 md:py-32 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-irish-green">What Our Guests Say</h2>
-          <p className="text-gray-600 max-w-xl mx-auto">
-            Don't just take our word for it - hear from our wonderful customers about their experiences at D'Arcy McGee's.
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold font-serif mb-4 text-irish-red">
+            What Our Guests Say
+          </h2>
+          <p className="text-gray-600 max-w-xl mx-auto text-lg">
+            Don't just take our word for it – hear from our wonderful customers
+            about their experiences at D'Arcy McGee's.
           </p>
         </div>
-        
+
         <div className="max-w-4xl mx-auto">
           <div className="relative pb-10">
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.id}
                 className={`transition-opacity duration-500 ${
-                  index === activeIndex ? "opacity-100" : "opacity-0 absolute top-0 left-0 right-0"
+                  index === activeIndex
+                    ? "opacity-100"
+                    : "opacity-0 absolute top-0 left-0 right-0"
                 }`}
               >
                 {index === activeIndex && (
@@ -80,13 +90,17 @@ const TestimonialsSection = () => {
                         </svg>
                       ))}
                     </div>
-                    <blockquote className="text-xl italic text-gray-700 mb-6">"{testimonial.quote}"</blockquote>
-                    <cite className="font-serif text-lg font-medium text-irish-green block">- {testimonial.name}</cite>
+                    <blockquote className="text-xl italic text-gray-700 mb-6">
+                      "{testimonial.quote}"
+                    </blockquote>
+                    <cite className="font-serif text-lg font-medium text-irish-green block">
+                      - {testimonial.name}
+                    </cite>
                   </div>
                 )}
               </div>
             ))}
-            
+
             <div className="flex justify-center mt-8 space-x-2">
               {testimonials.map((_, index) => (
                 <button
