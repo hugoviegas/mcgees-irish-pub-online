@@ -34,10 +34,9 @@ const AdminImageUploadPage = () => {
     setSuccess(null);
     setError(null);
     const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(
-      2,
-      8
-    )}.${fileExt}`;
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}.${fileExt}`;
     const { error } = await supabase.storage
       .from("barpics")
       .upload(fileName, file, {
