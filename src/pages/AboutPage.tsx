@@ -3,29 +3,9 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import LocationSection from "../components/LocationSection";
+import Gallery from "../components/Gallery";
 
 const AboutPage = () => {
-  const teamMembers = [
-    {
-      name: "Seamus O'Connor",
-      position: "Owner & Founder",
-      image: "https://randomuser.me/api/portraits/men/40.jpg",
-      bio: "With over 30 years in the hospitality industry, Seamus brought his vision of an authentic Irish pub to life when he opened D'Arcy McGee's in 1998. Born and raised in Dublin, he's passionate about sharing Irish culture and hospitality.",
-    },
-    {
-      name: "Fiona Murphy",
-      position: "Head Chef",
-      image: "https://randomuser.me/api/portraits/women/43.jpg",
-      bio: "Chef Fiona combines traditional Irish recipes with modern culinary techniques. Trained at the Culinary Institute of Ireland, she has worked in renowned kitchens across Europe before bringing her talents to D'Arcy McGee's.",
-    },
-    {
-      name: "Liam Byrne",
-      position: "Bar Manager",
-      image: "https://randomuser.me/api/portraits/men/36.jpg",
-      bio: "A certified master of whiskey with an encyclopedic knowledge of Irish spirits, Liam ensures our bar offers the finest selection of drinks. His creative cocktails and perfect pours have won numerous local awards.",
-    },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -51,11 +31,10 @@ const AboutPage = () => {
                     Our Story
                   </h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    D'Arcy McGee's was founded in 1998 by Dublin native Seamus
-                    O'Connor, who dreamed of creating an authentic Irish pub
-                    experience. Named after Thomas D'Arcy McGee, a father of
-                    Canadian confederation with proud Irish roots, our pub
-                    honors the rich cultural connections between Ireland and
+                    D'Arcy McGee's was founded in 1998, creating an authentic
+                    Irish pub experience. Named after Thomas D'Arcy McGee, a
+                    father of Canadian confederation with proud Irish roots, our
+                    pub honors the rich cultural connections between Ireland and
                     North America.
                   </p>
                   <p className="text-gray-700 mb-6 leading-relaxed">
@@ -75,28 +54,38 @@ const AboutPage = () => {
                   </p>
                 </div>
                 <div className="md:w-1/2">
-                  <div className="grid grid-cols-2 gap-4">
-                    <img
-                      src="/darcy-uploads/bar_pics/babyguinnes.jpg"
-                      alt="Baby Guinness shot at D'Arcy McGee's"
-                      className="rounded-lg shadow-md mb-4"
-                    />
-                    <img
-                      src="/darcy-uploads/bar_pics/inside_area1.png"
-                      alt="Inside area 1 at D'Arcy McGee's"
-                      className="rounded-lg shadow-md"
-                    />
-                    <img
-                      src="/darcy-uploads/bar_pics/inside_area2.png"
-                      alt="Inside area 2 at D'Arcy McGee's"
-                      className="rounded-lg shadow-md"
-                    />
-                    <img
-                      src="/darcy-uploads/bar_pics/bar_guinnes_tap.png"
-                      alt="Guinness tap at D'Arcy McGee's bar"
-                      className="rounded-lg shadow-md mb-4"
-                    />
-                  </div>
+                  <Gallery
+                    images={[
+                      {
+                        src: "/darcy-uploads/bar_pics/babyguinnes.jpg",
+                        alt: "Baby Guinness shot at D'Arcy McGee's",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/inside_area1.png",
+                        alt: "Inside area 1 at D'Arcy McGee's",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/inside_area2.png",
+                        alt: "Inside area 2 at D'Arcy McGee's",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/bar_guinnes_tap.png",
+                        alt: "Guinness tap at D'Arcy McGee's bar",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/Guinnes_Pint_Irish_Coffee.png",
+                        alt: "Guinness Pint and Irish Coffee at D'Arcy McGee's",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/Jims_bar.png",
+                        alt: "Jim's Bar at D'Arcy McGee's",
+                      },
+                      {
+                        src: "/darcy-uploads/bar_pics/outside1.png",
+                        alt: "Outside view of D'Arcy McGee's",
+                      },
+                    ]}
+                  />
                 </div>
               </div>
 

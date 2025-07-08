@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const GOOGLE_REVIEW_URL = "https://g.co/kgs/Fj11EXP";
+const GOOGLE_REVIEW_URL = "https://maps.app.goo.gl/Rn5wet5ZUFnkdiPp8";
 
 const FeedbackButton = () => {
   const [show, setShow] = useState(false);
