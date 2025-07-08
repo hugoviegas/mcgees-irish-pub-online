@@ -30,7 +30,7 @@ const LoginForm = () => {
     } else {
       console.log("Login successful, redirecting to admin menu...");
       // Force navigation to admin menu page
-      navigate("/admin/menu", { replace: true });
+      navigate("/admin", { replace: true });
     }
     setIsLoading(false);
   };

@@ -42,7 +42,7 @@ const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 pt-24">
         <h1 className="text-3xl font-bold text-irish-red mb-8 text-center">
           Admin Panel
         </h1>
