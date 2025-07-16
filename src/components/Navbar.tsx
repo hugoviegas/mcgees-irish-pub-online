@@ -36,10 +36,13 @@ const Navbar = () => {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-[72px]">
-        <Link to="/" className="flex items-center">
+        <Link to="/" className="flex flex-col items-start justify-center">
           <h1 className="text-2xl md:text-3xl font-bold text-irish-gold font-serif tracking-tight drop-shadow-sm">
             D'Arcy McGee's
           </h1>
+          <span className="text-xs md:text-sm font-normal text-irish-gold/70 mt-0.5 ml-0.5 tracking-wide">
+            Spawell Complex
+          </span>
         </Link>
 
         {/* Desktop menu */}
@@ -90,7 +93,7 @@ const Navbar = () => {
             asChild
             className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red font-semibold px-6 py-2 rounded-lg shadow"
           >
-            <Link to="/reservations">Reservations</Link>
+            <a href="tel:+35312345678">Call Us</a>
           </Button>
         </div>
 
@@ -171,9 +174,7 @@ const Navbar = () => {
               asChild
               className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red font-semibold px-6 py-2 rounded-lg shadow"
             >
-              <Link to="/reservations" onClick={() => setIsMenuOpen(false)}>
-                Reservations
-              </Link>
+              <a href="tel:+35312345678">Call Us</a>
             </Button>
           </div>
         </div>

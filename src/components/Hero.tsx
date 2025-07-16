@@ -15,17 +15,6 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 z-20">
         <div className="text-center">
-          <div className="mb-6 flex justify-center">
-            <img
-              src="/darcy-uploads/logo.png"
-              alt="D'Arcy McGee's"
-              className="h-32 md:h-40"
-            />
-          </div>
-          <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Traditional Irish pub and restaurant bringing the spirit of Ireland
-            to your neighborhood since 1998.
-          </p>
           <div className="space-x-4">
             <Button
               asChild

@@ -10,6 +10,12 @@ import { MenuCategory, MenuItem } from "../types/menu";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { toast } from "sonner";
 
+export interface CategoryFormProps {
+  category?: MenuCategory;
+  onSave: (category: MenuCategory) => Promise<void>;
+  onCancel: () => void;
+}
+
 const AdminMenuPage = () => {
   const { logout, isAuthenticated, loading: authLoading } = useAuth();
   const {

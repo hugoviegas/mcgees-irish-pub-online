@@ -7,9 +7,9 @@ import { ALLERGEN_LIST } from "../types/menu";
 
 // Allergen icon mapping (add icons as you get them)
 const ALLERGEN_ICONS: Record<string, string | null> = {
-  "1": "/icons/wheat/wheat.svg", // Example: gluten/wheat
-  "2": "/icons/egg.svg", // Example: eggs (add your icon if you have)
-  "3": "/icons/fish.svg", // Example: fish (add your icon if you have)
+  "1": "/icons/wheat.png", // Example: gluten/wheat
+  "2": "/icons/egg.png", // Example: eggs (add your icon if you have)
+  "3": "/icons/fish.png", // Example: fish (add your icon if you have)
   "4": null, // No icon yet
   "5": null, // No icon yet
   "6": null, // No icon yet
@@ -217,6 +217,7 @@ const MenuPage = () => {
                   <div
                     key={category.id}
                     ref={(el) => (sectionRefs.current[category.id] = el)}
+                    id={category.menu_type} // Add this line to set the id for anchor navigation
                     className="mb-16"
                   >
                     <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">

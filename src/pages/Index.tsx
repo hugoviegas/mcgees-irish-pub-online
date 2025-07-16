@@ -14,10 +14,10 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <HeroSlideshow />
+      <EventsSection />
       <main className="space-y-24 md:space-y-32 bg-[#f8f5f2] pt-0">
         <AboutSection />
         <MenuPreview />
-        <EventsSection />
         <TestimonialsSection />
         <LocationSection />
         <CTASection />

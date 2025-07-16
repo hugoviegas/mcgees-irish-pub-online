@@ -19,20 +19,22 @@ const AboutSection = () => {
               Welcome to <span className="text-irish-gold">D'Arcy McGee's</span>
             </h2>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Nestled in the heart of the city, D'Arcy McGee's brings authentic
-              Irish hospitality to life. Our pub is named after Thomas D'Arcy
-              McGee, a father of Canadian confederation with proud Irish roots.
+              Step into D'Arcy McGee's and feel right at home. Our pub is a
+              gathering place for friends, families, and neighbors—a spot where
+              laughter is shared, stories are told, and every guest is greeted
+              with a warm Irish welcome.
             </p>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Step through our doors and experience the warm embrace of a
-              traditional Irish pub, where every guest is treated like family.
-              Our classic wooden interiors, comfortable seating, and friendly
-              staff create the perfect atmosphere for any occasion.
+              Enjoy the cozy charm of our traditional interiors, the aroma of
+              hearty Irish fare, and the sound of live music drifting through
+              the air. Whether you're here for a quiet pint, a lively night out,
+              or a family meal, you'll find genuine hospitality and a true sense
+              of community.
             </p>
             <p className="text-gray-700 mb-10 text-lg leading-relaxed">
-              Whether you're joining us for a hearty Irish breakfast, a business
-              lunch, dinner with family, or a pint with friends, we promise an
-              experience that will keep you coming back.
+              We invite you to relax, unwind, and make yourself at home—because
+              at D'Arcy McGee's, you're not just a customer, you're part of the
+              family.
             </p>
             <Button
               asChild
