@@ -79,6 +79,21 @@ const MenuPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeSection]);
 
+  // Handle menu hash in URL
+  useEffect(() => {
+    function setMenuFromHash() {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const found = menus.find((m) => m.id.toLowerCase() === hash);
+      if (found) {
+        setActiveMenu(found.id);
+        setActiveSection("");
+      }
+    }
+    setMenuFromHash();
+    window.addEventListener('hashchange', setMenuFromHash);
+    return () => window.removeEventListener('hashchange', setMenuFromHash);
+  }, [menus]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -164,6 +179,7 @@ const MenuPage = () => {
                         setDropdownOpen((open) =>
                           activeMenu === menu.id ? !open : true
                         );
+                        window.location.hash = menu.id; // update hash
                       }}
                     >
                       {menu.name}
