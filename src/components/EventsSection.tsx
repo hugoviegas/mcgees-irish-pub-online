@@ -96,7 +96,7 @@ const EventsSection = () => {
                       <p className="text-gray-700 mb-6 leading-relaxed">
                         {format(new Date(event.date), "PPPPp")}
                         <br />
-                        {event.description || "Join us for a special event night!"}
+                        Join us for a special event night!
                       </p>
                       <div className="flex flex-wrap gap-4 mt-4">
                         <Button

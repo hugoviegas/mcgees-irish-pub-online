@@ -45,7 +45,7 @@ export const useSupabaseMenuData = () => {
       const menuWithItems = categories.map((category) => ({
         id: category.id,
         name: category.name,
-        menu_type: category.menu_type,
+        menu_type: category.menu_type as "aLaCarte" | "breakfast" | "drinks" | "otherMenu",
         items: items
           .filter((item) => item.category_id === category.id)
           .map((item) => ({
