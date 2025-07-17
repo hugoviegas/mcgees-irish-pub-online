@@ -135,8 +135,9 @@ const MenuPage = () => {
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               {/* Replace menu type buttons and section dropdown with a single dropdown */}
-              <div className="sticky top-24 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-2 md:py-4">
-                <div className="flex flex-row items-center justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
+              {/* Menu Bar: sticky, full width, responsive alignment */}
+              <div className="sticky top-12 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-2 md:py-4 w-full">
+                <div className="flex flex-row items-center justify-start md:justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
                   {menus.map((menu) => {
                     const isActive = activeMenu === menu.id;
                     const menuCategories = menuData.filter(
