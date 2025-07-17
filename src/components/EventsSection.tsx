@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Calendar } from "lucide-react";
 import { useEventsData } from "@/hooks/useEventsData";
 import { format, isAfter, isSameDay, addDays } from "date-fns";
+import { getEventImageUrl } from "@/utils/eventImageUtils";
 
 const EventsSection = () => {
   const { events, loading, error } = useEventsData();
@@ -71,19 +72,11 @@ const EventsSection = () => {
             </div>
             <div className="md:w-1/3 mt-8 md:mt-0">
               <div className="rounded-lg overflow-hidden shadow-lg">
-                {featuredEvent && featuredEvent.image_url ? (
-                  <img
-                    src={featuredEvent.image_url}
-                    alt={featuredEvent.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <img
-                    src="/darcy-uploads/bar-img1.jpg"
-                    alt="Live music at D'Arcy McGee's"
-                    className="w-full h-full object-cover"
-                  />
-                )}
+                <img
+                  src={featuredEvent ? getEventImageUrl(featuredEvent.image_url) : "/darcy-uploads/bar-img1.jpg"}
+                  alt={featuredEvent ? featuredEvent.title : "Live music at D'Arcy McGee's"}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>

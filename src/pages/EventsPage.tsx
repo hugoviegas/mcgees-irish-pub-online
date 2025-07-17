@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEventsData } from "../hooks/useEventsData";
 import { format } from "date-fns";
+import { getEventImageUrl } from "@/utils/eventImageUtils";
 
 const EventsPage = () => {
   const { events, loading, error } = useEventsData();
@@ -46,17 +47,11 @@ const EventsPage = () => {
                     <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
                       <div className="flex flex-col md:flex-row">
                         <div className="md:w-1/3 h-64 md:h-auto">
-                          {event.image_url ? (
-                            <img 
-                              src={event.image_url} 
-                              alt={event.title} 
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-irish-gold/20 flex items-center justify-center">
-                              <Music className="h-12 w-12 text-irish-gold" />
-                            </div>
-                          )}
+                          <img 
+                            src={getEventImageUrl(event.image_url)} 
+                            alt={event.title} 
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="md:w-2/3 p-6">
                           <div className="flex items-center mb-2">
