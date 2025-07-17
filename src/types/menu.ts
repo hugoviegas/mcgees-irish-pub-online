@@ -11,7 +11,7 @@ export type MenuItem = {
 export type MenuCategory = {
   id: string;
   name: string;
-  menu_type: "aLaCarte" | "breakfast" | "drinks";
+  menu_type: "aLaCarte" | "breakfast" | "drinks" | "otherMenu";
   items: MenuItem[];
 };
 

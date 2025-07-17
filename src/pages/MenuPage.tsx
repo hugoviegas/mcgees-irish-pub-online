@@ -26,7 +26,7 @@ const ALLERGEN_ICONS: Record<string, string | null> = {
 const MenuPage = () => {
   const { menuData, loading, error } = useSupabaseMenuData();
   const [activeMenu, setActiveMenu] = useState<
-    "aLaCarte" | "breakfast" | "drinks"
+    "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
   >("aLaCarte");
   const [allergyPopup, setAllergyPopup] = useState<null | {
     name: string;
@@ -46,6 +46,7 @@ const MenuPage = () => {
     { id: "aLaCarte" as const, name: "A La Carte" },
     { id: "breakfast" as const, name: "Breakfast" },
     { id: "drinks" as const, name: "Drinks" },
+    { id: "otherMenu" as const, name: "Other Menu" }, // New section
   ];
 
   // Filter categories based on active menu
@@ -56,7 +57,9 @@ const MenuPage = () => {
   const handleSectionSelect = (sectionId: string) => {
     const ref = sectionRefs.current[sectionId];
     if (ref) {
-      ref.scrollIntoView({ behavior: "smooth", block: "start" });
+      const yOffset = window.innerWidth < 768 ? 120 : 140; // More offset for mobile
+      const y = ref.getBoundingClientRect().top + window.pageYOffset - yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
@@ -132,8 +135,8 @@ const MenuPage = () => {
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               {/* Replace menu type buttons and section dropdown with a single dropdown */}
-              <div className="sticky top-16 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-4">
-                <div className="flex flex-row items-center justify-center gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2 w-full">
+              <div className="sticky top-24 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-2 md:py-4">
+                <div className="flex flex-row items-center justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
                   {menus.map((menu) => {
                     const isActive = activeMenu === menu.id;
                     const menuCategories = menuData.filter(
@@ -152,7 +155,7 @@ const MenuPage = () => {
                       <div key={menu.id} className="relative flex-shrink-0">
                         <button
                           ref={(el) => (menuButtonRefs.current[menu.id] = el)}
-                          className={`px-6 py-3 text-lg md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
+                          className={`px-4 py-2 text-base md:px-6 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
                             isActive
                               ? "bg-irish-red text-white"
                               : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
