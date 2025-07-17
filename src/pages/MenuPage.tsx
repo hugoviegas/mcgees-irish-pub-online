@@ -132,90 +132,89 @@ const MenuPage = () => {
             </div>
           </section>
 
+          {/* Full-width sticky menu bar section */}
+          <section className="w-full sticky top-18 z-50 bg-[#f8f5f2] border-b border-irish-gold shadow-sm py-2 md:py-4">
+            <div className="flex flex-row items-center justify-start md:justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
+              {menus.map((menu) => {
+                const isActive = activeMenu === menu.id;
+                const menuCategories = menuData.filter(
+                  (cat) => cat.menu_type === menu.id
+                );
+                const activeSectionName =
+                  isActive &&
+                  activeSection &&
+                  menuCategories.find((c) => c.id === activeSection)
+                    ? ` — ${
+                        menuCategories.find((c) => c.id === activeSection)
+                          ?.name
+                      }`
+                    : "";
+                return (
+                  <div key={menu.id} className="relative flex-shrink-0">
+                    <button
+                      ref={(el) => (menuButtonRefs.current[menu.id] = el)}
+                      className={`px-4 py-2 text-base md:px-6 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
+                        isActive
+                          ? "bg-irish-red text-white"
+                          : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
+                      }`}
+                      onClick={() => {
+                        setActiveMenu(menu.id);
+                        setActiveSection("");
+                        setDropdownOpen((open) =>
+                          activeMenu === menu.id ? !open : true
+                        );
+                      }}
+                    >
+                      {menu.name}
+                      {isActive && activeSectionName}
+                      <svg
+                        className="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {isActive && dropdownOpen && (
+                      <DropdownMenu
+                        anchorRef={menuButtonRefs.current[menu.id]}
+                        onClose={() => setDropdownOpen(false)}
+                      >
+                        {menuCategories.map((category) => (
+                          <button
+                            key={category.id}
+                            className={`block w-full text-left px-4 py-2 font-serif text-base ${
+                              activeSection === category.id
+                                ? "text-irish-red font-bold"
+                                : "text-irish-brown hover:bg-irish-gold/20"
+                            }`}
+                            onClick={() => {
+                              setActiveMenu(menu.id);
+                              handleSectionSelect(category.id);
+                              setActiveSection(category.id);
+                              setDropdownOpen(false);
+                            }}
+                          >
+                            {category.name}
+                          </button>
+                        ))}
+                      </DropdownMenu>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
-              {/* Replace menu type buttons and section dropdown with a single dropdown */}
-              {/* Menu Bar: sticky, full width, responsive alignment */}
-              <div className="sticky top-12 z-50 bg-[#f8f5f2] mb-10 border-b border-irish-gold shadow-sm py-2 md:py-4 w-full">
-                <div className="flex flex-row items-center justify-start md:justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
-                  {menus.map((menu) => {
-                    const isActive = activeMenu === menu.id;
-                    const menuCategories = menuData.filter(
-                      (cat) => cat.menu_type === menu.id
-                    );
-                    const activeSectionName =
-                      isActive &&
-                      activeSection &&
-                      menuCategories.find((c) => c.id === activeSection)
-                        ? ` — ${
-                            menuCategories.find((c) => c.id === activeSection)
-                              ?.name
-                          }`
-                        : "";
-                    return (
-                      <div key={menu.id} className="relative flex-shrink-0">
-                        <button
-                          ref={(el) => (menuButtonRefs.current[menu.id] = el)}
-                          className={`px-4 py-2 text-base md:px-6 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
-                            isActive
-                              ? "bg-irish-red text-white"
-                              : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
-                          }`}
-                          onClick={() => {
-                            setActiveMenu(menu.id);
-                            setActiveSection("");
-                            setDropdownOpen((open) =>
-                              activeMenu === menu.id ? !open : true
-                            );
-                          }}
-                        >
-                          {menu.name}
-                          {isActive && activeSectionName}
-                          <svg
-                            className="w-4 h-4 ml-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                        {isActive && dropdownOpen && (
-                          <DropdownMenu
-                            anchorRef={menuButtonRefs.current[menu.id]}
-                            onClose={() => setDropdownOpen(false)}
-                          >
-                            {menuCategories.map((category) => (
-                              <button
-                                key={category.id}
-                                className={`block w-full text-left px-4 py-2 font-serif text-base ${
-                                  activeSection === category.id
-                                    ? "text-irish-red font-bold"
-                                    : "text-irish-brown hover:bg-irish-gold/20"
-                                }`}
-                                onClick={() => {
-                                  setActiveMenu(menu.id);
-                                  handleSectionSelect(category.id);
-                                  setActiveSection(category.id);
-                                  setDropdownOpen(false);
-                                }}
-                              >
-                                {category.name}
-                              </button>
-                            ))}
-                          </DropdownMenu>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {currentMenuCategories.length > 0 ? (
                 currentMenuCategories.map((category) => (
                   <div
