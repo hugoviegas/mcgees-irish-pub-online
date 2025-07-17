@@ -2,6 +2,9 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { getBarPics, BarPic } from "@/integrations/supabase/getBarPics";
+import Gallery from "@/components/Gallery";
+import { useEffect } from "react";
 
 const AdminImageUploadPage = () => {
   const { isAuthenticated } = useAuth();
@@ -9,6 +12,15 @@ const AdminImageUploadPage = () => {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<BarPic[]>([]);
+
+  useEffect(() => {
+    async function fetchImages() {
+      const imgs = await getBarPics();
+      setImages(imgs);
+    }
+    fetchImages();
+  }, [success]);
 
   if (!isAuthenticated) {
     return (
@@ -73,6 +85,9 @@ const AdminImageUploadPage = () => {
         {success && <div className="text-green-600 text-center">{success}</div>}
         {error && <div className="text-red-600 text-center">{error}</div>}
       </form>
+      <div className="mt-8">
+        <Gallery images={images} />
+      </div>
     </div>
   );
 };

@@ -4,8 +4,15 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import LocationSection from "../components/LocationSection";
 import Gallery from "../components/Gallery";
+import { useEffect, useState } from "react";
+import { getBarPics, BarPic } from "@/integrations/supabase/getBarPics";
 
 const AboutPage = () => {
+  const [images, setImages] = useState<BarPic[]>([]);
+  useEffect(() => {
+    getBarPics().then(setImages);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -54,38 +61,7 @@ const AboutPage = () => {
                   </p>
                 </div>
                 <div className="md:w-1/2">
-                  <Gallery
-                    images={[
-                      {
-                        src: "/darcy-uploads/bar_pics/babyguinnes.jpg",
-                        alt: "Baby Guinness shot at D'Arcy McGee's",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/inside_area1.png",
-                        alt: "Inside area 1 at D'Arcy McGee's",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/inside_area2.png",
-                        alt: "Inside area 2 at D'Arcy McGee's",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/bar_guinnes_tap.png",
-                        alt: "Guinness tap at D'Arcy McGee's bar",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/Guinnes_Pint_Irish_Coffee.png",
-                        alt: "Guinness Pint and Irish Coffee at D'Arcy McGee's",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/Jims_bar.png",
-                        alt: "Jim's Bar at D'Arcy McGee's",
-                      },
-                      {
-                        src: "/darcy-uploads/bar_pics/outside1.png",
-                        alt: "Outside view of D'Arcy McGee's",
-                      },
-                    ]}
-                  />
+                  <Gallery images={images} />
                 </div>
               </div>
 

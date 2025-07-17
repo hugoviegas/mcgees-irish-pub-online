@@ -9,11 +9,18 @@ import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CategoryFormProps {
   category?: MenuCategory;
   onSave: (category: MenuCategory) => Promise<void>;
   onCancel: () => void;
+}
+
+// Função utilitária para obter a URL pública da imagem do Supabase
+function getMenuItemImageUrl(image?: string) {
+  if (!image || image === "/placeholder.svg") return "/placeholder.svg";
+  return supabase.storage.from("barpics").getPublicUrl(image).data.publicUrl;
 }
 
 const AdminMenuPage = () => {
@@ -282,6 +289,15 @@ const AdminMenuPage = () => {
                             className="border border-gray-200"
                           >
                             <CardContent className="p-4">
+                              {/* Exibir imagem do Supabase se houver */}
+                              <div className="w-full h-40 flex items-center justify-center mb-2 bg-gray-100 rounded overflow-hidden">
+                                <img
+                                  src={getMenuItemImageUrl(item.image)}
+                                  alt={item.name}
+                                  className="object-cover w-full h-full"
+                                  style={{ maxHeight: 160 }}
+                                />
+                              </div>
                               <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-semibold text-irish-brown">
                                   {item.name}
@@ -347,8 +363,8 @@ const AdminMenuPage = () => {
 
         {(showCategoryForm || editingCategory) && (
           <CategoryForm
-            category={editingCategory}
-            onSave={handleSaveCategory}
+            category={editingCategory as Partial<MenuCategory>}
+            onSubmit={handleSaveCategory}
             onCancel={() => {
               setEditingCategory(null);
               setShowCategoryForm(false);

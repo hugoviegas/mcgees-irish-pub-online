@@ -6,6 +6,7 @@ import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { useAuth } from "../contexts/AuthContext";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
+import { supabase } from "@/integrations/supabase/client";
 
 // Allergen icon mapping (add icons as you get them)
 const ALLERGEN_ICONS: Record<string, string | null> = {
@@ -24,6 +25,12 @@ const ALLERGEN_ICONS: Record<string, string | null> = {
   "13": null, // No icon yet
   "14": null, // No icon yet
 };
+
+// Função utilitária para obter a URL pública da imagem do Supabase
+function getMenuItemImageUrl(image?: string) {
+  if (!image || image === "/placeholder.svg") return "/placeholder.svg";
+  return supabase.storage.from("barpics").getPublicUrl(image).data.publicUrl;
+}
 
 const MenuPage = () => {
   const { menuData, loading, error } = useSupabaseMenuData();
@@ -277,7 +284,7 @@ const MenuPage = () => {
                               aria-label={`View details for ${item.name}`}
                             >
                               <img
-                                src={item.image}
+                                src={getMenuItemImageUrl(item.image)}
                                 alt={item.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
@@ -400,7 +407,7 @@ const MenuPage = () => {
                   </button>
                   {selectedItem.image && (
                     <img
-                      src={selectedItem.image}
+                      src={getMenuItemImageUrl(selectedItem.image)}
                       alt={selectedItem.name}
                       className="w-full max-h-80 object-contain rounded mb-4"
                     />
