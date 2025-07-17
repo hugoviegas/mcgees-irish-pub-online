@@ -20,7 +20,7 @@ const LocationSection = () => {
             {/* Replace with your actual Google Maps embed code */}
             <iframe
               title="D'Arcy McGee's Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2384.781585371465!2d-6.326178322738812!3d53.293447472273904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48670b71ab9689ff%3A0x1de5e286e37a4eaa!2sD&#39;Arcy%20McGee&#39;s!5e0!3m2!1spt-BR!2sie!4v1751320446691!5m2!1spt-BR!2sie"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2384.781585371465!2d-6.326178322738812!3d53.293447472273904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48670b71ab9689ff%3A0x1de5e286e37a4eaa!2sD&#39;Arcy%20McGee&#39;s!5e0!3m2!1sen!2sie!4v1751320446691!5m2!1sen!2sie"
               width="100%"
               height="100%"
               style={{ border: 0, minHeight: 420, height: "480px" }}

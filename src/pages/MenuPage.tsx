@@ -82,7 +82,7 @@ const MenuPage = () => {
   // Handle menu hash in URL
   useEffect(() => {
     function setMenuFromHash() {
-      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const hash = window.location.hash.replace("#", "").toLowerCase();
       const found = menus.find((m) => m.id.toLowerCase() === hash);
       if (found) {
         setActiveMenu(found.id);
@@ -90,8 +90,8 @@ const MenuPage = () => {
       }
     }
     setMenuFromHash();
-    window.addEventListener('hashchange', setMenuFromHash);
-    return () => window.removeEventListener('hashchange', setMenuFromHash);
+    window.addEventListener("hashchange", setMenuFromHash);
+    return () => window.removeEventListener("hashchange", setMenuFromHash);
   }, [menus]);
 
   if (loading) {
@@ -148,7 +148,7 @@ const MenuPage = () => {
           </section>
 
           {/* Full-width sticky menu bar section */}
-          <section className="w-full sticky top-16 z-50 bg-[#f8f5f2] border-b border-irish-gold shadow-sm py-2 md:py-4">
+          <section className="w-full sticky top-18 z-50 bg-[#f8f5f2] border-b border-irish-gold shadow-sm py-2 md:py-4">
             <div className="flex flex-row items-center justify-start md:justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-1 md:px-2 w-full">
               {menus.map((menu) => {
                 const isActive = activeMenu === menu.id;
@@ -160,8 +160,7 @@ const MenuPage = () => {
                   activeSection &&
                   menuCategories.find((c) => c.id === activeSection)
                     ? ` — ${
-                        menuCategories.find((c) => c.id === activeSection)
-                          ?.name
+                        menuCategories.find((c) => c.id === activeSection)?.name
                       }`
                     : "";
                 return (
