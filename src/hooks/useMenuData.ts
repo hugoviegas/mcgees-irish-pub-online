@@ -6,6 +6,7 @@ const initialMenuData: MenuCategory[] = [
   {
     id: "starters",
     name: "Starters",
+    menu_type: "aLaCarte",
     items: [
       {
         id: 1,
@@ -60,6 +61,7 @@ const initialMenuData: MenuCategory[] = [
   {
     id: "mains",
     name: "Main Courses",
+    menu_type: "aLaCarte",
     items: [
       {
         id: 7,
@@ -114,6 +116,7 @@ const initialMenuData: MenuCategory[] = [
   {
     id: "steaks-burgers",
     name: "Steaks & Burgers",
+    menu_type: "aLaCarte",
     items: [
       {
         id: 13,
@@ -159,6 +162,7 @@ const initialMenuData: MenuCategory[] = [
   {
     id: "fish",
     name: "Fish",
+    menu_type: "aLaCarte",
     items: [
       {
         id: 18,
@@ -174,13 +178,13 @@ const initialMenuData: MenuCategory[] = [
         description:
           "Fillet of Atlantic salmon, sautéed cream of samphire and monjoulet served with dill sauce and a choice of creamy mash potato or house fries.",
         price: "€19.95",
-        allergens: ["1", "2", "3", "9", "6", "14"],
       },
     ],
   },
   {
     id: "desserts",
     name: "Desserts",
+    menu_type: "aLaCarte",
     items: [
       {
         id: 20,
@@ -222,14 +226,14 @@ const initialMenuData: MenuCategory[] = [
         id: 25,
         name: "Selection of Ice Cream",
         description: "Choose from our selection of flavors.",
-        price: "€7.00",
-        allergens: ["6"],
+        price: "",
       },
     ],
   },
   {
     id: "wines",
     name: "Wines",
+    menu_type: "drinks",
     items: [
       {
         id: 26,
