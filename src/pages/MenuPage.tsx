@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
-import { ALLERGEN_LIST } from "../types/menu";
+import { useAuth } from "../contexts/AuthContext";
+import MenuItemForm from "../components/admin/MenuItemForm";
+import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 
 // Allergen icon mapping (add icons as you get them)
 const ALLERGEN_ICONS: Record<string, string | null> = {
@@ -41,6 +43,14 @@ const MenuPage = () => {
 
   // Add refs for each menu button
   const menuButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [editingItem, setEditingItem] = useState<{
+    item?: MenuItem;
+    categoryId?: string;
+  } | null>(null);
+  const [showItemForm, setShowItemForm] = useState(false);
+  const [addItemCategory, setAddItemCategory] = useState<string | null>(null);
 
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
@@ -93,6 +103,19 @@ const MenuPage = () => {
     window.addEventListener("hashchange", setMenuFromHash);
     return () => window.removeEventListener("hashchange", setMenuFromHash);
   }, [menus]);
+
+  // Adicionar lógica para salvar item (adicionar/editar)
+  const { addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
+  const handleSaveItem = async (item: MenuItem, categoryId: string) => {
+    if (editingItem?.item) {
+      await updateMenuItem(categoryId, item);
+    } else {
+      await addMenuItem(categoryId, item);
+    }
+    setEditingItem(null);
+    setShowItemForm(false);
+    setAddItemCategory(null);
+  };
 
   if (loading) {
     return (
@@ -485,6 +508,30 @@ const MenuPage = () => {
         </main>
       </div>
       <Footer />
+
+      {/* button to add item if user is authenticated */}
+      {isAuthenticated && (
+        <Button
+          className="mb-4 bg-irish-red hover:bg-irish-red/90"
+          onClick={() => setShowItemForm(true)}
+        >
+          Add Item
+        </Button>
+      )}
+
+      {/* Modal of item form */}
+      {(showItemForm || editingItem) && (
+        <MenuItemForm
+          item={editingItem?.item}
+          categoryId={editingItem?.categoryId || addItemCategory || ""}
+          onSave={handleSaveItem}
+          onCancel={() => {
+            setEditingItem(null);
+            setShowItemForm(false);
+            setAddItemCategory(null);
+          }}
+        />
+      )}
     </div>
   );
 };
