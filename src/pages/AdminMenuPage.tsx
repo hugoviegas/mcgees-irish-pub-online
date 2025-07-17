@@ -20,7 +20,10 @@ export interface CategoryFormProps {
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
   if (!image || image === "/placeholder.svg") return "/placeholder.svg";
-  return supabase.storage.from("barpics").getPublicUrl(image).data.publicUrl;
+  // Remove any leading slashes
+  const cleanImage = image.replace(/^\/+/, "");
+  const { data } = supabase.storage.from("barpics").getPublicUrl(cleanImage);
+  return data?.publicUrl || "/placeholder.svg";
 }
 
 const AdminMenuPage = () => {
