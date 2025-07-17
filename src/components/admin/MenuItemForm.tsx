@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MenuItem, ALLERGEN_LIST } from "../../types/menu";
 import { X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MenuItemFormProps {
   item?: MenuItem;
@@ -25,6 +25,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
   });
 
   const [newTag, setNewTag] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   useEffect(() => {
     if (item) {
@@ -74,6 +76,31 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
     }));
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    setImageError(null);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { error } = await supabase.storage.from("barpics").upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      if (error) {
+        setImageError("Error uploading image: " + error.message);
+      } else {
+        const url = `${supabase.storage.from("barpics").getPublicUrl(fileName).data.publicUrl}`;
+        setFormData(prev => ({ ...prev, image: url }));
+      }
+    } catch (err) {
+      setImageError("Error uploading image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -120,12 +147,27 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Image URL</label>
-              <Input
-                value={formData.image || ""}
-                onChange={(e) => handleInputChange("image", e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
+              <label className="block text-sm font-medium mb-2">Image</label>
+              {formData.image && (
+                <img src={formData.image} alt="Menu item" className="mb-2 max-h-32 rounded" />
+              )}
+              <div className="flex gap-2 items-center">
+                <Input
+                  value={formData.image || ""}
+                  onChange={(e) => handleInputChange("image", e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="flex-1"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  className="block"
+                />
+              </div>
+              {uploadingImage && <span className="text-xs text-gray-500 ml-2">Uploading...</span>}
+              {imageError && <span className="text-xs text-red-500 ml-2">{imageError}</span>}
             </div>
 
             <div>
