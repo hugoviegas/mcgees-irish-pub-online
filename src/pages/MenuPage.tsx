@@ -132,6 +132,103 @@ const MenuPage = () => {
             </div>
           </section>
 
+          {/* --- Menu Navigation Bar --- */}
+          {/* Use a fixed bar right after the Navbar, always at the top, full width, with a shadow and background. */}
+          {/* On mobile, make sure the first button is flush left (no horizontal scroll cut-off). */}
+          <div
+            className="fixed left-0 right-0 top-[4rem] z-40 bg-[#f8f5f2] border-b border-irish-gold shadow-sm"
+            style={{ minHeight: "56px" }}
+          >
+            <div
+              className="flex flex-row items-center justify-start gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2 w-full"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              {menus.map((menu, idx) => {
+                const isActive = activeMenu === menu.id;
+                const menuCategories = menuData.filter(
+                  (cat) => cat.menu_type === menu.id
+                );
+                const activeSectionName =
+                  isActive &&
+                  activeSection &&
+                  menuCategories.find((c) => c.id === activeSection)
+                    ? ` — ${
+                        menuCategories.find((c) => c.id === activeSection)?.name
+                      }`
+                    : "";
+                return (
+                  <div
+                    key={menu.id}
+                    className={`relative flex-shrink-0${
+                      idx === 0 ? " ml-0" : ""
+                    }`}
+                    style={idx === 0 ? { marginLeft: 0 } : {}}
+                  >
+                    <button
+                      ref={(el) => (menuButtonRefs.current[menu.id] = el)}
+                      className={`px-4 py-2 text-base md:px-6 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
+                        isActive
+                          ? "bg-irish-red text-white"
+                          : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
+                      }`}
+                      onClick={() => {
+                        setActiveMenu(menu.id);
+                        setActiveSection("");
+                        setDropdownOpen((open) =>
+                          activeMenu === menu.id ? !open : true
+                        );
+                      }}
+                      style={{ minWidth: 120 }}
+                    >
+                      {menu.name}
+                      {isActive && activeSectionName}
+                      <svg
+                        className="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {isActive && dropdownOpen && (
+                      <DropdownMenu
+                        anchorRef={menuButtonRefs.current[menu.id]}
+                        onClose={() => setDropdownOpen(false)}
+                      >
+                        {menuCategories.map((category) => (
+                          <button
+                            key={category.id}
+                            className={`block w-full text-left px-4 py-2 font-serif text-base ${
+                              activeSection === category.id
+                                ? "text-irish-red font-bold"
+                                : "text-irish-brown hover:bg-irish-gold/20"
+                            }`}
+                            onClick={() => {
+                              setActiveMenu(menu.id);
+                              handleSectionSelect(category.id);
+                              setActiveSection(category.id);
+                              setDropdownOpen(false);
+                            }}
+                          >
+                            {category.name}
+                          </button>
+                        ))}
+                      </DropdownMenu>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {/* Add a spacer to push content below the fixed menubar */}
+          <div className="h-[56px] md:h-[64px]" />
+
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               {/* Replace menu type buttons and section dropdown with a single dropdown */}
