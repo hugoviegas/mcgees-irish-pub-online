@@ -508,30 +508,6 @@ const MenuPage = () => {
         </main>
       </div>
       <Footer />
-
-      {/* button to add item if user is authenticated */}
-      {isAuthenticated && (
-        <Button
-          className="mb-4 bg-irish-red hover:bg-irish-red/90"
-          onClick={() => setShowItemForm(true)}
-        >
-          Add Item
-        </Button>
-      )}
-
-      {/* Modal of item form */}
-      {(showItemForm || editingItem) && (
-        <MenuItemForm
-          item={editingItem?.item}
-          categoryId={editingItem?.categoryId || addItemCategory || ""}
-          onSave={handleSaveItem}
-          onCancel={() => {
-            setEditingItem(null);
-            setShowItemForm(false);
-            setAddItemCategory(null);
-          }}
-        />
-      )}
     </div>
   );
 };

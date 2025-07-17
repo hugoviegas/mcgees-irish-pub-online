@@ -11,6 +11,10 @@ import AboutPage from "./pages/AboutPage";
 import ReservationsPage from "./pages/ReservationsPage";
 import NotFound from "./pages/NotFound";
 import LoginForm from "./components/admin/LoginForm";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminMenuPage from "./pages/AdminMenuPage";
+import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -24,7 +28,30 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/menu" element={<MenuPage />} />
-            <Route path="/admin" element={<LoginForm />} />
+            <Route
+              path="/admin/menu"
+              element={
+                <ProtectedRoute>
+                  <AdminMenuPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/events"
+              element={
+                <ProtectedRoute>
+                  <AdminEventsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/reservations" element={<ReservationsPage />} />
