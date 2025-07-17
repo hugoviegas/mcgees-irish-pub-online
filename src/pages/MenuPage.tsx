@@ -132,16 +132,11 @@ const MenuPage = () => {
             </div>
           </section>
 
-          {/* --- Menu Navigation Bar --- */}
-          {/* Use a fixed bar right after the Navbar, always at the top, full width, with a shadow and background. */}
-          {/* On mobile, make sure the first button is flush left (no horizontal scroll cut-off). */}
-          <div
-            className="fixed left-0 right-0 top-[4rem] z-40 bg-[#f8f5f2] border-b border-irish-gold shadow-sm"
-            style={{ minHeight: "56px" }}
-          >
+          {/* --- Menu Navigation Bar (improved, below hero section) --- */}
+          <section className="relative z-30">
             <div
-              className="flex flex-row items-center justify-start gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2 w-full"
-              style={{ WebkitOverflowScrolling: "touch" }}
+              className="w-full flex flex-row items-center justify-center gap-2 md:gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-irish-gold px-2 py-3 md:py-5 bg-[#f8f5f2] border-b border-irish-gold shadow-lg rounded-b-xl sticky md:static top-0"
+              style={{ WebkitOverflowScrolling: "touch", marginTop: '-2.5rem', minHeight: 0 }}
             >
               {menus.map((menu, idx) => {
                 const isActive = activeMenu === menu.id;
@@ -152,21 +147,17 @@ const MenuPage = () => {
                   isActive &&
                   activeSection &&
                   menuCategories.find((c) => c.id === activeSection)
-                    ? ` — ${
-                        menuCategories.find((c) => c.id === activeSection)?.name
-                      }`
+                    ? ` — ${menuCategories.find((c) => c.id === activeSection)?.name}`
                     : "";
                 return (
                   <div
                     key={menu.id}
-                    className={`relative flex-shrink-0${
-                      idx === 0 ? " ml-0" : ""
-                    }`}
+                    className={`relative flex-shrink-0${idx === 0 ? ' ml-0' : ''}`}
                     style={idx === 0 ? { marginLeft: 0 } : {}}
                   >
                     <button
                       ref={(el) => (menuButtonRefs.current[menu.id] = el)}
-                      className={`px-4 py-2 text-base md:px-6 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
+                      className={`px-5 py-2 text-base md:px-7 md:py-3 md:text-xl font-serif font-bold rounded-full shadow transition-colors border-2 border-irish-red focus:outline-none focus:ring-2 focus:ring-irish-gold flex items-center gap-2 justify-center whitespace-nowrap ${
                         isActive
                           ? "bg-irish-red text-white"
                           : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
@@ -179,6 +170,8 @@ const MenuPage = () => {
                         );
                       }}
                       style={{ minWidth: 120 }}
+                      aria-haspopup="listbox"
+                      aria-expanded={isActive && dropdownOpen}
                     >
                       {menu.name}
                       {isActive && activeSectionName}
@@ -188,6 +181,7 @@ const MenuPage = () => {
                         stroke="currentColor"
                         strokeWidth="2"
                         viewBox="0 0 24 24"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -206,7 +200,7 @@ const MenuPage = () => {
                             key={category.id}
                             className={`block w-full text-left px-4 py-2 font-serif text-base ${
                               activeSection === category.id
-                                ? "text-irish-red font-bold"
+                                ? "text-irish-red font-bold bg-irish-gold/10"
                                 : "text-irish-brown hover:bg-irish-gold/20"
                             }`}
                             onClick={() => {
@@ -215,6 +209,8 @@ const MenuPage = () => {
                               setActiveSection(category.id);
                               setDropdownOpen(false);
                             }}
+                            role="option"
+                            aria-selected={activeSection === category.id}
                           >
                             {category.name}
                           </button>
@@ -225,9 +221,9 @@ const MenuPage = () => {
                 );
               })}
             </div>
-          </div>
-          {/* Add a spacer to push content below the fixed menubar */}
-          <div className="h-[56px] md:h-[64px]" />
+          </section>
+          {/* Spacer to push content below nav bar on mobile */}
+          <div className="h-2 md:h-4" />
 
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
