@@ -7,24 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
-
-// Allergen icon mapping (add icons as you get them)
-const ALLERGEN_ICONS: Record<string, string | null> = {
-  "1": "/icons/wheat.png", // Example: gluten/wheat
-  "2": "/icons/egg.png", // Example: eggs (add your icon if you have)
-  "3": "/icons/fish.png", // Example: fish (add your icon if you have)
-  "4": null, // No icon yet
-  "5": null, // No icon yet
-  "6": null, // No icon yet
-  "7": null, // No icon yet
-  "8": null, // No icon yet
-  "9": null, // No icon yet
-  "10": null, // No icon yet
-  "11": null, // No icon yet
-  "12": null, // No icon yet
-  "13": null, // No icon yet
-  "14": null, // No icon yet
-};
+import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
 
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
@@ -310,9 +293,21 @@ const MenuPage = () => {
                             <div className="flex items-center gap-3 mt-auto">
                               {item.allergens?.length > 0 && (
                                 <>
-                                  <span className="text-xs text-irish-red font-bold bg-irish-gold/20 rounded-full px-2 py-1 mr-1">
-                                    {item.allergens.join(", ")}
-                                  </span>
+                                  <div className="flex items-center gap-1 mr-2">
+                                    {item.allergens.map((allergenId) => {
+                                      const IconComponent = ALLERGEN_ICON_COMPONENTS[allergenId];
+                                      return IconComponent ? (
+                                        <IconComponent
+                                          key={allergenId}
+                                          className="w-5 h-5 text-irish-red"
+                                        />
+                                      ) : (
+                                        <span key={allergenId} className="text-xs text-irish-red font-bold">
+                                          {allergenId}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
                                   <button
                                     className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
                                     onClick={() =>
@@ -353,7 +348,7 @@ const MenuPage = () => {
               )}
             </div>
 
-            {/* Allergy Popup Modal */}
+            {/* Updated Allergy Popup Modal */}
             {allergyPopup && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in">
@@ -367,20 +362,16 @@ const MenuPage = () => {
                   <h4 className="text-lg font-bold font-serif mb-4 text-irish-red">
                     Allergens for {allergyPopup.name}
                   </h4>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-3">
                     {allergyPopup.allergens.map((id) => {
                       const allergen = ALLERGEN_LIST.find((a) => a.id === id);
-                      const icon = ALLERGEN_ICONS[id] || null;
+                      const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
                       return (
-                        <div key={id} className="flex items-center gap-2">
-                          {icon ? (
-                            <img
-                              src={icon}
-                              alt={allergen?.name}
-                              className="w-6 h-6"
-                            />
+                        <div key={id} className="flex items-center gap-3">
+                          {IconComponent ? (
+                            <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
                           ) : (
-                            <span className="inline-block w-6 h-6 bg-gray-200 rounded-full" />
+                            <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
                           )}
                           <span className="text-sm font-medium">
                             {allergen?.name || id}
@@ -393,7 +384,7 @@ const MenuPage = () => {
               </div>
             )}
 
-            {/* Item Details Popup Modal */}
+            {/* Updated Item Details Popup Modal */}
             {selectedItem && (
               <div
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
@@ -431,22 +422,18 @@ const MenuPage = () => {
                       <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">
                         Allergens
                       </h4>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3">
                         {selectedItem.allergens.map((id) => {
                           const allergen = ALLERGEN_LIST.find(
                             (a) => a.id === id
                           );
-                          const icon = ALLERGEN_ICONS[id] || null;
+                          const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
                           return (
                             <div key={id} className="flex items-center gap-2">
-                              {icon ? (
-                                <img
-                                  src={icon}
-                                  alt={allergen?.name}
-                                  className="w-6 h-6"
-                                />
+                              {IconComponent ? (
+                                <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
                               ) : (
-                                <span className="inline-block w-6 h-6 bg-gray-200 rounded-full" />
+                                <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
                               )}
                               <span className="text-sm font-medium">
                                 {allergen?.name || id}
