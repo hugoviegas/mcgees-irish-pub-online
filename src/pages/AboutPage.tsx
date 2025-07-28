@@ -38,13 +38,6 @@ const AboutPage = () => {
                     Our Story
                   </h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    D'Arcy McGee's was founded in 1998, creating an authentic
-                    Irish pub experience. Named after Thomas D'Arcy McGee, a
-                    father of Canadian confederation with proud Irish roots, our
-                    pub honors the rich cultural connections between Ireland and
-                    North America.
-                  </p>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
                     What began as a small neighborhood pub has grown into a
                     beloved institution, known for its warm hospitality,
                     excellent food and drinks, and vibrant entertainment.
@@ -176,7 +169,7 @@ const AboutPage = () => {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white/10"
+                  className="border-irish-red text-irish-red hover:bg-irish-red hover:text-white"
                 >
                   <Link to="/contact">Find Us</Link>
                 </Button>

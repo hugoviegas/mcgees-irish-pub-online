@@ -32,6 +32,7 @@ const MenuPage = () => {
   const [selectedItem, setSelectedItem] = useState<
     null | (typeof currentMenuCategories)[0]["items"][0]
   >(null);
+  const [showAllergenModal, setShowAllergenModal] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
@@ -159,9 +160,17 @@ const MenuPage = () => {
                 OUR MENU
               </h1>
               <p className="text-white text-xl max-w-2xl mx-auto font-light">
-                Authentic Irish food and drink made with the finest ingredients
+                Authentic food and drink made with the finest ingredients
                 and traditional recipes.
               </p>
+              <div className="mt-6">
+                <Button
+                  className="bg-irish-gold text-irish-brown hover:bg-irish-gold/90 font-semibold px-6 py-3 rounded shadow"
+                  onClick={() => setShowAllergenModal(true)}
+                >
+                  Click here to see the allergens
+                </Button>
+              </div>
             </div>
           </section>
 
@@ -253,7 +262,7 @@ const MenuPage = () => {
                   <div
                     key={category.id}
                     ref={(el) => (sectionRefs.current[category.id] = el)}
-                    id={category.menu_type} // Add this line to set the id for anchor navigation
+                    id={category.menu_type}
                     className="mb-16"
                   >
                     <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">
@@ -375,6 +384,44 @@ const MenuPage = () => {
                           )}
                           <span className="text-sm font-medium">
                             {allergen?.name || id}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Allergen List Modal */}
+            {showAllergenModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in">
+                  <button
+                    className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
+                    onClick={() => setShowAllergenModal(false)}
+                    aria-label="Close allergen info"
+                  >
+                    ×
+                  </button>
+                  <h4 className="text-xl font-bold font-serif mb-4 text-irish-red text-center">
+                    Allergen Information
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    {ALLERGEN_LIST.map((allergen) => {
+                      const IconComponent = ALLERGEN_ICON_COMPONENTS[allergen.id];
+                      return (
+                        <div key={allergen.id} className="flex items-center gap-4 border-b pb-2">
+                          <span className="text-lg font-bold text-irish-gold w-8 text-center">
+                            {allergen.id}
+                          </span>
+                          {IconComponent ? (
+                            <IconComponent className="w-7 h-7 text-irish-red flex-shrink-0" />
+                          ) : (
+                            <span className="inline-block w-7 h-7 bg-gray-200 rounded-full flex-shrink-0" />
+                          )}
+                          <span className="text-base font-medium text-irish-brown">
+                            {allergen.name}
                           </span>
                         </div>
                       );
