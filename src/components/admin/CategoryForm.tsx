@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MenuCategory } from "@/types/menu";
+import { MenuCategory, MENU_TYPES } from "@/types/menu";
 import { X } from "lucide-react";
 import {
   Select,
@@ -81,7 +81,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               </label>
               <Select
                 value={formData.menu_type}
-                onValueChange={(value: "aLaCarte" | "breakfast" | "drinks") =>
+                onValueChange={(value) =>
                   setFormData((prev) => ({ ...prev, menu_type: value }))
                 }
               >
@@ -89,9 +89,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                   <SelectValue placeholder="Select menu type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="aLaCarte">A La Carte</SelectItem>
-                  <SelectItem value="breakfast">Breakfast</SelectItem>
-                  <SelectItem value="drinks">Drinks</SelectItem>
+                  {MENU_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

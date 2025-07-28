@@ -15,6 +15,13 @@ export type MenuCategory = {
   items: MenuItem[];
 };
 
+export const MENU_TYPES = [
+  { value: "aLaCarte", label: "A La Carte" },
+  { value: "breakfast", label: "Breakfast" },
+  { value: "drinks", label: "Drinks" },
+  { value: "otherMenu", label: "Other Menu" },
+];
+
 export type AllergenInfo = {
   id: string;
   name: string;
