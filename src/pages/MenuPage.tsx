@@ -8,6 +8,7 @@ import MenuItemForm from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
@@ -21,7 +22,7 @@ function getMenuItemImageUrl(image?: string) {
 }
 
 const MenuPage = () => {
-  const { menuData, loading, error } = useSupabaseMenuData();
+  const { menuData, loading, error, addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
   const [activeMenu, setActiveMenu] = useState<
     "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
   >("aLaCarte");
@@ -101,17 +102,42 @@ const MenuPage = () => {
     return () => window.removeEventListener("hashchange", setMenuFromHash);
   }, [menus]);
 
-  // Adicionar lógica para salvar item (adicionar/editar)
-  const { addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
+  // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
-    if (editingItem?.item) {
-      await updateMenuItem(categoryId, item);
-    } else {
-      await addMenuItem(categoryId, item);
+    try {
+      if (editingItem?.item) {
+        await updateMenuItem(categoryId, item);
+      } else {
+        await addMenuItem(categoryId, item);
+      }
+      setEditingItem(null);
+      setShowItemForm(false);
+      setAddItemCategory(null);
+    } catch (error) {
+      console.error("Error saving item:", error);
     }
-    setEditingItem(null);
-    setShowItemForm(false);
-    setAddItemCategory(null);
+  };
+
+  // Handle delete item
+  const handleDeleteItem = async (categoryId: string, itemId: number) => {
+    try {
+      await deleteMenuItem(categoryId, itemId);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
+  // Handle edit item
+  const handleEditItem = (item: MenuItem, categoryId: string) => {
+    setEditingItem({ item, categoryId });
+    setShowItemForm(true);
+  };
+
+  // Handle add item
+  const handleAddItem = (categoryId: string) => {
+    setAddItemCategory(categoryId);
+    setEditingItem({ categoryId });
+    setShowItemForm(true);
   };
 
   if (loading) {
@@ -266,15 +292,48 @@ const MenuPage = () => {
                     id={category.menu_type}
                     className="mb-16"
                   >
-                    <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">
-                      {category.name}
-                    </h2>
+                    <div className="flex items-center justify-between mb-8">
+                      <h2 className="text-3xl font-serif font-bold text-irish-red tracking-wide border-b-2 border-irish-gold inline-block pb-2 px-2">
+                        {category.name}
+                      </h2>
+                      {isAuthenticated && (
+                        <Button
+                          onClick={() => handleAddItem(category.id)}
+                          className="bg-irish-gold text-irish-brown hover:bg-irish-gold/90 flex items-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Item
+                        </Button>
+                      )}
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                       {category.items.map((item) => (
                         <div
                           key={item.id}
                           className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-2xl transition-shadow"
                         >
+                          {/* Admin Edit Controls */}
+                          {isAuthenticated && (
+                            <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEditItem(item, category.id)}
+                                className="bg-white/90 hover:bg-white"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteItem(category.id, item.id)}
+                                className="bg-white/90 hover:bg-white text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+
                           {item.image && (
                             <div
                               className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
@@ -361,6 +420,20 @@ const MenuPage = () => {
                 </p>
               )}
             </div>
+
+            {/* Menu Item Form Modal */}
+            {showItemForm && (
+              <MenuItemForm
+                item={editingItem?.item}
+                categoryId={editingItem?.categoryId || addItemCategory || ""}
+                onSave={handleSaveItem}
+                onCancel={() => {
+                  setShowItemForm(false);
+                  setEditingItem(null);
+                  setAddItemCategory(null);
+                }}
+              />
+            )}
 
             {/* Updated Allergy Popup Modal */}
             {allergyPopup && (
