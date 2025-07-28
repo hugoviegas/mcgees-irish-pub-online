@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MenuCategory } from "@/types/menu";
 
 interface CategoryFormProps {
-  category?: MenuCategory;
+  category?: Partial<MenuCategory>;
   onSubmit: (category: Partial<MenuCategory>) => void;
   onCancel: () => void;
 }
