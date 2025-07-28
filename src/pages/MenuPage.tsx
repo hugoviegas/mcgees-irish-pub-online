@@ -48,11 +48,12 @@ const MenuPage = () => {
   const [showItemForm, setShowItemForm] = useState(false);
   const [addItemCategory, setAddItemCategory] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const menus = [
     { id: "aLaCarte" as const, name: "A La Carte" },
     { id: "breakfast" as const, name: "Breakfast" },
     { id: "drinks" as const, name: "Drinks" },
-    { id: "otherMenu" as const, name: "Other Menu" }, // New section
+    { id: "otherMenu" as const, name: "Other Menu" },
   ];
 
   // Filter categories based on active menu
@@ -160,8 +161,8 @@ const MenuPage = () => {
                 OUR MENU
               </h1>
               <p className="text-white text-xl max-w-2xl mx-auto font-light">
-                Authentic food and drink made with the finest ingredients
-                and traditional recipes.
+                Authentic food and drink made with the finest ingredients and
+                traditional recipes.
               </p>
               <div className="mt-6">
                 <Button
@@ -304,14 +305,18 @@ const MenuPage = () => {
                                 <>
                                   <div className="flex items-center gap-1 mr-2">
                                     {item.allergens.map((allergenId) => {
-                                      const IconComponent = ALLERGEN_ICON_COMPONENTS[allergenId];
+                                      const IconComponent =
+                                        ALLERGEN_ICON_COMPONENTS[allergenId];
                                       return IconComponent ? (
                                         <IconComponent
                                           key={allergenId}
                                           className="w-5 h-5 text-irish-red"
                                         />
                                       ) : (
-                                        <span key={allergenId} className="text-xs text-irish-red font-bold">
+                                        <span
+                                          key={allergenId}
+                                          className="text-xs text-irish-red font-bold"
+                                        >
                                           {allergenId}
                                         </span>
                                       );
@@ -409,9 +414,13 @@ const MenuPage = () => {
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
                     {ALLERGEN_LIST.map((allergen) => {
-                      const IconComponent = ALLERGEN_ICON_COMPONENTS[allergen.id];
+                      const IconComponent =
+                        ALLERGEN_ICON_COMPONENTS[allergen.id];
                       return (
-                        <div key={allergen.id} className="flex items-center gap-4 border-b pb-2">
+                        <div
+                          key={allergen.id}
+                          className="flex items-center gap-4 border-b pb-2"
+                        >
                           <span className="text-lg font-bold text-irish-gold w-8 text-center">
                             {allergen.id}
                           </span>
