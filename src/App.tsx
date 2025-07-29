@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,6 @@ import EventsPage from "./pages/EventsPage";
 import AboutPage from "./pages/AboutPage";
 import ReservationsPage from "./pages/ReservationsPage";
 import NotFound from "./pages/NotFound";
-import LoginForm from "./components/admin/LoginForm";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
@@ -20,9 +20,9 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <BrowserRouter>
-        <TooltipProvider>
+    <TooltipProvider>
+      <AuthProvider>
+        <BrowserRouter>
           <Toaster />
           <Sonner />
           <Routes>
@@ -57,9 +57,9 @@ const App = () => (
             <Route path="/reservations" element={<ReservationsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </TooltipProvider>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

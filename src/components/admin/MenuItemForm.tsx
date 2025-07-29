@@ -1,136 +1,168 @@
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
-import { MenuItem } from "../../types/menu";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MenuItem, ALLERGEN_LIST } from '@/types/menu';
+import { supabase } from '@/integrations/supabase/client';
+import { sanitizeInput } from '@/utils/security';
+import { toast } from '@/components/ui/use-toast';
 
 interface MenuItemFormProps {
   item?: MenuItem;
   categoryId: string;
-  onSubmit: (item: Omit<MenuItem, 'id'>) => void;
+  onSave: (item: MenuItem, categoryId: string) => Promise<void>;
   onCancel: () => void;
 }
 
-// Utility function to sanitize input
-const sanitizeInput = (input: string): string => {
-  return input
-    .replace(/[<>\"']/g, '') // Remove potentially dangerous characters
-    .trim()
-    .slice(0, 1000); // Limit length
-};
-
-const MenuItemForm: React.FC<MenuItemFormProps> = ({
-  item,
-  categoryId,
-  onSubmit,
-  onCancel,
-}) => {
+const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    name: item?.name || "",
-    description: item?.description || "",
-    price: item?.price || "",
-    image: item?.image || "",
-    tags: item?.tags || [],
-    allergens: item?.allergens || [],
+    name: '',
+    description: '',
+    price: '',
+    image: '',
+    allergens: [] as string[],
+    tags: [] as string[],
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [newTag, setNewTag] = useState("");
-  const [newAllergen, setNewAllergen] = useState("");
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        name: item.name || '',
+        description: item.description || '',
+        price: item.price || '',
+        image: item.image || '',
+        allergens: item.allergens || [],
+        tags: item.tags || [],
+      });
+    }
+  }, [item]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInputChange = (field: string, value: string) => {
+    const sanitizedValue = sanitizeInput(value);
+    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+  };
+
+  const handleAllergenToggle = (allergenId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      allergens: prev.allergens.includes(allergenId)
+        ? prev.allergens.filter(id => id !== allergenId)
+        : [...prev.allergens, allergenId]
+    }));
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return null;
+
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `menu-items/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('barpics')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        toast({
+          title: "Upload Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      return filePath;
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: "Upload Error",
+        description: "An unexpected error occurred during upload.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Sanitize all text inputs
-    const sanitizedData = {
-      ...formData,
-      name: sanitizeInput(formData.name),
-      description: sanitizeInput(formData.description),
-      price: sanitizeInput(formData.price),
-      image: formData.image.trim(),
-      tags: formData.tags.map(tag => sanitizeInput(tag)),
-      allergens: formData.allergens.map(allergen => sanitizeInput(allergen)),
-    };
-
-    // Validate required fields
-    if (!sanitizedData.name || !sanitizedData.description || !sanitizedData.price) {
-      alert("Please fill in all required fields");
+    if (!formData.name.trim() || !formData.description.trim() || !formData.price.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
       return;
     }
 
-    // Validate price format
-    const priceRegex = /^[£$€]?\d+(\.\d{2})?$/;
-    if (!priceRegex.test(sanitizedData.price)) {
-      alert("Please enter a valid price format (e.g., £10.99)");
-      return;
-    }
+    try {
+      setSaving(true);
+      
+      let imageUrl = formData.image;
+      if (imageFile) {
+        const uploadedPath = await handleImageUpload(imageFile);
+        if (uploadedPath) {
+          imageUrl = uploadedPath;
+        }
+      }
 
-    onSubmit({
-      ...sanitizedData,
-      category_id: categoryId,
-    });
-  };
+      const menuItem: MenuItem = {
+        id: item?.id || Date.now(),
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        price: formData.price.trim(),
+        image: imageUrl,
+        allergens: formData.allergens,
+        tags: formData.tags,
+      };
 
-  const addTag = () => {
-    const sanitizedTag = sanitizeInput(newTag);
-    if (sanitizedTag && !formData.tags.includes(sanitizedTag)) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, sanitizedTag],
+      await onSave(menuItem, categoryId);
+      
+      toast({
+        title: "Success",
+        description: item ? "Menu item updated successfully!" : "Menu item created successfully!",
       });
-      setNewTag("");
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter((tag) => tag !== tagToRemove),
-    });
-  };
-
-  const addAllergen = () => {
-    const sanitizedAllergen = sanitizeInput(newAllergen);
-    if (sanitizedAllergen && !formData.allergens.includes(sanitizedAllergen)) {
-      setFormData({
-        ...formData,
-        allergens: [...formData.allergens, sanitizedAllergen],
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({
+        title: "Save Error",
+        description: "Failed to save menu item. Please try again.",
+        variant: "destructive",
       });
-      setNewAllergen("");
+    } finally {
+      setSaving(false);
     }
-  };
-
-  const removeAllergen = (allergenToRemove: string) => {
-    setFormData({
-      ...formData,
-      allergens: formData.allergens.filter((allergen) => allergen !== allergenToRemove),
-    });
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-irish-red">
-          {item ? "Edit Menu Item" : "Add New Menu Item"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-6 text-irish-red">
+          {item ? 'Edit Menu Item' : 'Add New Menu Item'}
+        </h2>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              placeholder="Enter item name"
+              onChange={(e) => handleInputChange('name', e.target.value)}
               required
               maxLength={100}
+              placeholder="Enter item name"
             />
           </div>
 
@@ -139,12 +171,10 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Enter item description"
+              onChange={(e) => handleInputChange('description', e.target.value)}
               required
               maxLength={500}
+              placeholder="Enter item description"
               rows={3}
             />
           </div>
@@ -154,104 +184,66 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({
             <Input
               id="price"
               value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              placeholder="e.g., £10.99"
+              onChange={(e) => handleInputChange('price', e.target.value)}
               required
-              maxLength={10}
+              placeholder="e.g., €12.99"
             />
           </div>
 
           <div>
-            <Label htmlFor="image">Image URL</Label>
+            <Label htmlFor="image">Image</Label>
             <Input
               id="image"
-              value={formData.image}
-              onChange={(e) =>
-                setFormData({ ...formData, image: e.target.value })
-              }
-              placeholder="Enter image URL"
-              type="url"
-              maxLength={500}
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              disabled={uploading}
             />
-          </div>
-
-          <div>
-            <Label>Tags</Label>
-            <div className="flex gap-2 mb-2">
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Add a tag"
-                maxLength={50}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTag();
-                  }
-                }}
-              />
-              <Button type="button" onClick={addTag} size="sm">
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                  {tag}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => removeTag(tag)}
-                  />
-                </Badge>
-              ))}
-            </div>
+            {formData.image && (
+              <p className="text-sm text-gray-600 mt-1">
+                Current image: {formData.image}
+              </p>
+            )}
           </div>
 
           <div>
             <Label>Allergens</Label>
-            <div className="flex gap-2 mb-2">
-              <Input
-                value={newAllergen}
-                onChange={(e) => setNewAllergen(e.target.value)}
-                placeholder="Add an allergen"
-                maxLength={50}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addAllergen();
-                  }
-                }}
-              />
-              <Button type="button" onClick={addAllergen} size="sm">
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.allergens.map((allergen) => (
-                <Badge key={allergen} variant="destructive" className="flex items-center gap-1">
-                  {allergen}
-                  <X
-                    className="w-3 h-3 cursor-pointer"
-                    onClick={() => removeAllergen(allergen)}
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {ALLERGEN_LIST.map((allergen) => (
+                <div key={allergen.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={allergen.id}
+                    checked={formData.allergens.includes(allergen.id)}
+                    onCheckedChange={() => handleAllergenToggle(allergen.id)}
                   />
-                </Badge>
+                  <Label htmlFor={allergen.id} className="text-sm">
+                    {allergen.name}
+                  </Label>
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <Button type="submit" className="flex-1">
-              {item ? "Update Item" : "Add Item"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
+          <div className="flex justify-end space-x-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={saving || uploading}
+            >
               Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving || uploading}
+              className="bg-irish-red hover:bg-irish-red/90"
+            >
+              {saving ? 'Saving...' : uploading ? 'Uploading...' : (item ? 'Update' : 'Create')}
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
