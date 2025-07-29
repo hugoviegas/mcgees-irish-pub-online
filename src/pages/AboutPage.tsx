@@ -3,15 +3,8 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import LocationSection from "../components/LocationSection";
-import Gallery from "../components/Gallery";
-import { useEffect, useState } from "react";
-import { getBarPics, BarPic } from "@/integrations/supabase/getBarPics";
 
 const AboutPage = () => {
-  const [images, setImages] = useState<BarPic[]>([]);
-  useEffect(() => {
-    getBarPics().then(setImages);
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -54,7 +47,11 @@ const AboutPage = () => {
                   </p>
                 </div>
                 <div className="md:w-1/2">
-                  <Gallery images={images} />
+                  <img
+                    src="/darcy-uploads/bar_pics/Bar and Restaurant Darcy McGee's.jpg"
+                    alt="Bar and Restaurant Darcy McGee's"
+                    className="w-full h-auto rounded-lg shadow-lg"
+                  />
                 </div>
               </div>
 
