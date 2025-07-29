@@ -59,13 +59,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(true);
       console.log('AuthProvider: Attempting login for:', email);
       
+      // Input validation
+      if (!email || !password) {
+        return { error: 'Email and password are required' };
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
       
       if (error) {
         console.error('AuthProvider: Login error:', error);
+        
+        // Provide user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          return { error: 'Invalid email or password' };
+        } else if (error.message.includes('Email not confirmed')) {
+          return { error: 'Please check your email and confirm your account' };
+        } else if (error.message.includes('Too many requests')) {
+          return { error: 'Too many login attempts. Please try again later.' };
+        }
+        
         return { error: error.message };
       }
       
@@ -74,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {};
     } catch (err) {
       console.error('AuthProvider: Login error:', err);
-      return { error: 'An unexpected error occurred' };
+      return { error: 'An unexpected error occurred. Please try again.' };
     } finally {
       setLoading(false);
     }

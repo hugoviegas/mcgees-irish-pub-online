@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,21 @@ const LoginForm = () => {
     setError("");
     setIsLoading(true);
 
+    // Basic input validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     console.log("Attempting login with:", { email, password: "***" });
 
     const result = await login(email, password);
@@ -29,7 +45,6 @@ const LoginForm = () => {
       setPassword("");
     } else {
       console.log("Login successful, redirecting to admin menu...");
-      // Force navigation to admin menu page
       navigate("/admin", { replace: true });
     }
     setIsLoading(false);
@@ -54,6 +69,7 @@ const LoginForm = () => {
                 placeholder="Enter your email"
                 required
                 disabled={isLoading}
+                autoComplete="email"
               />
             </div>
 
@@ -67,6 +83,7 @@ const LoginForm = () => {
                   placeholder="Enter password"
                   required
                   disabled={isLoading}
+                  autoComplete="current-password"
                 />
                 <Button
                   type="button"
@@ -95,11 +112,6 @@ const LoginForm = () => {
               {isLoading ? "Signing in..." : "Login"}
             </Button>
           </form>
-
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Demo credentials:</p>
-            <p>Password: admin123</p>
-          </div>
         </CardContent>
       </Card>
     </div>
