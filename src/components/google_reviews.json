@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "author": "John Gorry",
+    "profile_photo_url": "/public/placeholder.svg",
+    "rating": 5,
+    "text": "One of my favourite places to eat carvery. Lovely atmosphere and friendly staff. Ample space for dining.",
+    "relative_time_description": "4 months ago"
+  },
+  {
+    "author": "Ursula GB",
+    "profile_photo_url": "/public/placeholder.svg",
+    "rating": 5,
+    "text": "Great food with affordable price, friendly service and a cozy atmosphere.",
+    "relative_time_description": "a year ago"
+  },
+  {
+    "author": "Toan Nguyen",
+    "profile_photo_url": "/public/placeholder.svg",
+    "rating": 5,
+    "text": "Nice and healthy meal, cosy place, kid-friendly, will come again. Loads of parking too. Food: 5 | Service: 5 | Atmosphere: 5",
+    "relative_time_description": "2 months ago"
+  },
+  {
+    "author": "Ann Davis",
+    "profile_photo_url": "/public/placeholder.svg",
+    "rating": 5,
+    "text": "Lovely carvery on Sunday. Plenty of food given. Good selection of food. Food: 5 | Service: 5 | Atmosphere: 5",
+    "relative_time_description": "4 months ago"
+  },
+  {
+    "author": "Jody Fogarty",
+    "profile_photo_url": "/public/placeholder.svg",
+    "rating": 5,
+    "text": "I had not been here in years but had a great experience! The staff were lovely and really accommodating to our toddlers. I got the steak sandwich and I thought it was lovely! We will definitely be back and recommending to others! Thanks a mill",
+    "relative_time_description": "2 years ago"
+  }
+]
