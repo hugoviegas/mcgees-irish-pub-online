@@ -75,7 +75,7 @@ const TestimonialsSection = () => {
                   {review.profile_photo_url && (
                     <img
                       src={review.profile_photo_url}
-                      alt={review.author_name}
+                      alt={review.author_name || review.author}
                       className="w-8 h-8 rounded-full mr-3"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
@@ -83,7 +83,7 @@ const TestimonialsSection = () => {
                     />
                   )}
                   <div>
-                    <h4 className="font-medium text-sm">{review.author_name}</h4>
+                    <h4 className="font-medium text-sm">{review.author_name || review.author}</h4>
                     <p className="text-xs text-gray-500">Google Review</p>
                   </div>
                 </div>

@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface GoogleReview {
-  author_name: string;
+  author_name?: string;
+  author?: string;
   text: string;
   rating: number;
   profile_photo_url: string;
-  time: number;
+  time?: number;
+  relative_time_description?: string;
 }
 
 export const useGoogleReviews = () => {
