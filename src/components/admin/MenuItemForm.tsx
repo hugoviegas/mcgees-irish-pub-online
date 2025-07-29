@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { MenuItem, ALLERGEN_LIST } from '@/types/menu';
 import { supabase } from '@/integrations/supabase/client';
-import { sanitizeInput } from '@/utils/security';
+import { sanitizeTextInput, isValidPrice } from '@/utils/security';
 import { toast } from '@/components/ui/use-toast';
 
 interface MenuItemFormProps {
@@ -45,7 +44,18 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
   }, [item]);
 
   const handleInputChange = (field: string, value: string) => {
-    const sanitizedValue = sanitizeInput(value);
+    let sanitizedValue = sanitizeTextInput(value, field === 'description' ? 500 : 100);
+    
+    // Additional validation for price field
+    if (field === 'price' && value && !isValidPrice(value)) {
+      toast({
+        title: "Invalid Price",
+        description: "Please enter a valid price format (e.g., €12.99)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
   };
 
@@ -102,6 +112,15 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isValidPrice(formData.price)) {
+      toast({
+        title: "Invalid Price",
+        description: "Please enter a valid price format (e.g., €12.99)",
         variant: "destructive",
       });
       return;
