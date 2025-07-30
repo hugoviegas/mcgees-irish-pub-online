@@ -7,11 +7,11 @@ const AboutSection = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
-            <div className="rounded-2xl shadow-2xl overflow-hidden">
+            <div className="rounded-2xl shadow-2xl overflow-hidden aspect-[4/3]">
               <iframe
-                src="https://www.youtube.com/embed/wZ3WjL4QGSQ"
+                src="https://www.youtube.com/embed/wZ3WjL4QGSQ?autoplay=1&mute=1&controls=1&loop=1&playlist=wZ3WjL4QGSQ"
                 title="D'Arcy McGee's Video"
-                className="w-full h-64 md:h-80"
+                className="w-full h-full"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
