@@ -6,8 +6,8 @@ const AboutSection = () => {
     <section id="welcome" className="py-24 md:py-32 bg-white">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-16">
-          <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10">
-            <div className="rounded-2xl shadow-2xl overflow-hidden aspect-[4/3] md:aspect-video">
+          <div className="w-full md:w-1/2 mb-10 md:mb-0 md:pr-10 px-2 md:px-0">
+            <div className="rounded-2xl shadow-2xl overflow-hidden aspect-video">
               <iframe
                 src="https://www.youtube.com/embed/wZ3WjL4QGSQ?autoplay=1&mute=1&controls=1&loop=1&playlist=wZ3WjL4QGSQ"
                 title="D'Arcy McGee's Video"
