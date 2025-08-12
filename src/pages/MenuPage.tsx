@@ -74,7 +74,7 @@ const MenuPage = () => {
   const handleSectionSelect = (sectionId: string) => {
     const ref = sectionRefs.current[sectionId];
     if (ref) {
-      const yOffset = window.innerWidth < 768 ? 120 : 140; // More offset for mobile
+      const yOffset = window.innerWidth < 768 ? 120 : 140; 
       const y = ref.getBoundingClientRect().top + window.pageYOffset - yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }

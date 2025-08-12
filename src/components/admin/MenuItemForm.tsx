@@ -217,17 +217,17 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+            <div>
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
               required
               maxLength={100}
               placeholder="Enter item name"
             />
-          </div>
+            </div>
 
           <div>
             <Label htmlFor="description">Description *</Label>
