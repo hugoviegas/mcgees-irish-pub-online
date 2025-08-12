@@ -6,6 +6,10 @@ export type MenuItem = {
   image?: string;
   tags?: string[];
   allergens?: string[];
+  // Admin controls
+  hidden?: boolean; // mapped from is_hidden in DB
+  availableFrom?: string | null; // ISO string or null
+  availableTo?: string | null; // ISO string or null
 };
 
 export type MenuCategory = {

@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { MenuItem, ALLERGEN_LIST } from '@/types/menu';
 import { supabase } from '@/integrations/supabase/client';
 import { sanitizeTextInput, isValidPrice } from '@/utils/security';
@@ -18,6 +19,32 @@ interface MenuItemFormProps {
 }
 
 const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, onCancel }) => {
+  // Helpers to handle datetime-local formatting
+  const toInputValue = (iso?: string | null) => {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth() + 1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const min = pad(d.getMinutes());
+      return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+    } catch {
+      return '';
+    }
+  };
+  const toIsoStringOrNull = (localVal?: string | null) => {
+    if (!localVal) return null;
+    // localVal like 'YYYY-MM-DDTHH:mm'
+    try {
+      const d = new Date(localVal);
+      return d.toISOString();
+    } catch {
+      return null;
+    }
+  };
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -25,6 +52,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
     image: '',
     allergens: [] as string[],
     tags: [] as string[],
+  hidden: false,
+  availableFrom: '' as string | null,
+  availableTo: '' as string | null,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -38,24 +68,21 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
         price: item.price || '',
         image: item.image || '',
         allergens: item.allergens || [],
-        tags: item.tags || [],
+  tags: item.tags || [],
+  hidden: item.hidden ?? false,
+  availableFrom: toInputValue(item.availableFrom ?? null),
+  availableTo: toInputValue(item.availableTo ?? null),
       });
     }
   }, [item]);
 
   const handleInputChange = (field: string, value: string) => {
-    let sanitizedValue = sanitizeTextInput(value, field === 'description' ? 500 : 100);
-    
-    // Additional validation for price field
-    if (field === 'price' && value && !isValidPrice(value)) {
-      toast({
-        title: "Invalid Price",
-        description: "Please enter a valid price format (e.g., €12.99)",
-        variant: "destructive",
-      });
+    // For text fields, sanitize; for price allow typing and validate on submit/blur
+    if (field === 'price') {
+      setFormData(prev => ({ ...prev, price: value }));
       return;
     }
-    
+    const sanitizedValue = sanitizeTextInput(value, field === 'description' ? 500 : 100);
     setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
   };
 
@@ -128,6 +155,20 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
 
     try {
       setSaving(true);
+      // Validate date range
+      const fromIso = toIsoStringOrNull(formData.availableFrom);
+      const toIso = toIsoStringOrNull(formData.availableTo);
+      if (fromIso && toIso) {
+        if (new Date(fromIso) > new Date(toIso)) {
+          toast({
+            title: 'Invalid Date Range',
+            description: 'Available To must be after Available From.',
+            variant: 'destructive',
+          });
+          setSaving(false);
+          return;
+        }
+      }
       
       let imageUrl = formData.image;
       if (imageFile) {
@@ -144,7 +185,10 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
         price: formData.price.trim(),
         image: imageUrl,
         allergens: formData.allergens,
-        tags: formData.tags,
+  tags: formData.tags,
+  hidden: formData.hidden,
+        availableFrom: fromIso,
+        availableTo: toIso,
       };
 
       await onSave(menuItem, categoryId);
@@ -203,9 +247,36 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
             <Input
               id="price"
               value={formData.price}
+              inputMode="decimal"
               onChange={(e) => handleInputChange('price', e.target.value)}
+              onBlur={(e) => {
+                const val = e.target.value.trim();
+                if (val && !isValidPrice(val)) {
+                  toast({
+                    title: 'Invalid Price',
+                    description: 'Please enter a valid price format (e.g., €12.99)',
+                    variant: 'destructive',
+                  });
+                }
+              }}
               required
               placeholder="e.g., €12.99"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="tags">Tags (comma separated)</Label>
+            <Input
+              id="tags"
+              placeholder="Vegetarian Option, Spicy, Gluten Free"
+              value={formData.tags.join(', ')}
+              onChange={(e) => {
+                const parts = e.target.value
+                  .split(',')
+                  .map((t) => t.trim())
+                  .filter((t) => t.length > 0);
+                setFormData((prev) => ({ ...prev, tags: parts }));
+              }}
             />
           </div>
 
@@ -241,6 +312,36 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="availableFrom">Available From</Label>
+              <Input
+                id="availableFrom"
+                type="datetime-local"
+                value={formData.availableFrom || ''}
+                onChange={(e) => setFormData((p) => ({ ...p, availableFrom: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="availableTo">Available To</Label>
+              <Input
+                id="availableTo"
+                type="datetime-local"
+                value={formData.availableTo || ''}
+                onChange={(e) => setFormData((p) => ({ ...p, availableTo: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Switch
+              id="hidden"
+              checked={formData.hidden}
+              onCheckedChange={(checked) => setFormData((p) => ({ ...p, hidden: !!checked }))}
+            />
+            <Label htmlFor="hidden">Hide Item</Label>
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">

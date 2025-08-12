@@ -78,6 +78,9 @@ export type Database = {
           image: string | null
           name: string
           price: string
+          is_hidden: boolean | null
+          available_from: string | null
+          available_to: string | null
           tags: string[] | null
           updated_at: string | null
         }
@@ -90,6 +93,9 @@ export type Database = {
           image?: string | null
           name: string
           price: string
+          is_hidden?: boolean | null
+          available_from?: string | null
+          available_to?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }
@@ -102,6 +108,9 @@ export type Database = {
           image?: string | null
           name?: string
           price?: string
+          is_hidden?: boolean | null
+          available_from?: string | null
+          available_to?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }

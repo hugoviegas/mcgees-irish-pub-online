@@ -58,9 +58,18 @@ const MenuPage = () => {
   ];
 
   // Filter categories based on active menu
-  const currentMenuCategories = menuData.filter(
-    (category) => category.menu_type === activeMenu
-  );
+  const currentMenuCategories = menuData
+    .filter((category) => category.menu_type === activeMenu)
+    .map((category) => ({
+      ...category,
+      items: category.items.filter((item) => {
+        if (item.hidden) return false;
+        const now = new Date();
+        const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
+        const toOk = !item.availableTo || new Date(item.availableTo) >= now;
+        return fromOk && toOk;
+      }),
+    }));
 
   const handleSectionSelect = (sectionId: string) => {
     const ref = sectionRefs.current[sectionId];

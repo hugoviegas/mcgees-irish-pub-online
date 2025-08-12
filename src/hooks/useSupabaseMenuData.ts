@@ -41,7 +41,7 @@ export const useSupabaseMenuData = () => {
         throw itemsError;
       }
 
-      // Group items by menu type and category
+    // Group items by menu type and category; don't filter here so admin can see all
       const menuWithItems = categories.map((category) => ({
         id: category.id,
         name: category.name,
@@ -56,7 +56,10 @@ export const useSupabaseMenuData = () => {
             image: item.image || "/placeholder.svg",
             tags: item.tags || [],
             allergens: item.allergens || [],
-          })),
+            hidden: !!item.is_hidden,
+            availableFrom: item.available_from,
+            availableTo: item.available_to,
+      })),
       }));
 
       console.log("Processed menu data:", menuWithItems);
@@ -203,6 +206,9 @@ export const useSupabaseMenuData = () => {
         image: item.image || null,
         tags: item.tags || [],
         allergens: item.allergens || [],
+        is_hidden: item.hidden ?? false,
+        available_from: item.availableFrom || null,
+        available_to: item.availableTo || null,
       });
 
       if (error) {
@@ -230,7 +236,7 @@ export const useSupabaseMenuData = () => {
         throw new Error("User not authenticated");
       }
 
-      const { error } = await supabase
+    const { error } = await supabase
         .from("menu_items")
         .update({
           name: updatedItem.name,
@@ -239,6 +245,9 @@ export const useSupabaseMenuData = () => {
           image: updatedItem.image || null,
           tags: updatedItem.tags || [],
           allergens: updatedItem.allergens || [],
+      is_hidden: updatedItem.hidden ?? false,
+      available_from: updatedItem.availableFrom || null,
+      available_to: updatedItem.availableTo || null,
         })
         .eq("id", updatedItem.id);
 
