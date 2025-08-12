@@ -71,46 +71,46 @@ export type Database = {
       menu_items: {
         Row: {
           allergens: string[] | null
+          available_from: string | null
+          available_to: string | null
           category_id: string
           created_at: string | null
           description: string
           id: number
           image: string | null
+          is_hidden: boolean | null
           name: string
           price: string
-          is_hidden: boolean | null
-          available_from: string | null
-          available_to: string | null
           tags: string[] | null
           updated_at: string | null
         }
         Insert: {
           allergens?: string[] | null
+          available_from?: string | null
+          available_to?: string | null
           category_id: string
           created_at?: string | null
           description: string
           id?: number
           image?: string | null
+          is_hidden?: boolean | null
           name: string
           price: string
-          is_hidden?: boolean | null
-          available_from?: string | null
-          available_to?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }
         Update: {
           allergens?: string[] | null
+          available_from?: string | null
+          available_to?: string | null
           category_id?: string
           created_at?: string | null
           description?: string
           id?: number
           image?: string | null
+          is_hidden?: boolean | null
           name?: string
           price?: string
-          is_hidden?: boolean | null
-          available_from?: string | null
-          available_to?: string | null
           tags?: string[] | null
           updated_at?: string | null
         }

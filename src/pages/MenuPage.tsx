@@ -9,6 +9,8 @@ import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
@@ -19,6 +21,16 @@ function getMenuItemImageUrl(image?: string) {
   const cleanImage = image.replace(/^\/+/, "");
   const { data } = supabase.storage.from("barpics").getPublicUrl(cleanImage);
   return data?.publicUrl || "/placeholder.svg";
+}
+
+function formatPrice(value: string) {
+  // normalize simple prices to €X.XX; leave complex strings unchanged
+  const trimmed = value.trim();
+  const simple = trimmed.match(/^€?\s*(\d+(?:[.,]\d{1,2})?)$/);
+  if (!simple) return trimmed;
+  const num = parseFloat(simple[1].replace(',', '.'));
+  if (isNaN(num)) return trimmed;
+  return `€${num.toFixed(2)}`;
 }
 
 const MenuPage = () => {
@@ -62,13 +74,15 @@ const MenuPage = () => {
     .filter((category) => category.menu_type === activeMenu)
     .map((category) => ({
       ...category,
-      items: category.items.filter((item) => {
-        if (item.hidden) return false;
-        const now = new Date();
-        const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
-        const toOk = !item.availableTo || new Date(item.availableTo) >= now;
-        return fromOk && toOk;
-      }),
+      items: isAuthenticated
+        ? category.items
+        : category.items.filter((item) => {
+            if (item.hidden) return false;
+            const now = new Date();
+            const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
+            const toOk = !item.availableTo || new Date(item.availableTo) >= now;
+            return fromOk && toOk;
+          }),
     }));
 
   const handleSectionSelect = (sectionId: string) => {
@@ -152,16 +166,33 @@ const MenuPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="pt-16">
-          <main className="flex-grow flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-irish-red mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading menu...</p>
+      <Navbar />
+      <div className="pt-16">
+        <main className="flex-grow">
+          <section className="py-12 bg-[#f8f5f2]">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 p-5">
+                    <Skeleton className="w-full h-40 rounded-md" />
+                    <div className="mt-4 flex items-start justify-between">
+                      <Skeleton className="h-5 w-2/3" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="h-4 w-full mt-3" />
+                    <Skeleton className="h-4 w-5/6 mt-2" />
+                    <div className="mt-4 flex gap-2">
+                      <Skeleton className="h-9 w-20 rounded-full" />
+                      <Skeleton className="h-9 w-24 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </main>
-        </div>
-        <Footer />
+          </section>
+        </main>
+      </div>
+      <Footer />
       </div>
     );
   }
@@ -319,7 +350,12 @@ const MenuPage = () => {
                       {category.items.map((item) => (
                         <div
                           key={item.id}
-                          className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-2xl transition-shadow"
+                          className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-irish-gold"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`View details for ${item.name}`}
+                          onClick={() => setSelectedItem(item)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedItem(item); } }}
                         >
                           {/* Admin Edit Controls */}
                           {isAuthenticated && (
@@ -327,7 +363,7 @@ const MenuPage = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleEditItem(item, category.id)}
+                                onClick={(e) => { e.stopPropagation(); handleEditItem(item, category.id); }}
                                 className="bg-white/90 hover:bg-white"
                               >
                                 <Edit className="w-4 h-4" />
@@ -335,7 +371,7 @@ const MenuPage = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleDeleteItem(category.id, item.id)}
+                                onClick={(e) => { e.stopPropagation(); handleDeleteItem(category.id, item.id); }}
                                 className="bg-white/90 hover:bg-white text-red-600 hover:text-red-700"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -344,28 +380,26 @@ const MenuPage = () => {
                           )}
 
                           {item.image && (
-                            <div
-                              className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
-                              onClick={() => setSelectedItem(item)}
-                              aria-label={`View details for ${item.name}`}
-                            >
+                            <AspectRatio ratio={4/3} className="bg-gray-100 overflow-hidden">
                               <img
                                 src={getMenuItemImageUrl(item.image)}
                                 alt={item.name}
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
-                            </div>
+                            </AspectRatio>
                           )}
-                          <div className="p-6 flex flex-col flex-grow">
-                            <div className="flex justify-between items-start mb-2">
-                              <h3 className="text-2xl font-bold font-serif text-irish-brown leading-tight">
+                          <div className="p-5 flex flex-col flex-grow">
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="text-[18px] font-semibold font-serif text-irish-brown leading-tight">
                                 {item.name}
                               </h3>
-                              <span className="text-2xl font-semibold text-irish-red ml-2">
-                                {item.price}
+                              <span className="text-[18px] font-semibold text-irish-red ml-2">
+                                {formatPrice(item.price)}
                               </span>
                             </div>
-                            <p className="text-gray-700 text-base mb-4 font-light min-h-[48px]">
+                            <p className="text-gray-700 text-base leading-[1.55] mb-4 font-normal min-h-[48px] overflow-hidden">
                               {item.description}
                             </p>
                             <div className="flex items-center gap-3 mt-auto">
@@ -539,19 +573,29 @@ const MenuPage = () => {
                   >
                     ×
                   </button>
+                  {/* Sticky header with name and price for readability */}
+                  <div className="sticky top-0 z-10 w-full bg-white/95 backdrop-blur border-b border-gray-200 mb-3">
+                    <div className="flex items-center justify-between py-3">
+                      <h3 className="text-lg font-semibold font-serif text-irish-brown">
+                        {selectedItem.name}
+                      </h3>
+                      <span className="text-lg font-semibold text-irish-red">
+                        {formatPrice(selectedItem.price)}
+                      </span>
+                    </div>
+                  </div>
+
                   {selectedItem.image && (
-                    <img
-                      src={getMenuItemImageUrl(selectedItem.image)}
-                      alt={selectedItem.name}
-                      className="w-full max-h-80 object-contain rounded mb-4"
-                    />
+                    <AspectRatio ratio={4/3} className="w-full rounded mb-4 overflow-hidden bg-gray-100">
+                      <img
+                        src={getMenuItemImageUrl(selectedItem.image)}
+                        alt={selectedItem.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                    </AspectRatio>
                   )}
-                  <h3 className="text-2xl font-bold font-serif text-irish-brown mb-2 text-center">
-                    {selectedItem.name}
-                  </h3>
-                  <span className="text-xl font-semibold text-irish-red mb-2">
-                    {selectedItem.price}
-                  </span>
                   <p className="text-gray-700 text-base mb-4 font-light text-center">
                     {selectedItem.description}
                   </p>
