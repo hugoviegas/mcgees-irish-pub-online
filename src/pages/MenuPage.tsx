@@ -11,6 +11,7 @@ import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useLocation } from "react-router-dom";
 
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
@@ -35,6 +36,7 @@ function formatPrice(value: string) {
 
 const MenuPage = () => {
   const { menuData, loading, error, addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
+  const location = useLocation();
   const [activeMenu, setActiveMenu] = useState<
     "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
   >("aLaCarte");
@@ -47,7 +49,9 @@ const MenuPage = () => {
   >(null);
   const [showAllergenModal, setShowAllergenModal] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [highlightedItemId, setHighlightedItemId] = useState<number | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
 
   // Add refs for each menu button
@@ -110,10 +114,51 @@ const MenuPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeSection]);
 
-  // Handle menu hash in URL
+  // Handle menu hash in URL and search navigation
   useEffect(() => {
     function setMenuFromHash() {
       const hash = window.location.hash.replace("#", "").toLowerCase();
+      
+      // Check if it's a search result (item-xxx)
+      if (hash.startsWith("item-")) {
+        const itemId = parseInt(hash.replace("item-", ""));
+        if (!isNaN(itemId)) {
+          // Find which menu/category contains this item
+          let foundMenu = null;
+          let foundCategory = null;
+          
+          for (const category of menuData) {
+            const item = category.items.find(item => item.id === itemId);
+            if (item) {
+              foundMenu = category.menu_type;
+              foundCategory = category.id;
+              break;
+            }
+          }
+          
+          if (foundMenu && foundCategory) {
+            setActiveMenu(foundMenu);
+            setActiveSection(foundCategory);
+            setHighlightedItemId(itemId);
+            
+            // Scroll to the item after a short delay
+            setTimeout(() => {
+              const itemRef = itemRefs.current[itemId];
+              if (itemRef) {
+                const yOffset = window.innerWidth < 768 ? 160 : 180;
+                const y = itemRef.getBoundingClientRect().top + window.pageYOffset - yOffset;
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }, 100);
+            
+            // Clear highlight after 3 seconds
+            setTimeout(() => setHighlightedItemId(null), 3000);
+          }
+          return;
+        }
+      }
+      
+      // Regular menu navigation
       const found = menus.find((m) => m.id.toLowerCase() === hash);
       if (found) {
         setActiveMenu(found.id);
@@ -123,7 +168,7 @@ const MenuPage = () => {
     setMenuFromHash();
     window.addEventListener("hashchange", setMenuFromHash);
     return () => window.removeEventListener("hashchange", setMenuFromHash);
-  }, [menus]);
+  }, [menus, menuData]);
 
   // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
@@ -350,7 +395,12 @@ const MenuPage = () => {
                       {category.items.map((item) => (
                         <div
                           key={item.id}
-                          className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col relative group border border-gray-200 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-irish-gold"
+                          ref={(el) => (itemRefs.current[item.id] = el)}
+                          className={`bg-white rounded-xl shadow-md overflow-hidden flex flex-col relative group border transition-all focus:outline-none focus:ring-2 focus:ring-irish-gold ${
+                            highlightedItemId === item.id
+                              ? "border-irish-gold shadow-xl ring-2 ring-irish-gold ring-opacity-50"
+                              : "border-gray-200 hover:shadow-lg"
+                          }`}
                           role="button"
                           tabIndex={0}
                           aria-label={`View details for ${item.name}`}

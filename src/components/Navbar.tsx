@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import MenuSearch from "./MenuSearch";
+import { MenuItem } from "@/types/menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Check if we're on the home page
   const isHomePage = location.pathname === "/";
@@ -20,6 +25,11 @@ const Navbar = () => {
 
   // Always show solid background except on home page when not scrolled
   const shouldShowSolidBackground = !isHomePage || isScrolled;
+
+  const handleSearchItemSelect = (item: MenuItem) => {
+    // Navigate to menu page and add the item id as a hash
+    navigate(`/menu#item-${item.id}`);
+  };
 
   return (
     <nav
@@ -46,7 +56,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop menu */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center space-x-6">
           <Link
             to="/"
             className={`transition-colors font-medium ${
@@ -87,8 +97,15 @@ const Navbar = () => {
           >
             About
           </Link>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="text-white hover:text-irish-gold transition-colors p-2 rounded-lg hover:bg-white/10"
+            aria-label="Search menu"
+          >
+            <Search className="w-5 h-5" />
+          </button>
         </div>
-        <div className="hidden md:block ml-8">
+        <div className="hidden md:block ml-6">
           <Button
             asChild
             className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red font-semibold px-6 py-2 rounded-lg shadow"
@@ -170,6 +187,14 @@ const Navbar = () => {
             >
               About
             </Link>
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="text-white hover:text-irish-gold transition-colors py-2 flex items-center gap-2"
+              aria-label="Search menu"
+            >
+              <Search className="w-5 h-5" />
+              Search Menu
+            </button>
             <Button
               asChild
               className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red font-semibold px-6 py-2 rounded-lg shadow"
@@ -179,6 +204,13 @@ const Navbar = () => {
           </div>
         </div>
       )}
+
+      {/* Search Modal */}
+      <MenuSearch
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onItemSelect={handleSearchItemSelect}
+      />
     </nav>
   );
 };
