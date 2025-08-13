@@ -114,29 +114,38 @@ const Navbar = () => {
           </Button>
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden text-white focus:outline-none ml-2"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-8 h-8"
+        {/* Mobile menu button and search */}
+        <div className="md:hidden flex items-center space-x-2">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="text-white hover:text-irish-gold transition-colors p-2 rounded-lg hover:bg-white/10"
+            aria-label="Search menu"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={
-                isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
-              }
-            />
-          </svg>
-        </button>
+            <Search className="w-5 h-5" />
+          </button>
+          <button
+            className="text-white focus:outline-none"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-8 h-8"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={
+                  isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu dropdown */}

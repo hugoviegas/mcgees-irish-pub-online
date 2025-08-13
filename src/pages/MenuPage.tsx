@@ -429,7 +429,7 @@ const MenuPage = () => {
                             </div>
                           )}
 
-                          {item.image && (
+                          {item.image && !item.image.includes('placeholder') && item.image !== "/placeholder.svg" && (
                             <AspectRatio ratio={4/3} className="bg-gray-100 overflow-hidden">
                               <img
                                 src={getMenuItemImageUrl(item.image)}
