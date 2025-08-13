@@ -113,7 +113,7 @@ const MenuSearch = ({ isOpen, onClose, onItemSelect }: MenuSearchProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
       <div className="bg-white m-4 md:m-8 lg:mx-auto lg:mt-20 lg:max-w-4xl rounded-xl shadow-2xl overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
