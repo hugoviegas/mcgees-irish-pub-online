@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminSidesPage from "./pages/AdminSidesPage";
 import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminEventsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/sides"
+              element={
+                <ProtectedRoute>
+                  <AdminSidesPage />
                 </ProtectedRoute>
               }
             />

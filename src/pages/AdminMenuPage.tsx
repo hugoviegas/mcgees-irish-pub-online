@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Plus, Edit2, Trash2, LogOut, AlertCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import MenuItemForm from "../components/admin/MenuItemForm";
+import { MenuItemForm } from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
 import { MenuCategory, MenuItem } from "../types/menu";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
@@ -295,14 +295,16 @@ const AdminMenuPage = () => {
                           >
                             <CardContent className="p-4">
                               {/* Exibir imagem do Supabase se houver */}
-                              <div className="w-full h-40 flex items-center justify-center mb-2 bg-gray-100 rounded overflow-hidden">
-                                <img
-                                  src={getMenuItemImageUrl(item.image)}
-                                  alt={item.name}
-                                  className="object-cover w-full h-full"
-                                  style={{ maxHeight: 160 }}
-                                />
-                              </div>
+                              {item.images && item.images.length > 0 && (
+                                <div className="w-full h-40 flex items-center justify-center mb-2 bg-gray-100 rounded overflow-hidden">
+                                  <img
+                                    src={getMenuItemImageUrl(item.images[0].imageUrl)}
+                                    alt={item.name}
+                                    className="object-cover w-full h-full"
+                                    style={{ maxHeight: 160 }}
+                                  />
+                                </div>
+                              )}
                               <div className="flex justify-between items-start mb-2">
                                 <h4 className="font-semibold text-irish-brown">
                                   {item.name}

@@ -3,12 +3,28 @@ export type MenuItem = {
   name: string;
   description: string;
   price: string;
-  image?: string;
+  images?: MenuItemImage[];
   tags?: string[];
   allergens?: string[];
   hidden?: boolean; // mapped from is_hidden in DB
   availableFrom?: string | null; // ISO string or null
   availableTo?: string | null; // ISO string or null
+  displayOrder?: number;
+  sides?: Side[];
+};
+
+export type MenuItemImage = {
+  id: string;
+  menuItemId: number;
+  imageUrl: string;
+  displayOrder: number;
+};
+
+export type Side = {
+  id: string;
+  name: string;
+  description?: string;
+  price?: string;
 };
 
 export type MenuCategory = {

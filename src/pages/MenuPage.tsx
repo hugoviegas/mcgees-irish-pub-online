@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { useAuth } from "../contexts/AuthContext";
-import MenuItemForm from "../components/admin/MenuItemForm";
+import { MenuItemForm } from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
@@ -429,10 +429,10 @@ const MenuPage = () => {
                             </div>
                           )}
 
-                          {item.image && !item.image.includes('placeholder') && item.image !== "/placeholder.svg" && (
+                          {item.images && item.images.length > 0 && (
                             <AspectRatio ratio={4/3} className="bg-gray-100 overflow-hidden">
                               <img
-                                src={getMenuItemImageUrl(item.image)}
+                                src={getMenuItemImageUrl(item.images[0].imageUrl)}
                                 alt={item.name}
                                 loading="lazy"
                                 decoding="async"
@@ -635,10 +635,10 @@ const MenuPage = () => {
                     </div>
                   </div>
 
-                  {selectedItem.image && (
+                  {selectedItem.images && selectedItem.images.length > 0 && (
                     <AspectRatio ratio={4/3} className="w-full rounded mb-4 overflow-hidden bg-gray-100">
                       <img
-                        src={getMenuItemImageUrl(selectedItem.image)}
+                        src={getMenuItemImageUrl(selectedItem.images[0].imageUrl)}
                         alt={selectedItem.name}
                         loading="lazy"
                         decoding="async"

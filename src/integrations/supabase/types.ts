@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -68,6 +68,74 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_item_images: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          menu_item_id: number
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          menu_item_id: number
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          menu_item_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_images_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_item_sides: {
+        Row: {
+          created_at: string
+          id: string
+          menu_item_id: number
+          side_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          menu_item_id: number
+          side_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          menu_item_id?: number
+          side_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_sides_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_item_sides_side_id_fkey"
+            columns: ["side_id"]
+            isOneToOne: false
+            referencedRelation: "sides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_items: {
         Row: {
           allergens: string[] | null
@@ -76,8 +144,8 @@ export type Database = {
           category_id: string
           created_at: string | null
           description: string
+          display_order: number | null
           id: number
-          image: string | null
           is_hidden: boolean | null
           name: string
           price: string
@@ -91,8 +159,8 @@ export type Database = {
           category_id: string
           created_at?: string | null
           description: string
+          display_order?: number | null
           id?: number
-          image?: string | null
           is_hidden?: boolean | null
           name: string
           price: string
@@ -106,8 +174,8 @@ export type Database = {
           category_id?: string
           created_at?: string | null
           description?: string
+          display_order?: number | null
           id?: number
-          image?: string | null
           is_hidden?: boolean | null
           name?: string
           price?: string
@@ -123,6 +191,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sides: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          price: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          price?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
