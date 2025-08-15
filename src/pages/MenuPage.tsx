@@ -149,8 +149,13 @@ const MenuPage = () => {
                 const yOffset = window.innerWidth < 768 ? 160 : 180;
                 const y = itemRef.getBoundingClientRect().top + window.pageYOffset - yOffset;
                 window.scrollTo({ top: y, behavior: "smooth" });
+                
+                // Clear the hash after scrolling to prevent navigation issues
+                setTimeout(() => {
+                  history.replaceState(null, "", window.location.pathname);
+                }, 1000);
               }
-            }, 100);
+            }, 300);
             
             // Clear highlight after 3 seconds
             setTimeout(() => setHighlightedItemId(null), 3000);
@@ -313,12 +318,14 @@ const MenuPage = () => {
                           : "bg-white text-irish-red hover:bg-irish-red hover:text-white"
                       }`}
                       onClick={() => {
-                        setActiveMenu(menu.id);
-                        setActiveSection("");
-                        setDropdownOpen((open) =>
-                          activeMenu === menu.id ? !open : true
-                        );
-                        window.location.hash = menu.id; // update hash
+                        if (activeMenu === menu.id) {
+                          setDropdownOpen(!dropdownOpen);
+                        } else {
+                          setActiveMenu(menu.id);
+                          setActiveSection("");
+                          setDropdownOpen(true);
+                          window.location.hash = menu.id; // update hash
+                        }
                       }}
                     >
                       {menu.name}

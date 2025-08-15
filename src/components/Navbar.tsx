@@ -27,6 +27,8 @@ const Navbar = () => {
   const shouldShowSolidBackground = !isHomePage || isScrolled;
 
   const handleSearchItemSelect = (item: MenuItem) => {
+    // Close search first
+    setIsSearchOpen(false);
     // Navigate to menu page and add the item id as a hash
     navigate(`/menu#item-${item.id}`);
   };
