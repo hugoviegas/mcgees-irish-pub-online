@@ -62,3 +62,21 @@ export const ALLERGEN_LIST: AllergenInfo[] = [
   { id: "13", name: "MOLLUSCS" },
   { id: "14", name: "CRUSTACEANS" },
 ];
+
+// Allergen ID mapping for easy lookup
+export const ALLERGEN_NUMBERS = {
+  "GLUTEN/WHEAT": "1",
+  "EGGS": "2", 
+  "FISH": "3",
+  "PEANUTS": "4",
+  "SOYA BEANS": "5",
+  "MILK": "6",
+  "NUTS": "7",
+  "CELERY": "8",
+  "MUSTARD": "9",
+  "SESAME SEEDS": "10",
+  "SULPHUR DIOXIDE": "11",
+  "LUPIN": "12",
+  "MOLLUSCS": "13",
+  "CRUSTACEANS": "14"
+};

@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Plus, Edit2, Trash2, LogOut, AlertCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, LogOut, AlertCircle, ArrowUp, ArrowDown } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { MenuItemForm } from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
-import { MenuCategory, MenuItem } from "../types/menu";
+import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageCarousel } from "@/components/ImageCarousel";
 
 export interface CategoryFormProps {
   category?: MenuCategory;
@@ -154,6 +155,35 @@ const AdminMenuPage = () => {
     }
   };
 
+  const handleMoveItem = async (categoryId: string, item: MenuItem, direction: 'up' | 'down') => {
+    const category = menuData.find(cat => cat.id === categoryId);
+    if (!category) return;
+
+    const items = [...category.items].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    const currentIndex = items.findIndex(i => i.id === item.id);
+    
+    if (currentIndex === -1) return;
+    if (direction === 'up' && currentIndex === 0) return;
+    if (direction === 'down' && currentIndex === items.length - 1) return;
+
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    const swapItem = items[newIndex];
+
+    try {
+      // Swap display orders
+      const updatedItem = { ...item, displayOrder: swapItem.displayOrder || 0 };
+      const updatedSwapItem = { ...swapItem, displayOrder: item.displayOrder || 0 };
+
+      await updateMenuItem(categoryId, updatedItem);
+      await updateMenuItem(categoryId, updatedSwapItem);
+
+      toast.success("Item order updated!");
+    } catch (err) {
+      console.error("Error moving item:", err);
+      toast.error("Failed to update item order");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -287,75 +317,112 @@ const AdminMenuPage = () => {
                         No items in this category
                       </p>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {category.items.map((item) => (
+                      <div className="space-y-4">
+                        {category.items
+                          .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+                          .map((item, index) => (
                           <Card
                             key={item.id}
                             className="border border-gray-200"
                           >
                             <CardContent className="p-4">
-                              {/* Exibir imagem do Supabase se houver */}
-                              {item.images && item.images.length > 0 && (
-                                <div className="w-full h-40 flex items-center justify-center mb-2 bg-gray-100 rounded overflow-hidden">
-                                  <img
-                                    src={getMenuItemImageUrl(item.images[0].imageUrl)}
-                                    alt={item.name}
-                                    className="object-cover w-full h-full"
-                                    style={{ maxHeight: 160 }}
-                                  />
+                              <div className="flex gap-4">
+                                {/* Image with carousel */}
+                                <div className="w-32 h-32 flex-shrink-0">
+                                  {item.images && item.images.length > 0 ? (
+                                    <ImageCarousel
+                                      images={item.images}
+                                      itemName={item.name}
+                                      className="w-full h-full rounded"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-gray-100 rounded flex items-center justify-center">
+                                      <span className="text-gray-400 text-xs">No image</span>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-semibold text-irish-brown">
-                                  {item.name}
-                                </h4>
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() =>
-                                      setEditingItem({
-                                        item,
-                                        categoryId: category.id,
-                                      })
-                                    }
-                                  >
-                                    <Edit2 className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() =>
-                                      handleDeleteMenuItem(category.id, item.id)
-                                    }
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
+
+                                {/* Content */}
+                                <div className="flex-1">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-semibold text-irish-brown">
+                                      {item.name}
+                                    </h4>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleMoveItem(category.id, item, 'up')}
+                                        disabled={index === 0}
+                                        title="Move up"
+                                      >
+                                        <ArrowUp className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleMoveItem(category.id, item, 'down')}
+                                        disabled={index === category.items.length - 1}
+                                        title="Move down"
+                                      >
+                                        <ArrowDown className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() =>
+                                          setEditingItem({
+                                            item,
+                                            categoryId: category.id,
+                                          })
+                                        }
+                                      >
+                                        <Edit2 className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() =>
+                                          handleDeleteMenuItem(category.id, item.id)
+                                        }
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                  <p className="text-sm text-gray-600 mb-2">
+                                    {item.description}
+                                  </p>
+                                  <p className="font-medium text-irish-red mb-2">
+                                    {item.price}
+                                  </p>
+                                  {item.allergens && item.allergens.length > 0 && (
+                                    <p className="text-xs text-gray-500 mb-2">
+                                      Allergens: {item.allergens.map(id => {
+                                        const allergen = ALLERGEN_LIST.find(a => a.id === id);
+                                        return allergen ? `${id}. ${allergen.name}` : id;
+                                      }).join(", ")}
+                                    </p>
+                                  )}
+                                  {item.sides && item.sides.length > 0 && (
+                                    <p className="text-xs text-gray-500 mb-2">
+                                      Sides: {item.sides.map(side => side.name).join(", ")}
+                                    </p>
+                                  )}
+                                  {item.tags && item.tags.length > 0 && (
+                                    <div className="flex gap-1 flex-wrap">
+                                      {item.tags.map((tag) => (
+                                        <span
+                                          key={tag}
+                                          className="px-2 py-1 text-xs bg-gray-100 rounded"
+                                        >
+                                          {tag}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                              <p className="text-sm text-gray-600 mb-2">
-                                {item.description}
-                              </p>
-                              <p className="font-medium text-irish-red">
-                                {item.price}
-                              </p>
-                              {item.allergens && item.allergens.length > 0 && (
-                                <p className="text-xs text-gray-500 mt-2">
-                                  Allergens: {item.allergens.join(", ")}
-                                </p>
-                              )}
-                              {item.tags && item.tags.length > 0 && (
-                                <div className="flex gap-1 mt-2">
-                                  {item.tags.map((tag) => (
-                                    <span
-                                      key={tag}
-                                      className="px-2 py-1 text-xs bg-gray-100 rounded"
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
                             </CardContent>
                           </Card>
                         ))}

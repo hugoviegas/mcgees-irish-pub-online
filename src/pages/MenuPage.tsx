@@ -12,6 +12,7 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useLocation } from "react-router-dom";
+import { ImageCarousel } from "@/components/ImageCarousel";
 
 // Função utilitária para obter a URL pública da imagem do Supabase
 function getMenuItemImageUrl(image?: string) {
@@ -431,12 +432,10 @@ const MenuPage = () => {
 
                           {item.images && item.images.length > 0 && (
                             <AspectRatio ratio={4/3} className="bg-gray-100 overflow-hidden">
-                              <img
-                                src={getMenuItemImageUrl(item.images[0].imageUrl)}
-                                alt={item.name}
-                                loading="lazy"
-                                decoding="async"
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              <ImageCarousel
+                                images={item.images}
+                                itemName={item.name}
+                                className="w-full h-full"
                               />
                             </AspectRatio>
                           )}
@@ -459,19 +458,16 @@ const MenuPage = () => {
                                     {item.allergens.map((allergenId) => {
                                       const IconComponent =
                                         ALLERGEN_ICON_COMPONENTS[allergenId];
-                                      return IconComponent ? (
-                                        <IconComponent
-                                          key={allergenId}
-                                          className="w-5 h-5 text-irish-red"
-                                        />
-                                      ) : (
-                                        <span
-                                          key={allergenId}
-                                          className="text-xs text-irish-red font-bold"
-                                        >
-                                          {allergenId}
-                                        </span>
-                                      );
+                                       return (
+                                         <div key={allergenId} className="flex items-center gap-1">
+                                           <span className="text-xs font-bold text-irish-red bg-irish-gold/20 rounded-full w-5 h-5 flex items-center justify-center">
+                                             {allergenId}
+                                           </span>
+                                           {IconComponent && (
+                                             <IconComponent className="w-4 h-4 text-irish-red" />
+                                           )}
+                                         </div>
+                                       );
                                     })}
                                   </div>
                                   <button
@@ -553,9 +549,9 @@ const MenuPage = () => {
                           ) : (
                             <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
                           )}
-                          <span className="text-sm font-medium">
-                            {allergen?.name || id}
-                          </span>
+                           <span className="text-sm font-medium">
+                             {id}. {allergen?.name || id}
+                           </span>
                         </div>
                       );
                     })}
@@ -635,17 +631,15 @@ const MenuPage = () => {
                     </div>
                   </div>
 
-                  {selectedItem.images && selectedItem.images.length > 0 && (
-                    <AspectRatio ratio={4/3} className="w-full rounded mb-4 overflow-hidden bg-gray-100">
-                      <img
-                        src={getMenuItemImageUrl(selectedItem.images[0].imageUrl)}
-                        alt={selectedItem.name}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                    </AspectRatio>
-                  )}
+                   {selectedItem.images && selectedItem.images.length > 0 && (
+                     <AspectRatio ratio={4/3} className="w-full rounded mb-4 overflow-hidden bg-gray-100">
+                       <ImageCarousel
+                         images={selectedItem.images}
+                         itemName={selectedItem.name}
+                         className="w-full h-full"
+                       />
+                     </AspectRatio>
+                   )}
                   <p className="text-gray-700 text-base mb-4 font-light text-center">
                     {selectedItem.description}
                   </p>
@@ -667,9 +661,9 @@ const MenuPage = () => {
                               ) : (
                                 <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
                               )}
-                              <span className="text-sm font-medium">
-                                {allergen?.name || id}
-                              </span>
+                           <span className="text-sm font-medium">
+                             {id}. {allergen?.name || id}
+                           </span>
                             </div>
                           );
                         })}
