@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -25,6 +26,7 @@ const Hero = () => {
             <Button
               asChild
               className="border-white text-white hover:bg-white/10"
+              variant="outline"
             >
               <Link to="/reservations">Book a Table</Link>
             </Button>

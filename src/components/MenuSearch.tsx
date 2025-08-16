@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import { useSupabaseMenuData } from "@/hooks/useSupabaseMenuData";
@@ -25,6 +26,19 @@ const MenuSearch = ({ isOpen, onClose, onItemSelect }: MenuSearchProps) => {
     if (isOpen) {
       setSearchQuery("");
     }
+  }, [isOpen]);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   // Get all menu items with their categories
@@ -110,10 +124,20 @@ const MenuSearch = ({ isOpen, onClose, onItemSelect }: MenuSearchProps) => {
     onClose();
   };
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+      style={{ zIndex: 999999 }}
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white m-4 md:m-8 lg:mx-auto lg:mt-20 lg:max-w-4xl rounded-xl shadow-2xl overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
