@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { useAuth } from "../contexts/AuthContext";
-import { MenuItemForm } from "../components/admin/MenuItemForm";
+import MenuItemForm from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
@@ -36,6 +36,45 @@ function formatPrice(value: string) {
   return `€${num.toFixed(2)}`;
 }
 
+// DropdownMenu component
+const DropdownMenu = ({ anchorRef, onClose, children }: {
+  anchorRef: HTMLElement | null;
+  onClose: () => void;
+  children: React.ReactNode;
+}) => {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (anchorRef) {
+      const rect = anchorRef.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX
+      });
+    }
+  }, [anchorRef]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (anchorRef && !anchorRef.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [anchorRef, onClose]);
+
+  return (
+    <div
+      className="absolute z-50 bg-white border border-gray-200 rounded-md shadow-lg py-2 min-w-48"
+      style={{ top: position.top, left: position.left }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const MenuPage = () => {
   const { menuData, loading, error, addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
   const location = useLocation();
@@ -50,9 +89,12 @@ const MenuPage = () => {
     null | (typeof currentMenuCategories)[0]["items"][0]
   >(null);
   const [showAllergenModal, setShowAllergenModal] = useState(false);
+  const [showSpecialsModal, setShowSpecialsModal] = useState(false);
   const [highlightedItemId, setHighlightedItemId] = useState<number | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const menuButtonRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
 
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -285,12 +327,18 @@ const MenuPage = () => {
                 Authentic food and drink made with the finest ingredients and
                 traditional recipes.
               </p>
-              <div className="mt-6">
+              <div className="mt-6 flex gap-4 justify-center">
                 <Button
                   className="bg-irish-gold text-irish-brown hover:bg-irish-gold/90 font-semibold px-6 py-3 rounded shadow"
                   onClick={() => setShowAllergenModal(true)}
                 >
                   Click here to see the allergens
+                </Button>
+                <Button
+                  className="bg-white text-irish-red hover:bg-gray-100 font-semibold px-6 py-3 rounded shadow border-2 border-irish-gold"
+                  onClick={() => setShowSpecialsModal(true)}
+                >
+                  Chef's Specials
                 </Button>
               </div>
             </div>
@@ -605,6 +653,41 @@ const MenuPage = () => {
                         </div>
                       );
                     })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Chef's Specials Modal */}
+            {showSpecialsModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowSpecialsModal(false)}>
+                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
+                    onClick={() => setShowSpecialsModal(false)}
+                    aria-label="Close specials modal"
+                  >
+                    ×
+                  </button>
+                  <h4 className="text-xl font-bold font-serif mb-4 text-irish-red text-center">
+                    Chef's Specials
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="border-b pb-4">
+                      <h5 className="font-semibold text-irish-brown mb-2">Today's Special</h5>
+                      <p className="text-gray-700">Pan-seared salmon with lemon butter sauce, served with seasonal vegetables and roasted potatoes.</p>
+                      <p className="text-irish-red font-semibold mt-2">€18.50</p>
+                    </div>
+                    <div className="border-b pb-4">
+                      <h5 className="font-semibold text-irish-brown mb-2">Weekend Feature</h5>
+                      <p className="text-gray-700">Traditional Irish lamb stew with crusty bread, perfect for the weekend.</p>
+                      <p className="text-irish-red font-semibold mt-2">€16.00</p>
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-irish-brown mb-2">Chef's Dessert</h5>
+                      <p className="text-gray-700">Homemade Bailey's cheesecake with chocolate drizzle.</p>
+                      <p className="text-irish-red font-semibold mt-2">€7.50</p>
+                    </div>
                   </div>
                 </div>
               </div>
