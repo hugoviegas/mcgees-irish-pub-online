@@ -12,6 +12,7 @@ export type MenuItem = {
   availableTo?: string | null; // ISO string or null
   displayOrder?: number;
   sides?: Side[];
+  showSidesOutside?: boolean;
 };
 
 export type ExtraOption = {

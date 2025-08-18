@@ -52,6 +52,7 @@ const MenuPage = () => {
   const [showAllergenModal, setShowAllergenModal] = useState(false);
   const [showSpecialsModal, setShowSpecialsModal] = useState(false);
   const [highlightedItemId, setHighlightedItemId] = useState<number | null>(null);
+  const [visibleSidesFor, setVisibleSidesFor] = useState<number | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const [activeSection, setActiveSection] = useState<string>("");
@@ -422,6 +423,7 @@ const MenuPage = () => {
                             <p className="text-gray-700 text-base leading-[1.55] mb-4 font-normal min-h-[48px] overflow-hidden">
                               {item.description}
                             </p>
+                            {/* Sides shown inside the big item modal automatically when available */}
                             <div className="flex items-center gap-3 mt-auto">
                               {item.allergens?.length > 0 && (
                                 <>
@@ -458,6 +460,15 @@ const MenuPage = () => {
                                   </button>
                                 </>
                               )}
+                              {item.sides && item.sides.length > 0 && item.showSidesOutside && (
+                                <button
+                                  className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
+                                  onClick={(e) => { e.stopPropagation(); setVisibleSidesFor(visibleSidesFor === item.id ? null : item.id); }}
+                                  aria-label={`Show sides for ${item.name}`}
+                                >
+                                  Sides
+                                </button>
+                              )}
                               {item.tags?.length > 0 && (
                                 <div className="flex flex-wrap gap-1 ml-2">
                                   {item.tags.map((tag) => (
@@ -472,6 +483,18 @@ const MenuPage = () => {
                               )}
                             </div>
                           </div>
+                          {item.showSidesOutside && visibleSidesFor === item.id && item.sides && item.sides.length > 0 && (
+                            <div className="p-4 border-t bg-gray-50">
+                              <strong className="text-sm block mb-1">Available sides</strong>
+                              <div className="flex flex-wrap gap-3">
+                                {item.sides.map((s) => (
+                                  <div key={s.id} className="px-3 py-2 bg-white rounded shadow-sm text-sm">
+                                    {s.name}{s.price ? ` — ${s.price}` : ''}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -650,6 +673,16 @@ const MenuPage = () => {
                   <p className="text-gray-700 text-base mb-4 font-light text-center">
                     {selectedItem.description}
                   </p>
+                  {selectedItem.sides && selectedItem.sides.length > 0 && (
+                    <div className="mb-4 w-full">
+                      <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">Sides</h4>
+                      <ul className="list-disc list-inside text-sm text-gray-700">
+                        {selectedItem.sides.map((s) => (
+                          <li key={s.id}>{s.name}{s.price ? ` — ${s.price}` : ''}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {selectedItem.allergens?.length > 0 && (
                     <div className="mb-4 w-full">
                       <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">

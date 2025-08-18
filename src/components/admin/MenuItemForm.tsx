@@ -61,6 +61,10 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || '');
+  const { sides: availableSides, addSide: addGlobalSide } = useSidesData();
+  const [showSidesOutside, setShowSidesOutside] = useState<boolean>(item?.showSidesOutside || false);
+  const [newSideName, setNewSideName] = useState('');
+  const [newSidePrice, setNewSidePrice] = useState('');
 
   useEffect(() => {
     if (item) {
@@ -76,6 +80,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       setAllergens(item.allergens || []);
       setSelectedSides(item.sides || []);
   setExtras(item.extras?.map(e => ({ id: e.id, name: e.name, price: e.price })) || []);
+  setShowSidesOutside(item.showSidesOutside ?? false);
       if (item.images) {
         setImages(item.images.map(img => ({
           id: img.id,
@@ -108,6 +113,26 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         ? prev.filter(s => s.id !== side.id)
         : [...prev, side]
     );
+  };
+
+  const handleAddNewSide = async () => {
+    const name = newSideName.trim();
+    const price = newSidePrice.trim();
+    if (!name) {
+      toast.error('Please enter a name for the new side');
+      return;
+    }
+    try {
+      const created = await addGlobalSide({ name, description: undefined, price: price || undefined });
+      // add to selectedSides
+      setSelectedSides(prev => [...prev, created]);
+      setNewSideName('');
+      setNewSidePrice('');
+      toast.success('Side added');
+    } catch (err) {
+      console.error('Error creating side inline:', err);
+      toast.error('Failed to add side');
+    }
   };
 
   const handleImageUpload = async (file: File) => {
@@ -212,7 +237,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
           imageUrl: img.url,
           displayOrder: index
         })),
-        sides: selectedSides
+  sides: selectedSides,
+  showSidesOutside
       };
 
       await onSave(menuItem, selectedCategory);
@@ -415,6 +441,47 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <Label>Available Sides</Label>
+                    <div className="mt-2 max-h-40 overflow-y-auto space-y-2">
+                      {availableSides.map((side) => (
+                        <div key={side.id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={!!selectedSides.find(s => s.id === side.id)}
+                            onChange={() => handleSideToggle(side)}
+                          />
+                          <span className="flex-1">{side.name}{side.price ? ` — ${side.price}` : ''}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <Input
+                        placeholder="New side name"
+                        value={newSideName}
+                        onChange={(e) => setNewSideName(e.target.value)}
+                      />
+                      <Input
+                        placeholder="Price (optional)"
+                        value={newSidePrice}
+                        onChange={(e) => setNewSidePrice(e.target.value)}
+                      />
+                      <div className="col-span-2 flex justify-end">
+                        <Button type="button" onClick={handleAddNewSide}>Add Side</Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Side display</Label>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-2">
+                        <Checkbox id="showOutside" checked={showSidesOutside} onCheckedChange={(v) => setShowSidesOutside(!!v)} />
+                        <Label htmlFor="showOutside">Show sides outside item</Label>
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor="availableFrom">Available From</Label>
                     <Input

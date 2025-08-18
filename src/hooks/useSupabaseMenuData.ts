@@ -53,6 +53,8 @@ export const useSupabaseMenuData = () => {
             displayOrder: img.display_order
           })) || [],
           sides: dbItem.sides?.map((s: any) => s.sides).filter(Boolean) || []
+          ,
+          showSidesOutside: dbItem.show_sides_outside || false
         })) || [];
 
         // Sort items by display_order
@@ -209,6 +211,7 @@ export const useSupabaseMenuData = () => {
           description: item.description,
           price: item.price,
           extras: item.extras || [],
+          show_sides_outside: item.showSidesOutside || false,
           display_order: nextOrder,
           tags: item.tags || [],
           allergens: item.allergens || [],
@@ -284,6 +287,7 @@ export const useSupabaseMenuData = () => {
           description: updatedItem.description,
           price: updatedItem.price,
           extras: updatedItem.extras || [],
+          show_sides_outside: updatedItem.showSidesOutside || false,
           display_order: updatedItem.displayOrder,
           tags: updatedItem.tags || [],
           allergens: updatedItem.allergens || [],
