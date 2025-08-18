@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { X, Upload, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSidesData } from '@/hooks/useSidesData';
+
+interface FormImage {
+  id?: string;
+  file?: File;
+  url: string;
+  displayOrder: number;
+}
 
 interface MenuItemFormProps {
   item?: MenuItem;
@@ -29,23 +37,12 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       const yyyy = d.getFullYear();
       const mm = pad(d.getMonth() + 1);
       const dd = pad(d.getDate());
-      const hh = pad(d.getHours());
-      const min = pad(d.getMinutes());
-      return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+      return `${yyyy}-${mm}-${dd}`;
     } catch {
       return '';
     }
   };
-  const toIsoStringOrNull = (localVal?: string | null) => {
-    if (!localVal) return null;
-    // localVal like 'YYYY-MM-DDTHH:mm'
-    try {
-      const d = new Date(localVal);
-      return d.toISOString();
-    } catch {
-      return null;
-    }
-  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -59,6 +56,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
   const [allergens, setAllergens] = useState<string[]>([]);
   const [selectedSides, setSelectedSides] = useState<Side[]>([]);
   const [images, setImages] = useState<FormImage[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || '');
@@ -69,18 +67,24 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         name: item.name || '',
         description: item.description || '',
         price: item.price || '',
-        image: item.image || '',
-        allergens: item.allergens || [],
-  tags: item.tags || [],
-  hidden: item.hidden ?? false,
-  availableFrom: toInputValue(item.availableFrom ?? null),
-  availableTo: toInputValue(item.availableTo ?? null),
+        tags: Array.isArray(item.tags) ? item.tags.join(', ') : '',
+        hidden: item.hidden ?? false,
+        availableFrom: toInputValue(item.availableFrom ?? null),
+        availableTo: toInputValue(item.availableTo ?? null),
       });
+      setAllergens(item.allergens || []);
+      setSelectedSides(item.sides || []);
+      if (item.images) {
+        setImages(item.images.map(img => ({
+          id: img.id,
+          url: img.imageUrl,
+          displayOrder: img.displayOrder
+        })));
+      }
     }
   }, [item]);
   
   useEffect(() => {
-    // if parent provides a different initial category, use it
     if (categoryId) setSelectedCategory(categoryId);
   }, [categoryId]);
 
@@ -149,7 +153,6 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       
       if (newIndex >= 0 && newIndex < newImages.length) {
         [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
-        // Update display order
         newImages.forEach((img, i) => {
           img.displayOrder = i;
         });
@@ -167,14 +170,12 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       return;
     }
 
-    // Validate price format
     const priceRegex = /^€?\d+(\.\d{2})?$/;
     if (!priceRegex.test(formData.price.trim())) {
       toast.error('Please enter a valid price (e.g., €12.50 or 12.50)');
       return;
     }
 
-    // Validate date range
     if (formData.availableFrom && formData.availableTo) {
       const fromDate = new Date(formData.availableFrom);
       const toDate = new Date(formData.availableTo);
@@ -186,6 +187,10 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
 
     try {
       setSaving(true);
+
+      if (imageFile) {
+        await handleImageUpload(imageFile);
+      }
 
       const menuItem: MenuItem = {
         id: item?.id || 0,
@@ -207,12 +212,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         sides: selectedSides
       };
 
-      await onSave(menuItem, categoryId);
+      await onSave(menuItem, selectedCategory);
       
-      toast({
-        title: "Success",
-        description: item ? "Menu item updated successfully!" : "Menu item created successfully!",
-      });
+      toast.success(item ? "Menu item updated successfully!" : "Menu item created successfully!");
     } catch (error) {
       console.error('Error saving menu item:', error);
       toast.error('Failed to save menu item');
@@ -282,69 +284,105 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                 </div>
               </div>
 
-          <div>
-            <Label htmlFor="image">Image</Label>
-            <Input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              disabled={uploading}
-            />
-            {formData.image && (
-              <p className="text-sm text-gray-600 mt-1">
-                Current image: {formData.image}
-              </p>
-            )}
-          </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="image">Image</Label>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                    disabled={uploading}
+                  />
+                  {images.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {images.map((img, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                          <img src={img.url} alt="" className="w-12 h-12 object-cover rounded" />
+                          <span className="flex-1 text-sm truncate">{img.url.split('/').pop()}</span>
+                          <div className="flex gap-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => moveImage(index, 'up')}
+                              disabled={index === 0}
+                            >
+                              <ArrowUp className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => moveImage(index, 'down')}
+                              disabled={index === images.length - 1}
+                            >
+                              <ArrowDown className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => removeImage(index)}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-            <div>
-              <Label>Allergens</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                {ALLERGEN_LIST.map((allergen) => (
-                  <div key={allergen.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`allergen-${allergen.id}`}
-                      checked={allergens.includes(allergen.name)}
-                      onCheckedChange={() => handleAllergenToggle(allergen.name)}
-                    />
-                    <Label htmlFor={`allergen-${allergen.id}`} className="text-sm">
-                      {allergen.name}
-                    </Label>
+                <div>
+                  <Label>Allergens</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2 max-h-32 overflow-y-auto">
+                    {ALLERGEN_LIST.map((allergen) => (
+                      <div key={allergen.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`allergen-${allergen.id}`}
+                          checked={allergens.includes(allergen.id)}
+                          onCheckedChange={() => handleAllergenToggle(allergen.id)}
+                        />
+                        <Label htmlFor={`allergen-${allergen.id}`} className="text-sm">
+                          {allergen.name}
+                        </Label>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="availableFrom">Available From</Label>
-                <Input
-                  id="availableFrom"
-                  type="date"
-                  value={formData.availableFrom}
-                  onChange={(e) => handleInputChange('availableFrom', e.target.value)}
-                />
-              </div>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <Label htmlFor="availableFrom">Available From</Label>
+                    <Input
+                      id="availableFrom"
+                      type="date"
+                      value={formData.availableFrom}
+                      onChange={(e) => handleInputChange('availableFrom', e.target.value)}
+                    />
+                  </div>
 
-              <div>
-                <Label htmlFor="availableTo">Available To</Label>
-                <Input
-                  id="availableTo"
-                  type="date"
-                  value={formData.availableTo}
-                  onChange={(e) => handleInputChange('availableTo', e.target.value)}
-                />
-              </div>
-            </div>
+                  <div>
+                    <Label htmlFor="availableTo">Available To</Label>
+                    <Input
+                      id="availableTo"
+                      type="date"
+                      value={formData.availableTo}
+                      onChange={(e) => handleInputChange('availableTo', e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="hidden"
-                checked={formData.hidden}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hidden: checked }))}
-              />
-              <Label htmlFor="hidden">Hide from menu</Label>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="hidden"
+                    checked={formData.hidden}
+                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hidden: checked }))}
+                  />
+                  <Label htmlFor="hidden">Hide from menu</Label>
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-2 pt-4">
@@ -364,4 +402,6 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       </div>
     </div>
   );
-}
+};
+
+export default MenuItemForm;
