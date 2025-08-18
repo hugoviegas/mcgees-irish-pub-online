@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -24,7 +25,7 @@ const HeroSlideshow = () => {
 
   return (
     <section
-      className="relative h-[70vh] md:h-screen flex items-center justify-center overflow-hidden"
+      className="relative h-screen flex items-center justify-center overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -40,36 +41,35 @@ const HeroSlideshow = () => {
         />
       ))}
 
-      <div className="container mx-auto px-4 z-20 flex flex-col items-center justify-center text-center">
-        {/* Center CTAs only - logo and paragraph removed as requested */}
-        <div className="space-y-6 max-w-3xl">
+      <div className="container mx-auto px-4 z-20 flex flex-col items-center justify-end h-full pb-32">
+        <div className="space-y-6 max-w-3xl text-center">
+          <p className="text-sm md:text-base text-white/90 mx-auto max-w-xl mb-6">
+            Stop by for today's fresh chef specials and enjoy authentic Irish
+            dishes prepared daily.
+          </p>
+          
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               onClick={() => setShowSpecials(true)}
-              className="bg-irish-gold hover:bg-irish-gold/90 text-irish-red text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-transform transform-gpu hover:-translate-y-0.5 motion-reduce:transform-none w-full sm:w-auto"
+              className="bg-white text-irish-red hover:bg-white/90 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-white transition-colors w-full sm:w-auto"
             >
               Chef Specials Today
             </Button>
 
             <Button
               asChild
-              className="bg-white text-irish-red hover:bg-white/90 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-colors w-full sm:w-auto"
+              className="bg-white text-irish-red hover:bg-white/90 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-white transition-colors w-full sm:w-auto"
             >
               <Link to="/menu">View Menu</Link>
             </Button>
 
             <Button
               asChild
-              className="border-white text-white hover:bg-white/10 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-white transition-colors w-full sm:w-auto"
+              className="bg-white text-irish-red hover:bg-white/90 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-white transition-colors w-full sm:w-auto"
             >
               <a href="tel:+35314907727">Call Us</a>
             </Button>
           </div>
-
-          <p className="text-sm md:text-base text-white/90 mx-auto max-w-xl">
-            Stop by for today’s fresh chef specials and enjoy authentic Irish
-            dishes prepared daily.
-          </p>
         </div>
       </div>
 
