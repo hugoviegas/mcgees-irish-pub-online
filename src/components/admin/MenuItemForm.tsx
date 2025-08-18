@@ -22,7 +22,7 @@ interface FormImage {
 interface MenuItemFormProps {
   item?: MenuItem;
   categoryId: string;
-  categories?: { id: string; name: string }[];
+  categories?: { id: string; name: string; menu_type?: string }[];
   onSave: (item: MenuItem, categoryId: string) => Promise<void>;
   onCancel: () => void;
 }
@@ -56,6 +56,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
   const [allergens, setAllergens] = useState<string[]>([]);
   const [selectedSides, setSelectedSides] = useState<Side[]>([]);
   const [images, setImages] = useState<FormImage[]>([]);
+  const [extras, setExtras] = useState<{ id?: string; name: string; price: string }[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -74,6 +75,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       });
       setAllergens(item.allergens || []);
       setSelectedSides(item.sides || []);
+  setExtras(item.extras?.map(e => ({ id: e.id, name: e.name, price: e.price })) || []);
       if (item.images) {
         setImages(item.images.map(img => ({
           id: img.id,
@@ -197,6 +199,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: formData.price.trim(),
+  extras: extras.map(e => ({ id: e.id || '', name: e.name, price: e.price })),
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
         allergens,
         hidden: formData.hidden,
@@ -239,6 +242,23 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <select
+                    id="category"
+                    className="w-full rounded border p-2"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    {categories && categories.length > 0 ? (
+                      categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))
+                    ) : (
+                      <option value={selectedCategory}>{selectedCategory || 'Default'}</option>
+                    )}
+                  </select>
+                </div>
                 <div>
                   <Label htmlFor="name">Name *</Label>
                   <Input
@@ -349,6 +369,48 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                         </Label>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Extras / Options</Label>
+                  <div className="mt-2 space-y-2">
+                    {extras.map((ex, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          className="flex-1 rounded border p-2"
+                          value={ex.name}
+                          onChange={(e) => setExtras(prev => prev.map((p, i) => i === idx ? { ...p, name: e.target.value } : p))}
+                          placeholder="Option name (e.g., Large)"
+                        />
+                        <input
+                          className="w-28 rounded border p-2"
+                          value={ex.price}
+                          onChange={(e) => setExtras(prev => prev.map((p, i) => i === idx ? { ...p, price: e.target.value } : p))}
+                          placeholder="€0.00"
+                        />
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setExtras(prev => prev.filter((_, i) => i !== idx))}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+
+                    <div className="flex gap-2">
+                      <input id="newExtraName" className="flex-1 rounded border p-2" placeholder="New option name" />
+                      <input id="newExtraPrice" className="w-28 rounded border p-2" placeholder="€0.00" />
+                      <Button type="button" onClick={() => {
+                        const nameInput = (document.getElementById('newExtraName') as HTMLInputElement);
+                        const priceInput = (document.getElementById('newExtraPrice') as HTMLInputElement);
+                        const name = nameInput?.value?.trim() || '';
+                        const price = priceInput?.value?.trim() || '';
+                        if (!name) return;
+                        setExtras(prev => [...prev, { id: crypto?.randomUUID?.() || String(Date.now()), name, price }]);
+                        if (nameInput) nameInput.value = '';
+                        if (priceInput) priceInput.value = '';
+                      }}>
+                        Add
+                      </Button>
+                    </div>
                   </div>
                 </div>
 

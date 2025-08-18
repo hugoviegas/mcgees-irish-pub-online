@@ -113,6 +113,8 @@ const AdminMenuPage = () => {
         <MenuItemForm
           item={editingItem?.item}
           categoryId={editingItem?.categoryId || addItemCategory || ""}
+          // pass available categories so the form can let admins move items between categories/menus
+          categories={menuData.map(c => ({ id: c.id, name: c.name, menu_type: c.menu_type }))}
           onSave={handleSaveItem}
           onCancel={() => {
             setShowItemForm(false);

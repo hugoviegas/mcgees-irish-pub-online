@@ -406,9 +406,18 @@ const MenuPage = () => {
                               <h3 className="text-[18px] font-semibold font-serif text-irish-brown leading-tight">
                                 {item.name}
                               </h3>
-                              <span className="text-[18px] font-semibold text-irish-red ml-2">
-                                {formatPrice(item.price)}
-                              </span>
+                              <div className="text-[18px] font-semibold text-irish-red ml-2 text-right">
+                                <div>{formatPrice(item.price)}</div>
+                                {item.extras && item.extras.length > 0 && (
+                                  <div className="text-sm font-medium mt-1">
+                                    {item.extras.map((ex: any, i: number) => (
+                                      <span key={i} className="block">
+                                        {formatPrice(ex.price)} {ex.name ? `(${ex.name})` : ''}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             <p className="text-gray-700 text-base leading-[1.55] mb-4 font-normal min-h-[48px] overflow-hidden">
                               {item.description}
@@ -480,6 +489,7 @@ const MenuPage = () => {
               <MenuItemForm
                 item={editingItem?.item}
                 categoryId={editingItem?.categoryId || addItemCategory || ""}
+                categories={menuData.map(c => ({ id: c.id, name: c.name }))}
                 onSave={handleSaveItem}
                 onCancel={() => {
                   setShowItemForm(false);

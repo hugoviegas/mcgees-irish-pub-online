@@ -3,6 +3,7 @@ export type MenuItem = {
   name: string;
   description: string;
   price: string;
+  extras?: ExtraOption[];
   images?: MenuItemImage[];
   tags?: string[];
   allergens?: string[];
@@ -11,6 +12,12 @@ export type MenuItem = {
   availableTo?: string | null; // ISO string or null
   displayOrder?: number;
   sides?: Side[];
+};
+
+export type ExtraOption = {
+  id?: string; // optional, stored as part of JSON
+  name: string;
+  price: string;
 };
 
 export type MenuItemImage = {
