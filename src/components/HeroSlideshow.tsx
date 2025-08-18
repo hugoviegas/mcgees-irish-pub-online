@@ -10,17 +10,23 @@ const images = [
 
 const HeroSlideshow = () => {
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    if (paused) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 8000); // 8 seconds per slide
     return () => clearInterval(interval);
-  }, []);
+  }, [paused]);
 
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-black/50 z-10"></div>
+    <section
+      className="relative h-[70vh] md:h-screen flex items-center justify-center overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10"></div>
       {images.map((img, idx) => (
         <img
           key={img}
@@ -31,35 +37,46 @@ const HeroSlideshow = () => {
           }`}
         />
       ))}
+
       <div className="container mx-auto px-4 z-20 flex flex-col items-center justify-center text-center">
-        <div className="mb-6 flex justify-center">
-          <img
-            src="/darcy-uploads/logo.png"
-            alt="D'Arcy McGee's"
-            className="h-32 md:h-40 drop-shadow-lg"
-          />
-        </div>
-        <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto drop-shadow-lg">
-          Traditional Irish pub and restaurant bringing the spirit of Ireland to
-          your neighborhood since 1998.
-        </p>
-        <div className="space-x-4 mb-12">
-          <Button
-            asChild
-            className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-irish-red transition-colors"
-          >
-            <Link to="/menu">View Menu</Link>
-          </Button>
-          <Button
-            asChild
-            className="border-white text-white hover:bg-white/10 text-lg font-bold px-8 py-4 rounded-full shadow border-2 border-white transition-colors"
-          >
-            <a href="tel:+35314907727">Call Us</a>
-          </Button>
+        {/* Center CTAs only - logo and paragraph removed as requested */}
+        <div className="space-y-6 max-w-3xl">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              asChild
+              className="bg-irish-gold hover:bg-irish-gold/90 text-irish-red text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-colors w-full sm:w-auto"
+            >
+              <Link to="/specials">Chef Specials Today</Link>
+            </Button>
+
+            <Button
+              asChild
+              className="bg-white text-irish-red hover:bg-white/90 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-colors w-full sm:w-auto"
+            >
+              <Link to="/menu">View Menu</Link>
+            </Button>
+
+            <Button
+              asChild
+              className="border-white text-white hover:bg-white/10 text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-white transition-colors w-full sm:w-auto"
+            >
+              <a href="tel:+35314907727">Call Us</a>
+            </Button>
+          </div>
+
+          <p className="text-sm md:text-base text-white/90 mx-auto max-w-xl">
+            Stop by for today’s fresh chef specials and enjoy authentic Irish
+            dishes prepared daily.
+          </p>
         </div>
       </div>
+
       <div className="absolute bottom-10 w-full text-center z-20">
-        <a href="#welcome" className="inline-block animate-bounce text-white">
+        <a
+          href="#welcome"
+          className="inline-block animate-bounce text-white"
+          aria-label="Scroll to content"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -76,11 +93,14 @@ const HeroSlideshow = () => {
           </svg>
         </a>
       </div>
+
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
         {images.map((_, idx) => (
-          <span
+          <button
             key={idx}
-            className={`block w-3 h-3 rounded-full border border-irish-gold bg-white/80 transition-all duration-300 ${
+            aria-label={`Go to slide ${idx + 1}`}
+            onClick={() => setCurrent(idx)}
+            className={`block w-3 h-3 rounded-full border border-irish-gold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-irish-gold ${
               idx === current ? "bg-irish-gold scale-110" : "bg-white/60"
             }`}
           />
