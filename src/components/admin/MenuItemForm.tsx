@@ -14,11 +14,12 @@ import { toast } from '@/components/ui/use-toast';
 interface MenuItemFormProps {
   item?: MenuItem;
   categoryId: string;
+  categories?: { id: string; name: string }[];
   onSave: (item: MenuItem, categoryId: string) => Promise<void>;
   onCancel: () => void;
 }
 
-const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, onCancel }) => {
+const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categories, onSave, onCancel }) => {
   // Helpers to handle datetime-local formatting
   const toInputValue = (iso?: string | null) => {
     if (!iso) return '';
@@ -59,6 +60,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || '');
 
   useEffect(() => {
     if (item) {
@@ -73,8 +75,15 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
   availableFrom: toInputValue(item.availableFrom ?? null),
   availableTo: toInputValue(item.availableTo ?? null),
       });
+      // if editing an item and no explicit category passed, keep provided categoryId
+      setSelectedCategory((prev) => prev || categoryId);
     }
   }, [item]);
+  
+  useEffect(() => {
+    // if parent provides a different initial category, use it
+    if (categoryId) setSelectedCategory(categoryId);
+  }, [categoryId]);
 
   const handleInputChange = (field: string, value: string) => {
     // For text fields, sanitize; for price allow typing and validate on submit/blur
@@ -191,7 +200,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
         availableTo: toIso,
       };
 
-      await onSave(menuItem, categoryId);
+      // send selected category to parent so item can be moved if needed
+      await onSave(menuItem, selectedCategory || categoryId);
       
       toast({
         title: "Success",
@@ -294,6 +304,24 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, onSave, o
                 Current image: {formData.image}
               </p>
             )}
+          </div>
+
+          <div>
+            <Label htmlFor="category">Category / Menu</Label>
+            <select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full border rounded px-3 py-2 mt-2"
+            >
+              {categories && categories.length > 0 ? (
+                categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))
+              ) : (
+                <option value={categoryId}>{'Current Category'}</option>
+              )}
+            </select>
           </div>
 
           <div>

@@ -248,6 +248,7 @@ export const useSupabaseMenuData = () => {
       is_hidden: updatedItem.hidden ?? false,
       available_from: updatedItem.availableFrom || null,
       available_to: updatedItem.availableTo || null,
+      category_id: categoryId, // allow moving item to different category
         })
         .eq("id", updatedItem.id);
 

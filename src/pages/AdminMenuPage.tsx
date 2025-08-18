@@ -381,6 +381,7 @@ const AdminMenuPage = () => {
           <MenuItemForm
             item={editingItem?.item}
             categoryId={showItemForm || editingItem?.categoryId || ""}
+            categories={menuData.map((c) => ({ id: c.id, name: c.name }))}
             onSave={handleSaveItem}
             onCancel={() => {
               setEditingItem(null);

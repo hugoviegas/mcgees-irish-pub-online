@@ -82,19 +82,22 @@ const MenuPage = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      const yOffset = window.innerWidth < 768 ? 120 : 140;
       const offsets = Object.entries(sectionRefs.current).map(([id, ref]) => {
         if (!ref) return { id, top: Infinity };
-        const rect = ref.getBoundingClientRect();
-        return { id, top: Math.abs(rect.top - 120) }; // 120px offset for sticky header
+        const rect = (ref as HTMLDivElement).getBoundingClientRect();
+        return { id, top: Math.abs(rect.top - yOffset) };
       });
       offsets.sort((a, b) => a.top - b.top);
       if (offsets[0] && offsets[0].id !== activeSection) {
         setActiveSection(offsets[0].id);
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // run once to set initial active section for current menu
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeSection]);
+  }, [activeMenu, activeSection]);
 
   // Handle menu hash in URL
   useEffect(() => {
@@ -237,10 +240,9 @@ const MenuPage = () => {
                       }`}
                       onClick={() => {
                         setActiveMenu(menu.id);
-                        setActiveSection("");
-                        setDropdownOpen((open) =>
-                          activeMenu === menu.id ? !open : true
-                        );
+                        // set active section to first category for this menu (if any)
+                        setActiveSection(menuCategories[0]?.id || "");
+                        setDropdownOpen(true);
                         window.location.hash = menu.id; // update hash
                       }}
                     >
@@ -298,7 +300,7 @@ const MenuPage = () => {
                   <div
                     key={category.id}
                     ref={(el) => (sectionRefs.current[category.id] = el)}
-                    id={category.menu_type}
+                    id={category.id}
                     className="mb-16"
                   >
                     <div className="flex items-center justify-between mb-8">
@@ -383,10 +385,8 @@ const MenuPage = () => {
                                       ) : (
                                         <span
                                           key={allergenId}
-                                          className="text-xs text-irish-red font-bold"
-                                        >
-                                          {allergenId}
-                                        </span>
+                                          className="inline-block w-2 h-2 bg-irish-red rounded-full"
+                                        />
                                       );
                                     })}
                                   </div>
@@ -446,8 +446,8 @@ const MenuPage = () => {
 
             {/* Updated Allergy Popup Modal */}
             {allergyPopup && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setAllergyPopup(null)}>
+                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setAllergyPopup(null)}
@@ -464,6 +464,7 @@ const MenuPage = () => {
                       const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
                       return (
                         <div key={id} className="flex items-center gap-3">
+                          <span className="text-sm font-bold text-irish-gold w-6 text-center">{id}</span>
                           {IconComponent ? (
                             <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
                           ) : (
@@ -482,8 +483,8 @@ const MenuPage = () => {
 
             {/* Allergen List Modal */}
             {showAllergenModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAllergenModal(false)}>
+                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setShowAllergenModal(false)}
@@ -494,7 +495,7 @@ const MenuPage = () => {
                   <h4 className="text-xl font-bold font-serif mb-4 text-irish-red text-center">
                     Allergen Information
                   </h4>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {ALLERGEN_LIST.map((allergen) => {
                       const IconComponent =
                         ALLERGEN_ICON_COMPONENTS[allergen.id];
@@ -503,9 +504,6 @@ const MenuPage = () => {
                           key={allergen.id}
                           className="flex items-center gap-4 border-b pb-2"
                         >
-                          <span className="text-lg font-bold text-irish-gold w-8 text-center">
-                            {allergen.id}
-                          </span>
                           {IconComponent ? (
                             <IconComponent className="w-7 h-7 text-irish-red flex-shrink-0" />
                           ) : (
@@ -604,7 +602,7 @@ const MenuPage = () => {
               <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red">
                 Hours of Service
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-md shadow">
                   <h3 className="text-2xl font-serif font-bold mb-3 text-irish-gold">
                     BREAKFAST
@@ -631,14 +629,7 @@ const MenuPage = () => {
                   <p>FRI & SAT 3PM-10PM</p>
                   <p>SUNDAY 6PM-8PM</p>
                 </div>
-                <div className="bg-white p-6 rounded-md shadow">
-                  <h3 className="text-2xl font-serif font-bold mb-3 text-irish-gold">
-                    EARLY BIRD MENU
-                  </h3>
-                  <p className="font-medium">TWO COURSE MEAL</p>
-                  <p className="font-medium">SERVED</p>
-                  <p>MON-FRI</p>
-                </div>
+                {/* Early Bird removed per request */}
               </div>
             </div>
           </section>
