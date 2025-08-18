@@ -44,8 +44,7 @@ const HeroSlideshow = () => {
       <div className="container mx-auto px-4 z-20 flex flex-col items-center justify-end h-full pb-32">
         <div className="space-y-6 max-w-3xl text-center">
           <p className="text-sm md:text-base text-white/90 mx-auto max-w-xl mb-6">
-            Stop by for today's fresh chef specials and enjoy authentic Irish
-            dishes prepared daily.
+            Check out today's chef specials and enjoy dishes prepared daily.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
