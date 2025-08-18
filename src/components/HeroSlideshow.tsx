@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import SpecialsModal from "./SpecialsModal";
 
 const images = [
   "/darcy-uploads/hero/slideshow/slide1.jpg",
@@ -11,6 +12,7 @@ const images = [
 const HeroSlideshow = () => {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [showSpecials, setShowSpecials] = useState(false);
 
   useEffect(() => {
     if (paused) return;
@@ -43,10 +45,10 @@ const HeroSlideshow = () => {
         <div className="space-y-6 max-w-3xl">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
-              asChild
-              className="bg-irish-gold hover:bg-irish-gold/90 text-irish-red text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-colors w-full sm:w-auto"
+              onClick={() => setShowSpecials(true)}
+              className="bg-irish-gold hover:bg-irish-gold/90 text-irish-red text-lg font-bold px-6 py-3 rounded-full shadow border-2 border-irish-red transition-transform transform-gpu hover:-translate-y-0.5 motion-reduce:transform-none w-full sm:w-auto"
             >
-              <Link to="/specials">Chef Specials Today</Link>
+              Chef Specials Today
             </Button>
 
             <Button
@@ -106,6 +108,7 @@ const HeroSlideshow = () => {
           />
         ))}
       </div>
+      <SpecialsModal open={showSpecials} onClose={() => setShowSpecials(false)} />
     </section>
   );
 };
