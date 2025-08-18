@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -15,7 +16,7 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 z-20">
         <div className="text-center">
-          <div className="space-x-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
             <Button
               asChild
               className="bg-irish-gold hover:bg-irish-gold/80 text-irish-red"
@@ -25,8 +26,15 @@ const Hero = () => {
             <Button
               asChild
               className="border-white text-white hover:bg-white/10"
+              variant="outline"
             >
               <Link to="/reservations">Book a Table</Link>
+            </Button>
+            <Button
+              asChild
+              className="bg-irish-red hover:bg-irish-red/90 text-irish-gold border border-irish-gold"
+            >
+              <Link to="/menu#specials">See Chef Specials</Link>
             </Button>
           </div>
         </div>

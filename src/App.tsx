@@ -1,7 +1,7 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+// import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -14,13 +14,14 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminSidesPage from "./pages/AdminSidesPage";
 import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    
       <AuthProvider>
         <BrowserRouter>
           <Toaster />
@@ -45,6 +46,14 @@ const App = () => (
               }
             />
             <Route
+              path="/admin/sides"
+              element={
+                <ProtectedRoute>
+                  <AdminSidesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin"
               element={
                 <ProtectedRoute>
@@ -59,7 +68,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-    </TooltipProvider>
+    
   </QueryClientProvider>
 );
 

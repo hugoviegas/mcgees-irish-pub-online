@@ -12,58 +12,61 @@ export const useSupabaseMenuData = () => {
       setLoading(true);
       console.log("Fetching menu data from Supabase...");
 
-      // Fetch categories with their menu_type
-      const { data: categories, error: categoriesError } = await supabase
-        .from("menu_categories")
-        .select("*")
-        .order("display_order");
-
-      if (categoriesError) {
-        console.error("Categories error:", categoriesError);
-        throw categoriesError;
-      }
-
-      // Fetch all menu items
-      const { data: items, error: itemsError } = await supabase
-        .from("menu_items")
-        .select(
-          `
+      // Fetch categories with their items, images, and sides
+      const { data, error } = await supabase
+        .from('menu_categories')
+        .select(`
           *,
-          menu_categories (
-            menu_type
+          items:menu_items(
+            *,
+            images:menu_item_images(*),
+            sides:menu_item_sides(
+              sides(*)
+            )
           )
-        `
-        )
-        .order("id");
+        `)
+        .order('display_order');
 
-      if (itemsError) {
-        console.error("Items error:", itemsError);
-        throw itemsError;
+      if (error) {
+        console.error("Error fetching menu data:", error);
+        throw error;
       }
 
-    // Group items by menu type and category; don't filter here so admin can see all
-      const menuWithItems = categories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        menu_type: category.menu_type as "aLaCarte" | "breakfast" | "drinks" | "otherMenu",
-        items: items
-          .filter((item) => item.category_id === category.id)
-          .map((item) => ({
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            image: item.image || "/placeholder.svg",
-            tags: item.tags || [],
-            allergens: item.allergens || [],
-            hidden: !!item.is_hidden,
-            availableFrom: item.available_from,
-            availableTo: item.available_to,
-      })),
-      }));
+      // Process the data into the expected format
+      const processedData = data.map(category => {
+        const processedItems = category.items?.map((dbItem: any) => ({
+          id: dbItem.id,
+          name: dbItem.name,
+          description: dbItem.description,
+          price: dbItem.price,
+          displayOrder: dbItem.display_order,
+          tags: dbItem.tags || [],
+          allergens: dbItem.allergens || [],
+          hidden: dbItem.is_hidden,
+          availableFrom: dbItem.available_from,
+          availableTo: dbItem.available_to,
+          images: dbItem.images?.map((img: any) => ({
+            id: img.id,
+            menuItemId: img.menu_item_id,
+            imageUrl: img.image_url,
+            displayOrder: img.display_order
+          })) || [],
+          sides: dbItem.sides?.map((s: any) => s.sides).filter(Boolean) || []
+        })) || [];
 
-      console.log("Processed menu data:", menuWithItems);
-      setMenuData(menuWithItems);
+        // Sort items by display_order
+        processedItems.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+        return {
+          id: category.id,
+          name: category.name,
+          menu_type: category.menu_type as "aLaCarte" | "breakfast" | "drinks" | "otherMenu",
+          items: processedItems
+        };
+      });
+
+      console.log("Processed menu data:", processedData);
+      setMenuData(processedData);
       setError(null);
     } catch (err) {
       console.error("Error fetching menu data:", err);
@@ -86,7 +89,7 @@ export const useSupabaseMenuData = () => {
       }
 
       const { error } = await supabase.from("menu_categories").insert({
-        id: crypto.randomUUID(), // Generate a new UUID for the category
+        id: crypto.randomUUID(),
         name: category.name,
         menu_type: category.menu_type || "aLaCarte",
         display_order: menuData.length + 1,
@@ -155,18 +158,7 @@ export const useSupabaseMenuData = () => {
           throw new Error("User not authenticated");
         }
 
-        // First delete all items in the category (due to CASCADE this should happen automatically, but let's be explicit)
-        const { error: itemsError } = await supabase
-          .from("menu_items")
-          .delete()
-          .eq("category_id", categoryId);
-
-        if (itemsError) {
-          console.error("Delete items error:", itemsError);
-          throw itemsError;
-        }
-
-        // Then delete the category
+        // Delete the category (cascade will handle items)
         const { error: categoryError } = await supabase
           .from("menu_categories")
           .delete()
@@ -198,22 +190,69 @@ export const useSupabaseMenuData = () => {
         throw new Error("User not authenticated");
       }
 
-      const { error } = await supabase.from("menu_items").insert({
-        category_id: categoryId,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        image: item.image || null,
-        tags: item.tags || [],
-        allergens: item.allergens || [],
-        is_hidden: item.hidden ?? false,
-        available_from: item.availableFrom || null,
-        available_to: item.availableTo || null,
-      });
+      // Get current max display_order for this category
+      const { data: existingItems } = await supabase
+        .from("menu_items")
+        .select("display_order")
+        .eq("category_id", categoryId)
+        .order("display_order", { ascending: false })
+        .limit(1);
+
+      const nextOrder = existingItems?.[0]?.display_order ? existingItems[0].display_order + 1 : 1;
+
+      const { data: newItem, error } = await supabase
+        .from("menu_items")
+        .insert({
+          category_id: categoryId,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          display_order: nextOrder,
+          tags: item.tags || [],
+          allergens: item.allergens || [],
+          is_hidden: item.hidden ?? false,
+          available_from: item.availableFrom || null,
+          available_to: item.availableTo || null,
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error("Insert menu item error:", error);
         throw error;
+      }
+
+      // Add images if provided
+      if (item.images && item.images.length > 0) {
+        const imageInserts = item.images.map((img, index) => ({
+          menu_item_id: newItem.id,
+          image_url: img.imageUrl,
+          display_order: index
+        }));
+
+        const { error: imageError } = await supabase
+          .from("menu_item_images")
+          .insert(imageInserts);
+
+        if (imageError) {
+          console.error("Insert images error:", imageError);
+        }
+      }
+
+      // Add sides if provided
+      if (item.sides && item.sides.length > 0) {
+        const sideInserts = item.sides.map(side => ({
+          menu_item_id: newItem.id,
+          side_id: side.id
+        }));
+
+        const { error: sidesError } = await supabase
+          .from("menu_item_sides")
+          .insert(sideInserts);
+
+        if (sidesError) {
+          console.error("Insert sides error:", sidesError);
+        }
       }
 
       console.log("Menu item added successfully");
@@ -236,13 +275,13 @@ export const useSupabaseMenuData = () => {
         throw new Error("User not authenticated");
       }
 
-    const { error } = await supabase
+      const { error } = await supabase
         .from("menu_items")
         .update({
           name: updatedItem.name,
           description: updatedItem.description,
           price: updatedItem.price,
-          image: updatedItem.image || null,
+          display_order: updatedItem.displayOrder,
           tags: updatedItem.tags || [],
           allergens: updatedItem.allergens || [],
       is_hidden: updatedItem.hidden ?? false,
@@ -257,10 +296,71 @@ export const useSupabaseMenuData = () => {
         throw error;
       }
 
+      // Update images - remove old ones and add new ones
+      await supabase
+        .from("menu_item_images")
+        .delete()
+        .eq("menu_item_id", updatedItem.id);
+
+      if (updatedItem.images && updatedItem.images.length > 0) {
+        const imageInserts = updatedItem.images.map((img, index) => ({
+          menu_item_id: updatedItem.id,
+          image_url: img.imageUrl,
+          display_order: index
+        }));
+
+        await supabase
+          .from("menu_item_images")
+          .insert(imageInserts);
+      }
+
+      // Update sides - remove old ones and add new ones
+      await supabase
+        .from("menu_item_sides")
+        .delete()
+        .eq("menu_item_id", updatedItem.id);
+
+      if (updatedItem.sides && updatedItem.sides.length > 0) {
+        const sideInserts = updatedItem.sides.map(side => ({
+          menu_item_id: updatedItem.id,
+          side_id: side.id
+        }));
+
+        await supabase
+          .from("menu_item_sides")
+          .insert(sideInserts);
+      }
+
       console.log("Menu item updated successfully");
       await fetchMenuData();
     } catch (err) {
       console.error("Error updating menu item:", err);
+      throw err;
+    }
+  };
+
+  const updateMenuItemOrder = async (categoryId: string, items: MenuItem[]) => {
+    try {
+      // Check if user is authenticated
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Update display order for each item
+      const updates = items.map((item, index) => 
+        supabase
+          .from("menu_items")
+          .update({ display_order: index + 1 })
+          .eq("id", item.id)
+      );
+
+      await Promise.all(updates);
+      await fetchMenuData();
+    } catch (err) {
+      console.error("Error updating menu item order:", err);
       throw err;
     }
   };
@@ -297,6 +397,50 @@ export const useSupabaseMenuData = () => {
     }
   };
 
+  const deleteMenuItemImage = async (imageId: string) => {
+    try {
+      // Check if user is authenticated
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Get image URL before deletion to remove from storage
+      const { data: image } = await supabase
+        .from("menu_item_images")
+        .select("image_url")
+        .eq("id", imageId)
+        .single();
+
+      if (image?.image_url) {
+        // Extract file path from URL and remove from storage
+        const urlParts = image.image_url.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        await supabase.storage
+          .from('barpics')
+          .remove([fileName]);
+      }
+
+      // Delete from database
+      const { error } = await supabase
+        .from("menu_item_images")
+        .delete()
+        .eq("id", imageId);
+
+      if (error) {
+        console.error("Delete menu item image error:", error);
+        throw error;
+      }
+
+      await fetchMenuData();
+    } catch (err) {
+      console.error("Error deleting menu item image:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchMenuData();
   }, []);
@@ -310,7 +454,9 @@ export const useSupabaseMenuData = () => {
     deleteCategory,
     addMenuItem,
     updateMenuItem,
+    updateMenuItemOrder,
     deleteMenuItem,
+    deleteMenuItemImage,
     refetch: fetchMenuData,
   };
 };
