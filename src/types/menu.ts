@@ -2,7 +2,7 @@ export type MenuItem = {
   id: number;
   name: string;
   description: string;
-  price: string;
+  price?: string; // Made optional
   extras?: ExtraOption[];
   images?: MenuItemImage[];
   tags?: string[];

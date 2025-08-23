@@ -144,6 +144,34 @@ export const useSupabaseMenuData = () => {
     }
   };
 
+  const updateCategoryOrder = async (orderedCategories: MenuCategory[]) => {
+    try {
+      console.log("Updating category order:", orderedCategories);
+
+      // Check if user is authenticated
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      // Update display order for each category
+      const updates = orderedCategories.map((category, index) => 
+        supabase
+          .from("menu_categories")
+          .update({ display_order: index + 1 })
+          .eq("id", category.id)
+      );
+
+      await Promise.all(updates);
+      await fetchMenuData();
+    } catch (err) {
+      console.error("Error updating category order:", err);
+      throw err;
+    }
+  };
+
   const deleteCategory = async (categoryId: string) => {
     if (
       confirm(
@@ -209,7 +237,7 @@ export const useSupabaseMenuData = () => {
           category_id: categoryId,
           name: item.name,
           description: item.description,
-          price: item.price,
+          price: item.price || "", // Make price optional by providing empty string as default
           extras: item.extras || [],
           show_sides_outside: item.showSidesOutside || false,
           display_order: nextOrder,
@@ -285,7 +313,7 @@ export const useSupabaseMenuData = () => {
         .update({
           name: updatedItem.name,
           description: updatedItem.description,
-          price: updatedItem.price,
+          price: updatedItem.price || "", // Make price optional
           extras: updatedItem.extras || [],
           show_sides_outside: updatedItem.showSidesOutside || false,
           display_order: updatedItem.displayOrder,
@@ -458,6 +486,7 @@ export const useSupabaseMenuData = () => {
     error,
     addCategory,
     updateCategory,
+    updateCategoryOrder,
     deleteCategory,
     addMenuItem,
     updateMenuItem,
