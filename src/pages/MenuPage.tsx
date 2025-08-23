@@ -8,7 +8,7 @@ import MenuItemForm from "../components/admin/MenuItemForm";
 import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useLocation } from "react-router-dom";
@@ -168,20 +168,25 @@ const MenuPage = () => {
           // Find which menu/category contains this item
           let foundMenu = null;
           let foundCategory = null;
+          let foundItem = null;
           
           for (const category of menuData) {
             const item = category.items.find(item => item.id === itemId);
             if (item) {
               foundMenu = category.menu_type;
               foundCategory = category.id;
+              foundItem = item;
               break;
             }
           }
           
-          if (foundMenu && foundCategory) {
+          if (foundMenu && foundCategory && foundItem) {
             setActiveMenu(foundMenu);
             setActiveSection(foundCategory);
             setHighlightedItemId(itemId);
+            
+            // Open the item details modal immediately
+            setSelectedItem(foundItem);
             
             // Scroll to the item after a short delay
             setTimeout(() => {
@@ -375,16 +380,11 @@ const MenuPage = () => {
                         <div
                           key={item.id}
                           ref={(el) => (itemRefs.current[item.id] = el)}
-                          className={`bg-white rounded-xl shadow-md overflow-hidden flex flex-col relative group border transition-all focus:outline-none focus:ring-2 focus:ring-irish-gold ${
+                          className={`bg-white rounded-xl shadow-md overflow-hidden flex flex-col relative group border transition-all ${
                             highlightedItemId === item.id
                               ? "border-irish-gold shadow-xl ring-2 ring-irish-gold ring-opacity-50"
                               : "border-gray-200 hover:shadow-lg"
                           }`}
-                          role="button"
-                          tabIndex={0}
-                          aria-label={`View details for ${item.name}`}
-                          onClick={() => setSelectedItem(item)}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedItem(item); } }}
                         >
                           {/* Admin Edit Controls */}
                           {isAuthenticated && (
@@ -419,7 +419,10 @@ const MenuPage = () => {
                           )}
                           <div className="p-5 flex flex-col flex-grow">
                             <div className="flex justify-between items-start mb-3">
-                              <h3 className="text-[18px] font-semibold font-serif text-irish-brown leading-tight">
+                              <h3 
+                                className="text-[18px] font-semibold font-serif text-irish-brown leading-tight cursor-pointer hover:text-irish-red transition-colors"
+                                onClick={() => setSelectedItem(item)}
+                              >
                                 {item.name}
                               </h3>
                               <div className="text-[18px] font-semibold text-irish-red ml-2 text-right">
@@ -463,12 +466,7 @@ const MenuPage = () => {
                                   </div>
                                   <button
                                     className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
-                                    onClick={() =>
-                                      setAllergyPopup({
-                                        name: item.name,
-                                        allergens: item.allergens,
-                                      })
-                                    }
+                                    onClick={(e) => { e.stopPropagation(); setAllergyPopup({ name: item.name, allergens: item.allergens }); }}
                                     aria-label={`Show allergies for ${item.name}`}
                                   >
                                     Allergies
@@ -496,6 +494,14 @@ const MenuPage = () => {
                                   ))}
                                 </div>
                               )}
+                              <Button
+                                size="sm"
+                                onClick={() => setSelectedItem(item)}
+                                className="ml-auto bg-irish-red hover:bg-irish-red/90 text-white flex items-center gap-1"
+                              >
+                                <Eye className="w-4 h-4" />
+                                See more
+                              </Button>
                             </div>
                           </div>
                           {item.showSidesOutside && visibleSidesFor === item.id && item.sides && item.sides.length > 0 && (

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { MenuItemImage } from '@/types/menu';
@@ -51,10 +52,10 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         className="w-full h-full object-cover transition-opacity duration-300"
       />
       
-      {/* Navigation arrows */}
+      {/* Navigation arrows - always visible when there are multiple images */}
       <button
         onClick={prevImage}
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/70"
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full transition-all duration-200 hover:bg-black/70"
         aria-label="Previous image"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -62,7 +63,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
       
       <button
         onClick={nextImage}
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-black/70"
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1.5 rounded-full transition-all duration-200 hover:bg-black/70"
         aria-label="Next image"
       >
         <ChevronRight className="w-4 h-4" />
