@@ -72,6 +72,21 @@ const MenuPage = () => {
     { id: "otherMenu" as const, name: "Other Menu" },
   ];
 
+  // Sort allergens by number for display
+  const sortedAllergens = [...ALLERGEN_LIST].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+  // Filter menu data for specials - only show visible items
+  const getVisibleSpecialItems = () => {
+    const now = new Date();
+    const allItems = menuData.flatMap(category => category.items);
+    return allItems.filter(item => {
+      if (item.hidden) return false;
+      const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
+      const toOk = !item.availableTo || new Date(item.availableTo) >= now;
+      return fromOk && toOk;
+    }).slice(0, 3); // Show first 3 visible items as specials
+  };
+
   // Filter categories based on active menu
   const currentMenuCategories = menuData
     .filter((category) => category.menu_type === activeMenu)
@@ -536,23 +551,25 @@ const MenuPage = () => {
                     Allergens for {allergyPopup.name}
                   </h4>
                   <div className="grid grid-cols-1 gap-3">
-                    {allergyPopup.allergens.map((id) => {
-                      const allergen = ALLERGEN_LIST.find((a) => a.id === id);
-                      const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
-                      return (
-                        <div key={id} className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-irish-gold w-6 text-center">{id}</span>
-                          {IconComponent ? (
-                            <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
-                          ) : (
-                            <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
-                          )}
-                           <span className="text-sm font-medium">
-                             {id}. {allergen?.name || id}
-                           </span>
-                        </div>
-                      );
-                    })}
+                    {allergyPopup.allergens
+                      .sort((a, b) => parseInt(a) - parseInt(b))
+                      .map((id) => {
+                        const allergen = ALLERGEN_LIST.find((a) => a.id === id);
+                        const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
+                        return (
+                          <div key={id} className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-irish-gold w-6 text-center">{id}</span>
+                            {IconComponent ? (
+                              <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
+                            ) : (
+                              <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
+                            )}
+                            <span className="text-sm font-medium">
+                              {id}. {allergen?.name || id}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
@@ -573,7 +590,7 @@ const MenuPage = () => {
                     Allergen Information
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {ALLERGEN_LIST.map((allergen) => {
+                    {sortedAllergens.map((allergen) => {
                       const IconComponent =
                         ALLERGEN_ICON_COMPONENTS[allergen.id];
                       return (
@@ -587,7 +604,7 @@ const MenuPage = () => {
                             <span className="inline-block w-7 h-7 bg-gray-200 rounded-full flex-shrink-0" />
                           )}
                           <span className="text-base font-medium text-irish-brown">
-                            {allergen.name}
+                            {allergen.id}. {allergen.name}
                           </span>
                         </div>
                       );
@@ -612,21 +629,20 @@ const MenuPage = () => {
                     Chef's Specials
                   </h4>
                   <div className="space-y-4">
-                    <div className="border-b pb-4">
-                      <h5 className="font-semibold text-irish-brown mb-2">Today's Special</h5>
-                      <p className="text-gray-700">Pan-seared salmon with lemon butter sauce, served with seasonal vegetables and roasted potatoes.</p>
-                      <p className="text-irish-red font-semibold mt-2">€18.50</p>
-                    </div>
-                    <div className="border-b pb-4">
-                      <h5 className="font-semibold text-irish-brown mb-2">Weekend Feature</h5>
-                      <p className="text-gray-700">Traditional Irish lamb stew with crusty bread, perfect for the weekend.</p>
-                      <p className="text-irish-red font-semibold mt-2">€16.00</p>
-                    </div>
-                    <div>
-                      <h5 className="font-semibold text-irish-brown mb-2">Chef's Dessert</h5>
-                      <p className="text-gray-700">Homemade Bailey's cheesecake with chocolate drizzle.</p>
-                      <p className="text-irish-red font-semibold mt-2">€7.50</p>
-                    </div>
+                    {getVisibleSpecialItems().length > 0 ? (
+                      getVisibleSpecialItems().map((item, index) => (
+                        <div key={item.id} className="border-b pb-4 last:border-b-0">
+                          <h5 className="font-semibold text-irish-brown mb-2">{item.name}</h5>
+                          <p className="text-gray-700 text-sm mb-2">{item.description}</p>
+                          <p className="text-irish-red font-semibold">{formatPrice(item.price)}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-gray-600">
+                        <p>No specials available at the moment.</p>
+                        <p className="text-sm mt-2">Check back later for our chef's recommendations!</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -689,24 +705,26 @@ const MenuPage = () => {
                         Allergens
                       </h4>
                       <div className="grid grid-cols-1 gap-3">
-                        {selectedItem.allergens.map((id) => {
-                          const allergen = ALLERGEN_LIST.find(
-                            (a) => a.id === id
-                          );
-                          const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
-                          return (
-                            <div key={id} className="flex items-center gap-2">
-                              {IconComponent ? (
-                                <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
-                              ) : (
-                                <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
-                              )}
-                           <span className="text-sm font-medium">
-                             {id}. {allergen?.name || id}
-                           </span>
-                            </div>
-                          );
-                        })}
+                        {selectedItem.allergens
+                          .sort((a, b) => parseInt(a) - parseInt(b))
+                          .map((id) => {
+                            const allergen = ALLERGEN_LIST.find(
+                              (a) => a.id === id
+                            );
+                            const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
+                            return (
+                              <div key={id} className="flex items-center gap-2">
+                                {IconComponent ? (
+                                  <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
+                                ) : (
+                                  <span className="inline-block w-6 h-6 bg-gray-200 rounded-full flex-shrink-0" />
+                                )}
+                                <span className="text-sm font-medium">
+                                  {id}. {allergen?.name || id}
+                                </span>
+                              </div>
+                            );
+                          })}
                       </div>
                     </div>
                   )}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,6 +65,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
   const [newSideName, setNewSideName] = useState('');
   const [newSidePrice, setNewSidePrice] = useState('');
 
+  // Sort allergens by number for display
+  const sortedAllergens = [...ALLERGEN_LIST].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
   useEffect(() => {
     if (item) {
       setFormData({
@@ -79,8 +81,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       });
       setAllergens(item.allergens || []);
       setSelectedSides(item.sides || []);
-  setExtras(item.extras?.map(e => ({ id: e.id, name: e.name, price: e.price })) || []);
-  setShowSidesOutside(item.showSidesOutside ?? false);
+      setExtras(item.extras?.map(e => ({ id: e.id, name: e.name, price: e.price })) || []);
+      setShowSidesOutside(item.showSidesOutside ?? false);
       if (item.images) {
         setImages(item.images.map(img => ({
           id: img.id,
@@ -169,6 +171,16 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
     }
   };
 
+  // Handle file selection and immediate upload
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await handleImageUpload(file);
+      // Clear the input
+      e.target.value = '';
+    }
+  };
+
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
@@ -224,7 +236,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: formData.price.trim(),
-  extras: extras.map(e => ({ id: e.id || '', name: e.name, price: e.price })),
+        extras: extras.map(e => ({ id: e.id || '', name: e.name, price: e.price })),
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
         allergens,
         hidden: formData.hidden,
@@ -237,8 +249,8 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
           imageUrl: img.url,
           displayOrder: index
         })),
-  sides: selectedSides,
-  showSidesOutside
+        sides: selectedSides,
+        showSidesOutside
       };
 
       await onSave(menuItem, selectedCategory);
@@ -337,9 +349,12 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                     id="image"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                    onChange={handleFileSelect}
                     disabled={uploading}
                   />
+                  {uploading && (
+                    <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+                  )}
                   {images.length > 0 && (
                     <div className="mt-2 space-y-2">
                       {images.map((img, index) => (
@@ -383,7 +398,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                 <div>
                   <Label>Allergens</Label>
                   <div className="grid grid-cols-2 gap-2 mt-2 max-h-32 overflow-y-auto">
-                    {ALLERGEN_LIST.map((allergen) => (
+                    {sortedAllergens.map((allergen) => (
                       <div key={allergen.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`allergen-${allergen.id}`}
@@ -391,7 +406,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                           onCheckedChange={() => handleAllergenToggle(allergen.id)}
                         />
                         <Label htmlFor={`allergen-${allergen.id}`} className="text-sm">
-                          {allergen.name}
+                          {allergen.id}. {allergen.name}
                         </Label>
                       </div>
                     ))}
