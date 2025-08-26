@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MenuCategory, MenuItem } from "../types/menu";
@@ -244,7 +243,7 @@ export const useSupabaseMenuData = () => {
           category_id: categoryId,
           name: item.name,
           description: item.description,
-          price: item.price || "", // Make price optional by providing empty string as default
+          price: item.price || null,
           extras: item.extras || [],
           show_sides_outside: item.showSidesOutside || false,
           display_order: nextOrder,
@@ -320,16 +319,16 @@ export const useSupabaseMenuData = () => {
         .update({
           name: updatedItem.name,
           description: updatedItem.description,
-          price: updatedItem.price || "", // Make price optional
+          price: updatedItem.price || null,
           extras: updatedItem.extras || [],
           show_sides_outside: updatedItem.showSidesOutside || false,
           display_order: updatedItem.displayOrder,
           tags: updatedItem.tags || [],
           allergens: updatedItem.allergens || [],
-      is_hidden: updatedItem.hidden ?? false,
-      available_from: updatedItem.availableFrom || null,
-      available_to: updatedItem.availableTo || null,
-      category_id: categoryId, // allow moving item to different category
+          is_hidden: updatedItem.hidden ?? false,
+          available_from: updatedItem.availableFrom || null,
+          available_to: updatedItem.availableTo || null,
+          category_id: categoryId,
         })
         .eq("id", updatedItem.id);
 

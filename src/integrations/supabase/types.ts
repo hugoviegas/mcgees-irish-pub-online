@@ -46,6 +46,7 @@ export type Database = {
           created_at: string | null
           display_order: number | null
           id: string
+          is_hidden: boolean | null
           menu_type: string
           name: string
           updated_at: string | null
@@ -54,6 +55,7 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           id: string
+          is_hidden?: boolean | null
           menu_type?: string
           name: string
           updated_at?: string | null
@@ -62,6 +64,7 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           id?: string
+          is_hidden?: boolean | null
           menu_type?: string
           name?: string
           updated_at?: string | null
@@ -145,10 +148,13 @@ export type Database = {
           created_at: string | null
           description: string
           display_order: number | null
+          extras: Json | null
           id: number
           is_hidden: boolean | null
           name: string
           price: string
+          show_sides_inside: boolean | null
+          show_sides_outside: boolean | null
           tags: string[] | null
           updated_at: string | null
         }
@@ -160,10 +166,13 @@ export type Database = {
           created_at?: string | null
           description: string
           display_order?: number | null
+          extras?: Json | null
           id?: number
           is_hidden?: boolean | null
           name: string
           price: string
+          show_sides_inside?: boolean | null
+          show_sides_outside?: boolean | null
           tags?: string[] | null
           updated_at?: string | null
         }
@@ -175,10 +184,13 @@ export type Database = {
           created_at?: string | null
           description?: string
           display_order?: number | null
+          extras?: Json | null
           id?: number
           is_hidden?: boolean | null
           name?: string
           price?: string
+          show_sides_inside?: boolean | null
+          show_sides_outside?: boolean | null
           tags?: string[] | null
           updated_at?: string | null
         }
