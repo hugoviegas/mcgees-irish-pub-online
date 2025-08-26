@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MenuCategory, MenuItem } from "../types/menu";
@@ -64,7 +65,8 @@ export const useSupabaseMenuData = () => {
           id: category.id,
           name: category.name,
           menu_type: category.menu_type as "aLaCarte" | "breakfast" | "drinks" | "otherMenu",
-          items: processedItems
+          items: processedItems,
+          hidden: category.is_hidden || false
         };
       });
 
@@ -91,11 +93,15 @@ export const useSupabaseMenuData = () => {
         throw new Error("User not authenticated");
       }
 
+      // Ensure menu_type is properly mapped
+      let dbMenuType = category.menu_type || "aLaCarte";
+      
       const { error } = await supabase.from("menu_categories").insert({
         id: crypto.randomUUID(),
         name: category.name,
-        menu_type: category.menu_type || "aLaCarte",
+        menu_type: dbMenuType,
         display_order: menuData.length + 1,
+        is_hidden: category.hidden || false,
       });
 
       if (error) {
@@ -128,6 +134,7 @@ export const useSupabaseMenuData = () => {
         .update({
           name: updatedCategory.name,
           menu_type: updatedCategory.menu_type,
+          is_hidden: updatedCategory.hidden,
         })
         .eq("id", updatedCategory.id);
 

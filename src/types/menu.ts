@@ -40,6 +40,7 @@ export type MenuCategory = {
   name: string;
   menu_type: "aLaCarte" | "breakfast" | "drinks" | "otherMenu";
   items: MenuItem[];
+  hidden?: boolean; // Add hidden field for categories
 };
 
 export const MENU_TYPES = [

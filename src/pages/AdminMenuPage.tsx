@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Settings } from 'lucide-react';
+import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Settings, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import MenuItemForm from '../components/admin/MenuItemForm';
 import CategoryForm from '../components/admin/CategoryForm';
@@ -113,6 +112,19 @@ const AdminMenuPage = () => {
     }
   };
 
+  const toggleCategoryVisibility = async (category: MenuCategory) => {
+    try {
+      await updateCategory({ 
+        ...category, 
+        hidden: !category.hidden 
+      });
+      toast.success(`Category ${category.hidden ? 'shown' : 'hidden'} successfully`);
+    } catch (error) {
+      console.error("Error toggling category visibility:", error);
+      toast.error("Failed to update category visibility");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -135,10 +147,17 @@ const AdminMenuPage = () => {
       </div>
       
       {menuData.map((category, categoryIndex) => (
-        <div key={category.id} className="mb-8 border rounded-lg p-4">
+        <div key={category.id} className={`mb-8 border rounded-lg p-4 ${category.hidden ? 'bg-gray-100 opacity-75' : ''}`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold">{category.name}</h2>
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                {category.name}
+                {category.hidden && (
+                  <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                    Hidden
+                  </span>
+                )}
+              </h2>
               <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                 {category.menu_type}
               </span>
@@ -159,6 +178,14 @@ const AdminMenuPage = () => {
                 disabled={categoryIndex === menuData.length - 1}
               >
                 <ArrowDown className="w-4 h-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => toggleCategoryVisibility(category)}
+                title={category.hidden ? 'Show category' : 'Hide category'}
+              >
+                {category.hidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
               </Button>
               <Button
                 size="sm"

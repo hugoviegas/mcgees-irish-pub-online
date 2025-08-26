@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MenuCategory } from "@/types/menu";
 
 interface CategoryFormProps {
@@ -16,6 +17,7 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
   const [formData, setFormData] = useState<Partial<MenuCategory>>({
     name: category?.name || "",
     menu_type: category?.menu_type || "aLaCarte",
+    hidden: category?.hidden || false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -56,6 +58,17 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
             <SelectItem value="otherMenu">Other Menu</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="hidden"
+          checked={formData.hidden}
+          onCheckedChange={(checked) => 
+            setFormData(prev => ({ ...prev, hidden: checked as boolean }))
+          }
+        />
+        <Label htmlFor="hidden">Hide this category</Label>
       </div>
 
       <div className="flex gap-2">
