@@ -103,6 +103,17 @@ const Footer = () => {
           <span className="text-xs text-gray-300 mt-2">
             &copy; {currentYear} D'Arcy McGee's. All rights reserved.
           </span>
+          <span className="text-[10px] md:text-xs text-gray-400">
+            Developed by {""}
+            <a
+              href="https://hugoviegas.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-irish-gold"
+            >
+              Hugo Viegas
+            </a>
+          </span>
         </div>
       </div>
     </footer>
