@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useEventsData } from "../hooks/useEventsData";
-import { Event } from "../types/events";
+import { Event, EventFormData } from "../types/events";
 import { EventForm } from "../components/admin/EventForm";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -31,7 +31,7 @@ export default function AdminEventsPage() {
     setEditingEvent(null);
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: EventFormData) => {
     if (editingEvent) {
       await updateEvent(editingEvent.id, data);
     } else {
@@ -43,7 +43,10 @@ export default function AdminEventsPage() {
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Manage Events</h1>
-        <Button onClick={handleAddEvent} className="bg-irish-red hover:bg-irish-red/90">
+        <Button
+          onClick={handleAddEvent}
+          className="bg-irish-red hover:bg-irish-red/90"
+        >
           Add New Event
         </Button>
       </div>
@@ -52,7 +55,9 @@ export default function AdminEventsPage() {
         <h2 className="text-2xl font-semibold mb-4">Current Events</h2>
         {events.length === 0 ? (
           <Card className="p-8 text-center">
-            <p className="text-gray-500">No events found. Create your first event!</p>
+            <p className="text-gray-500">
+              No events found. Create your first event!
+            </p>
           </Card>
         ) : (
           events.map((event) => (
@@ -72,6 +77,11 @@ export default function AdminEventsPage() {
                   </div>
                 </div>
                 <div className="space-x-2">
+                  {event.is_month_poster && (
+                    <span className="inline-block text-sm text-irish-gold mr-2">
+                      Month Poster
+                    </span>
+                  )}
                   <Button
                     variant="outline"
                     onClick={() => handleEditEvent(event)}
@@ -100,6 +110,7 @@ export default function AdminEventsPage() {
                   title: editingEvent.title,
                   date: editingEvent.date,
                   image_url: editingEvent.image_url || "",
+                  is_month_poster: editingEvent.is_month_poster || false,
                 }
               : undefined
           }

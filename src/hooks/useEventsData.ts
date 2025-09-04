@@ -12,7 +12,7 @@ export function useEventsData() {
       setLoading(true);
       const { data, error } = await supabase
         .from("events")
-        .select("*")
+        .select(`*`)
         .order("date", { ascending: true });
 
       if (error) throw error;
@@ -25,36 +25,24 @@ export function useEventsData() {
   }, []);
 
   const addEvent = async (eventData: EventFormData) => {
-    try {
-      const { error } = await supabase.from("events").insert([eventData]);
-      if (error) throw error;
-      await fetchEvents();
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase.from("events").insert([eventData]);
+    if (error) throw error;
+    await fetchEvents();
   };
 
   const updateEvent = async (id: string, eventData: Partial<EventFormData>) => {
-    try {
-      const { error } = await supabase
-        .from("events")
-        .update(eventData)
-        .eq("id", id);
-      if (error) throw error;
-      await fetchEvents();
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase
+      .from("events")
+      .update(eventData)
+      .eq("id", id);
+    if (error) throw error;
+    await fetchEvents();
   };
 
   const deleteEvent = async (id: string) => {
-    try {
-      const { error } = await supabase.from("events").delete().eq("id", id);
-      if (error) throw error;
-      await fetchEvents();
-    } catch (err) {
-      throw err;
-    }
+    const { error } = await supabase.from("events").delete().eq("id", id);
+    if (error) throw error;
+    await fetchEvents();
   };
 
   useEffect(() => {

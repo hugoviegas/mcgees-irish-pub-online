@@ -12,10 +12,12 @@ import {
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEventsData } from "../hooks/useEventsData";
+import { Event as EventType } from "../types/events";
 import { format, isAfter, isSameDay, startOfToday } from "date-fns";
 import { getEventImageUrl } from "@/utils/eventImageUtils";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const EventsPage = () => {
   const { events, loading, error } = useEventsData();
@@ -28,33 +30,44 @@ const EventsPage = () => {
   const upcomingEvents = events
     ? events
         .filter((event) => {
+          // Exclude month poster entries from the upcoming events list
+          if (event.is_month_poster) return false;
           const eventDate = new Date(event.date);
           return isSameDay(eventDate, today) || isAfter(eventDate, today);
         })
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     : [];
 
-  const handleSlide = (direction: 'prev' | 'next') => {
+  // Find month poster event (first one marked as poster)
+  const monthPoster = events?.find((e) => e.is_month_poster) ?? null;
+
+  const handleSlide = (direction: "prev" | "next") => {
     if (isSliding) return;
-    
+
     setIsSliding(true);
-    
-    if (direction === 'prev') {
-      setCurrentIndex((prev) => prev > 0 ? prev - 1 : upcomingEvents.length - 1);
+
+    if (direction === "prev") {
+      setCurrentIndex((prev) =>
+        prev > 0 ? prev - 1 : upcomingEvents.length - 1
+      );
     } else {
-      setCurrentIndex((prev) => prev < upcomingEvents.length - 1 ? prev + 1 : 0);
+      setCurrentIndex((prev) =>
+        prev < upcomingEvents.length - 1 ? prev + 1 : 0
+      );
     }
-    
+
     setTimeout(() => setIsSliding(false), 500);
   };
 
-  const handleAddToCalendar = (event: any) => {
+  const handleAddToCalendar = (event: EventType) => {
     const eventDate = new Date(event.date);
-    const startDate = eventDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const endDate = new Date(eventDate.getTime() + 3 * 60 * 60 * 1000)
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .split(".")[0] + "Z";
+    const startDate =
+      eventDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const endDate =
+      new Date(eventDate.getTime() + 3 * 60 * 60 * 1000)
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .split(".")[0] + "Z";
 
     const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
       event.title
@@ -64,7 +77,7 @@ const EventsPage = () => {
     window.open(calendarUrl, "_blank");
   };
 
-  const handleShare = (event: any) => {
+  const handleShare = (event: EventType) => {
     if (navigator.share) {
       navigator.share({
         title: event.title,
@@ -107,7 +120,8 @@ const EventsPage = () => {
                   Upcoming Events
                 </h2>
                 <p className="text-gray-200 text-lg md:text-xl max-w-3xl mx-auto">
-                  Join us for live music, cultural events, and special promotions at D'Arcy McGee's Irish Pub.
+                  Join us for live music, cultural events, and special
+                  promotions at D'Arcy McGee's Irish Pub.
                 </p>
               </div>
 
@@ -132,99 +146,137 @@ const EventsPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-12">
-                  {upcomingEvents.map((event, index) => (
-                    <div key={event.id} className="relative max-w-7xl mx-auto">
-                      {/* Event Card */}
-                      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-irish-gold/80 mx-4 md:mx-8">
-                        <div className="flex flex-col lg:flex-row min-h-[500px] md:min-h-[600px]">
-                          {/* Event Image */}
-                          <div className="lg:w-1/2 h-[300px] md:h-[400px] lg:h-auto relative group">
-                            <div
-                              className="h-full cursor-pointer overflow-hidden"
-                              onClick={() => setExpandedImage(getEventImageUrl(event.image_url))}
-                            >
-                              <img
-                                src={getEventImageUrl(event.image_url)}
-                                alt={event.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                  </svg>
+                <div className="grid lg:grid-cols-[minmax(280px,420px)_1fr] gap-8">
+                  {/* Left: poster (sticky) */}
+                  {monthPoster && (
+                    <div className="mb-6 lg:mb-0">
+                      <div className="lg:sticky lg:top-20 flex justify-center lg:justify-start">
+                        <div className="w-full max-w-full lg:max-w-[420px] mx-auto lg:mx-0">
+                          {/* A2 portrait ratio ~ 420/594 = 0.707 */}
+                          <AspectRatio
+                            ratio={420 / 594}
+                            className="rounded-xl overflow-hidden shadow-lg border border-irish-gold/40 bg-white"
+                          >
+                            <img
+                              src={getEventImageUrl(monthPoster.image_url)}
+                              alt="Month Poster"
+                              className="w-full h-full object-contain"
+                            />
+                          </AspectRatio>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Right: events list */}
+                  <div>
+                    {upcomingEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="relative max-w-7xl mx-auto mb-6"
+                      >
+                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-irish-gold/60 mx-4 md:mx-8">
+                          <div className="flex flex-col lg:flex-row min-h-[220px] md:min-h-[180px]">
+                            <div className="lg:w-1/2 h-[160px] md:h-[180px] lg:h-auto relative group">
+                              <div
+                                className="h-full cursor-pointer overflow-hidden"
+                                onClick={() =>
+                                  setExpandedImage(
+                                    getEventImageUrl(event.image_url)
+                                  )
+                                }
+                              >
+                                <img
+                                  src={getEventImageUrl(event.image_url)}
+                                  alt={event.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                                    <svg
+                                      className="w-8 h-8 text-white"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                      />
+                                    </svg>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Event Details */}
-                          <div className="lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-                            <div className="flex items-start mb-8">
-                              <div className="mr-6 bg-irish-gold/20 text-irish-gold p-4 rounded-full flex-shrink-0">
-                                <Music className="h-8 w-8 md:h-10 md:w-10" />
+                            <div className="lg:w-1/2 p-4 md:p-6 lg:p-8 flex flex-col justify-center">
+                              <div className="flex items-start mb-6">
+                                <div className="mr-4 bg-irish-gold/20 text-irish-gold p-3 rounded-full flex-shrink-0">
+                                  <Music className="h-6 w-6 md:h-8 md:w-8" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="text-lg md:text-xl font-serif font-bold text-irish-red mb-1 leading-tight">
+                                    {event.title}
+                                  </h3>
+                                  <div className="flex flex-wrap gap-2 text-gray-600 text-sm md:text-base mb-3">
+                                    <span className="flex items-center">
+                                      <Calendar className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                                      {format(
+                                        new Date(event.date),
+                                        "MMM d, yyyy"
+                                      )}
+                                    </span>
+                                    <span className="flex items-center">
+                                      <Clock className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                                      {format(new Date(event.date), "h:mm a")}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex-1">
-                                <h3 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-irish-red mb-4 leading-tight">
-                                  {event.title}
-                                </h3>
-                                <div className="flex flex-wrap gap-4 text-gray-600 text-lg md:text-xl mb-6">
-                                  <span className="flex items-center">
-                                    <Calendar className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                                    {format(new Date(event.date), "MMM d, yyyy")}
+
+                              <p className="text-gray-600 text-sm md:text-base mb-3 leading-relaxed">
+                                Join us for an unforgettable evening of
+                                entertainment.
+                              </p>
+
+                              <div className="flex gap-3 items-center">
+                                <Button
+                                  asChild
+                                  className="bg-irish-red hover:bg-irish-red/90 text-white text-sm px-4 py-2 rounded-full font-semibold shadow transition-all duration-200"
+                                >
+                                  <a href="tel:+35314907727">Book Table</a>
+                                </Button>
+
+                                <button
+                                  onClick={() => handleShare(event)}
+                                  className="flex items-center gap-2 p-2 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-200"
+                                  title="Share event"
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                  <span className="text-sm font-medium">
+                                    Share
                                   </span>
-                                  <span className="flex items-center">
-                                    <Clock className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                                    {format(new Date(event.date), "h:mm a")}
+                                </button>
+                                <button
+                                  onClick={() => handleAddToCalendar(event)}
+                                  className="flex items-center gap-2 p-2 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-200"
+                                  title="Add to calendar"
+                                >
+                                  <CalendarIcon className="h-4 w-4" />
+                                  <span className="text-sm font-medium">
+                                    Add to Calendar
                                   </span>
-                                </div>
-                                <div className="flex items-center text-gray-600 text-lg md:text-xl mb-8">
-                                  <MapPin className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                                  <span>D'Arcy McGee's Irish Pub</span>
-                                </div>
+                                </button>
                               </div>
-                            </div>
-
-                            <p className="text-gray-600 text-lg md:text-xl mb-10 leading-relaxed">
-                              Join us for an unforgettable evening of entertainment in the heart of Dublin's authentic Irish pub atmosphere.
-                            </p>
-
-                            {/* Action Buttons */}
-                            <div className="flex flex-wrap gap-4 mb-8">
-                              <Button
-                                asChild
-                                className="bg-irish-red hover:bg-irish-red/90 text-white text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                              >
-                                <a href="tel:+35314907727">Book Table</a>
-                              </Button>
-                            </div>
-
-                            {/* Interactive Buttons */}
-                            <div className="flex gap-4">
-                              <button
-                                onClick={() => handleShare(event)}
-                                className="flex items-center gap-2 p-3 md:p-4 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-300 hover:scale-105"
-                                title="Share event"
-                              >
-                                <Share2 className="h-5 w-5 md:h-6 md:w-6" />
-                                <span className="text-sm md:text-base font-medium">Share</span>
-                              </button>
-                              <button
-                                onClick={() => handleAddToCalendar(event)}
-                                className="flex items-center gap-2 p-3 md:p-4 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-300 hover:scale-105"
-                                title="Add to calendar"
-                              >
-                                <CalendarIcon className="h-5 w-5 md:h-6 md:w-6" />
-                                <span className="text-sm md:text-base font-medium">Add to Calendar</span>
-                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -265,8 +317,18 @@ const EventsPage = () => {
                   onClick={() => setExpandedImage(null)}
                   className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full p-3 transition-colors backdrop-blur-sm"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
