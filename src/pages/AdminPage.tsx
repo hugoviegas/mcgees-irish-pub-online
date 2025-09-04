@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 import AdminMenuPage from "./AdminMenuPage";
 import AdminEventsPage from "./AdminEventsPage";
 import AdminImageUploadPage from "./AdminImageUploadPage";
@@ -9,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import LoginForm from "../components/admin/LoginForm";
 
 const AdminPage: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, logout } = useAuth();
   const [tab, setTab] = useState("menu");
 
   if (loading) {
@@ -43,9 +44,19 @@ const AdminPage: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 py-8 pt-24">
-        <h1 className="text-3xl font-bold text-irish-red mb-8 text-center">
-          Admin Panel
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-irish-red">Admin Panel</h1>
+          <Button
+            onClick={async () => {
+              await logout();
+              // Redirect to homepage after logout
+              window.location.href = "/";
+            }}
+            className="bg-irish-gold text-irish-brown"
+          >
+            Logout
+          </Button>
+        </div>
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="flex justify-center mb-8">
             <TabsTrigger value="menu">Menu</TabsTrigger>

@@ -31,13 +31,20 @@ function formatPrice(value: string) {
   const trimmed = value.trim();
   const simple = trimmed.match(/^€?\s*(\d+(?:[.,]\d{1,2})?)$/);
   if (!simple) return trimmed;
-  const num = parseFloat(simple[1].replace(',', '.'));
+  const num = parseFloat(simple[1].replace(",", "."));
   if (isNaN(num)) return trimmed;
   return `€${num.toFixed(2)}`;
 }
 
 const MenuPage = () => {
-  const { menuData, loading, error, addMenuItem, updateMenuItem, deleteMenuItem } = useSupabaseMenuData();
+  const {
+    menuData,
+    loading,
+    error,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
+  } = useSupabaseMenuData();
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState<
     "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
@@ -51,7 +58,9 @@ const MenuPage = () => {
   >(null);
   const [showAllergenModal, setShowAllergenModal] = useState(false);
   const [showSpecialsModal, setShowSpecialsModal] = useState(false);
-  const [highlightedItemId, setHighlightedItemId] = useState<number | null>(null);
+  const [highlightedItemId, setHighlightedItemId] = useState<number | null>(
+    null
+  );
   const [visibleSidesFor, setVisibleSidesFor] = useState<number | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -72,23 +81,33 @@ const MenuPage = () => {
     { id: "otherMenu" as const, name: "Other Menu" },
   ];
 
+  // Filter out hidden categories for non-authenticated users
+  const visibleMenuData = isAuthenticated
+    ? menuData
+    : menuData.filter((c) => !c.hidden);
+
   // Sort allergens by number for display
-  const sortedAllergens = [...ALLERGEN_LIST].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  const sortedAllergens = [...ALLERGEN_LIST].sort(
+    (a, b) => parseInt(a.id) - parseInt(b.id)
+  );
 
   // Filter menu data for specials - only show visible items
   const getVisibleSpecialItems = () => {
     const now = new Date();
-    const allItems = menuData.flatMap(category => category.items);
-    return allItems.filter(item => {
-      if (item.hidden) return false;
-      const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
-      const toOk = !item.availableTo || new Date(item.availableTo) >= now;
-      return fromOk && toOk;
-    }).slice(0, 3); // Show first 3 visible items as specials
+    const allItems = menuData.flatMap((category) => category.items);
+    return allItems
+      .filter((item) => {
+        if (item.hidden) return false;
+        const fromOk =
+          !item.availableFrom || new Date(item.availableFrom) <= now;
+        const toOk = !item.availableTo || new Date(item.availableTo) >= now;
+        return fromOk && toOk;
+      })
+      .slice(0, 2); // Show first 2 visible items as specials
   };
 
-  // Filter categories based on active menu
-  const currentMenuCategories = menuData
+  // Filter categories based on active menu and user visibility
+  const currentMenuCategories = visibleMenuData
     .filter((category) => category.menu_type === activeMenu)
     .map((category) => ({
       ...category,
@@ -97,7 +116,8 @@ const MenuPage = () => {
         : category.items.filter((item) => {
             if (item.hidden) return false;
             const now = new Date();
-            const fromOk = !item.availableFrom || new Date(item.availableFrom) <= now;
+            const fromOk =
+              !item.availableFrom || new Date(item.availableFrom) <= now;
             const toOk = !item.availableTo || new Date(item.availableTo) >= now;
             return fromOk && toOk;
           }),
@@ -106,17 +126,19 @@ const MenuPage = () => {
   const handleSectionSelect = (sectionId: string) => {
     const ref = sectionRefs.current[sectionId];
     if (ref) {
-      const yOffset = window.innerWidth < 768 ? 120 : 140; 
+      const yOffset = window.innerWidth < 768 ? 120 : 140;
       const y = ref.getBoundingClientRect().top + window.pageYOffset - yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
       setActiveSection(sectionId);
     }
   };
 
-  const handleMenuSelect = (menuId: 'aLaCarte' | 'breakfast' | 'drinks' | 'otherMenu') => {
+  const handleMenuSelect = (
+    menuId: "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
+  ) => {
     setActiveMenu(menuId);
     // Find first category for this menu and set it as active section
-    const firstCategory = menuData.find(cat => cat.menu_type === menuId);
+    const firstCategory = menuData.find((cat) => cat.menu_type === menuId);
     if (firstCategory) {
       setActiveSection(firstCategory.id);
     } else {
@@ -129,27 +151,34 @@ const MenuPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const yOffset = window.innerWidth < 768 ? 120 : 140;
-      
+
       // Only consider sections from the current active menu
-      const currentMenuSections = Object.entries(sectionRefs.current).filter(([id, ref]) => {
-        return ref && menuData.some(cat => cat.id === id && cat.menu_type === activeMenu);
-      });
-      
+      const currentMenuSections = Object.entries(sectionRefs.current).filter(
+        ([id, ref]) => {
+          return (
+            ref &&
+            menuData.some(
+              (cat) => cat.id === id && cat.menu_type === activeMenu
+            )
+          );
+        }
+      );
+
       if (currentMenuSections.length === 0) return;
-      
+
       const offsets = currentMenuSections.map(([id, ref]) => {
         if (!ref) return { id, top: Infinity };
         const rect = (ref as HTMLDivElement).getBoundingClientRect();
         return { id, top: Math.abs(rect.top - yOffset) };
       });
-      
+
       offsets.sort((a, b) => a.top - b.top);
-      
+
       if (offsets[0] && offsets[0].id !== activeSection) {
         setActiveSection(offsets[0].id);
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     // Run once to set initial active section for current menu
     handleScroll();
@@ -160,7 +189,7 @@ const MenuPage = () => {
   useEffect(() => {
     function setMenuFromHash() {
       const hash = window.location.hash.replace("#", "").toLowerCase();
-      
+
       // Check if it's a search result (item-xxx)
       if (hash.startsWith("item-")) {
         const itemId = parseInt(hash.replace("item-", ""));
@@ -169,9 +198,9 @@ const MenuPage = () => {
           let foundMenu = null;
           let foundCategory = null;
           let foundItem = null;
-          
+
           for (const category of menuData) {
-            const item = category.items.find(item => item.id === itemId);
+            const item = category.items.find((item) => item.id === itemId);
             if (item) {
               foundMenu = category.menu_type;
               foundCategory = category.id;
@@ -179,35 +208,42 @@ const MenuPage = () => {
               break;
             }
           }
-          
+
           if (foundMenu && foundCategory && foundItem) {
             setActiveMenu(foundMenu);
             setActiveSection(foundCategory);
             setHighlightedItemId(itemId);
-            
+
             // Open the item details modal immediately
             setSelectedItem(foundItem);
-            
+
             // Scroll to the item after a short delay
             setTimeout(() => {
               const itemRef = itemRefs.current[itemId];
               if (itemRef) {
                 const yOffset = window.innerWidth < 768 ? 160 : 180;
-                const y = itemRef.getBoundingClientRect().top + window.pageYOffset - yOffset;
+                const y =
+                  itemRef.getBoundingClientRect().top +
+                  window.pageYOffset -
+                  yOffset;
                 window.scrollTo({ top: y, behavior: "smooth" });
-                
+
                 // Clear the hash immediately after navigation to prevent lock
-                window.history.replaceState(null, "", window.location.pathname + window.location.search);
+                window.history.replaceState(
+                  null,
+                  "",
+                  window.location.pathname + window.location.search
+                );
               }
             }, 300);
-            
+
             // Clear highlight after 3 seconds
             setTimeout(() => setHighlightedItemId(null), 3000);
           }
           return;
         }
       }
-      
+
       // Regular menu navigation
       const found = menus.find((m) => m.id.toLowerCase() === hash);
       if (found) {
@@ -260,33 +296,36 @@ const MenuPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="pt-16">
-        <main className="flex-grow">
-          <section className="py-12 bg-[#f8f5f2]">
-            <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 p-5">
-                    <Skeleton className="w-full h-40 rounded-md" />
-                    <div className="mt-4 flex items-start justify-between">
-                      <Skeleton className="h-5 w-2/3" />
-                      <Skeleton className="h-5 w-16" />
+        <Navbar />
+        <div className="pt-16">
+          <main className="flex-grow">
+            <section className="py-12 bg-[#f8f5f2]">
+              <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 p-5"
+                    >
+                      <Skeleton className="w-full h-40 rounded-md" />
+                      <div className="mt-4 flex items-start justify-between">
+                        <Skeleton className="h-5 w-2/3" />
+                        <Skeleton className="h-5 w-16" />
+                      </div>
+                      <Skeleton className="h-4 w-full mt-3" />
+                      <Skeleton className="h-4 w-5/6 mt-2" />
+                      <div className="mt-4 flex gap-2">
+                        <Skeleton className="h-9 w-20 rounded-full" />
+                        <Skeleton className="h-9 w-24 rounded-full" />
+                      </div>
                     </div>
-                    <Skeleton className="h-4 w-full mt-3" />
-                    <Skeleton className="h-4 w-5/6 mt-2" />
-                    <div className="mt-4 flex gap-2">
-                      <Skeleton className="h-9 w-20 rounded-full" />
-                      <Skeleton className="h-9 w-24 rounded-full" />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
-        </main>
-      </div>
-      <Footer />
+            </section>
+          </main>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -392,7 +431,10 @@ const MenuPage = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={(e) => { e.stopPropagation(); handleEditItem(item, category.id); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditItem(item, category.id);
+                                }}
                                 className="bg-white/90 hover:bg-white"
                               >
                                 <Edit className="w-4 h-4" />
@@ -400,7 +442,10 @@ const MenuPage = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={(e) => { e.stopPropagation(); handleDeleteItem(category.id, item.id); }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteItem(category.id, item.id);
+                                }}
                                 className="bg-white/90 hover:bg-white text-red-600 hover:text-red-700"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -409,7 +454,10 @@ const MenuPage = () => {
                           )}
 
                           {item.images && item.images.length > 0 && (
-                            <AspectRatio ratio={4/3} className="bg-gray-100 overflow-hidden">
+                            <AspectRatio
+                              ratio={4 / 3}
+                              className="bg-gray-100 overflow-hidden"
+                            >
                               <ImageCarousel
                                 images={item.images}
                                 itemName={item.name}
@@ -419,7 +467,7 @@ const MenuPage = () => {
                           )}
                           <div className="p-5 flex flex-col flex-grow">
                             <div className="flex justify-between items-start mb-3">
-                              <h3 
+                              <h3
                                 className="text-[18px] font-semibold font-serif text-irish-brown leading-tight cursor-pointer hover:text-irish-red transition-colors"
                                 onClick={() => setSelectedItem(item)}
                               >
@@ -431,7 +479,8 @@ const MenuPage = () => {
                                   <div className="text-sm font-medium mt-1">
                                     {item.extras.map((ex: any, i: number) => (
                                       <span key={i} className="block">
-                                        {formatPrice(ex.price)} {ex.name ? `(${ex.name})` : ''}
+                                        {formatPrice(ex.price)}{" "}
+                                        {ex.name ? `(${ex.name})` : ""}
                                       </span>
                                     ))}
                                   </div>
@@ -466,22 +515,37 @@ const MenuPage = () => {
                                   </div>
                                   <button
                                     className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
-                                    onClick={(e) => { e.stopPropagation(); setAllergyPopup({ name: item.name, allergens: item.allergens }); }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setAllergyPopup({
+                                        name: item.name,
+                                        allergens: item.allergens,
+                                      });
+                                    }}
                                     aria-label={`Show allergies for ${item.name}`}
                                   >
                                     Allergies
                                   </button>
                                 </>
                               )}
-                              {item.sides && item.sides.length > 0 && item.showSidesOutside && (
-                                <button
-                                  className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
-                                  onClick={(e) => { e.stopPropagation(); setVisibleSidesFor(visibleSidesFor === item.id ? null : item.id); }}
-                                  aria-label={`Show sides for ${item.name}`}
-                                >
-                                  Sides
-                                </button>
-                              )}
+                              {item.sides &&
+                                item.sides.length > 0 &&
+                                item.showSidesOutside && (
+                                  <button
+                                    className="ml-1 px-2 py-1 text-xs bg-irish-gold text-irish-brown rounded shadow hover:bg-irish-gold/80 transition-colors border border-irish-gold"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setVisibleSidesFor(
+                                        visibleSidesFor === item.id
+                                          ? null
+                                          : item.id
+                                      );
+                                    }}
+                                    aria-label={`Show sides for ${item.name}`}
+                                  >
+                                    Sides
+                                  </button>
+                                )}
                               {item.tags?.length > 0 && (
                                 <div className="flex flex-wrap gap-1 ml-2">
                                   {item.tags.map((tag) => (
@@ -504,18 +568,27 @@ const MenuPage = () => {
                               </Button>
                             </div>
                           </div>
-                          {item.showSidesOutside && visibleSidesFor === item.id && item.sides && item.sides.length > 0 && (
-                            <div className="p-4 border-t bg-gray-50">
-                              <strong className="text-sm block mb-1">Available sides</strong>
-                              <div className="flex flex-wrap gap-3">
-                                {item.sides.map((s) => (
-                                  <div key={s.id} className="px-3 py-2 bg-white rounded shadow-sm text-sm">
-                                    {s.name}{s.price ? ` — ${s.price}` : ''}
-                                  </div>
-                                ))}
+                          {item.showSidesOutside &&
+                            visibleSidesFor === item.id &&
+                            item.sides &&
+                            item.sides.length > 0 && (
+                              <div className="p-4 border-t bg-gray-50">
+                                <strong className="text-sm block mb-1">
+                                  Available sides
+                                </strong>
+                                <div className="flex flex-wrap gap-3">
+                                  {item.sides.map((s) => (
+                                    <div
+                                      key={s.id}
+                                      className="px-3 py-2 bg-white rounded shadow-sm text-sm"
+                                    >
+                                      {s.name}
+                                      {s.price ? ` — ${s.price}` : ""}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
                         </div>
                       ))}
                     </div>
@@ -533,7 +606,7 @@ const MenuPage = () => {
               <MenuItemForm
                 item={editingItem?.item}
                 categoryId={editingItem?.categoryId || addItemCategory || ""}
-                categories={menuData.map(c => ({ id: c.id, name: c.name }))}
+                categories={menuData.map((c) => ({ id: c.id, name: c.name }))}
                 onSave={handleSaveItem}
                 onCancel={() => {
                   setShowItemForm(false);
@@ -544,8 +617,14 @@ const MenuPage = () => {
             )}
 
             {allergyPopup && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setAllergyPopup(null)}>
-                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                onClick={() => setAllergyPopup(null)}
+              >
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-8 min-w-[300px] max-w-xs relative animate-fade-in"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setAllergyPopup(null)}
@@ -564,7 +643,9 @@ const MenuPage = () => {
                         const IconComponent = ALLERGEN_ICON_COMPONENTS[id];
                         return (
                           <div key={id} className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-irish-gold w-6 text-center">{id}</span>
+                            <span className="text-sm font-bold text-irish-gold w-6 text-center">
+                              {id}
+                            </span>
                             {IconComponent ? (
                               <IconComponent className="w-6 h-6 text-irish-red flex-shrink-0" />
                             ) : (
@@ -583,8 +664,14 @@ const MenuPage = () => {
 
             {/* Allergen List Modal */}
             {showAllergenModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowAllergenModal(false)}>
-                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                onClick={() => setShowAllergenModal(false)}
+              >
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setShowAllergenModal(false)}
@@ -622,8 +709,14 @@ const MenuPage = () => {
 
             {/* Chef's Specials Modal */}
             {showSpecialsModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowSpecialsModal(false)}>
-                <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                onClick={() => setShowSpecialsModal(false)}
+              >
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
                     onClick={() => setShowSpecialsModal(false)}
@@ -637,16 +730,27 @@ const MenuPage = () => {
                   <div className="space-y-4">
                     {getVisibleSpecialItems().length > 0 ? (
                       getVisibleSpecialItems().map((item, index) => (
-                        <div key={item.id} className="border-b pb-4 last:border-b-0">
-                          <h5 className="font-semibold text-irish-brown mb-2">{item.name}</h5>
-                          <p className="text-gray-700 text-sm mb-2">{item.description}</p>
-                          <p className="text-irish-red font-semibold">{formatPrice(item.price)}</p>
+                        <div
+                          key={item.id}
+                          className="border-b pb-4 last:border-b-0"
+                        >
+                          <h5 className="font-semibold text-irish-brown mb-2">
+                            {item.name}
+                          </h5>
+                          <p className="text-gray-700 text-sm mb-2">
+                            {item.description}
+                          </p>
+                          <p className="text-irish-red font-semibold">
+                            {formatPrice(item.price)}
+                          </p>
                         </div>
                       ))
                     ) : (
                       <div className="text-center text-gray-600">
                         <p>No specials available at the moment.</p>
-                        <p className="text-sm mt-2">Check back later for our chef's recommendations!</p>
+                        <p className="text-sm mt-2">
+                          Check back later for our chef's recommendations!
+                        </p>
                       </div>
                     )}
                   </div>
@@ -683,24 +787,32 @@ const MenuPage = () => {
                     </div>
                   </div>
 
-                   {selectedItem.images && selectedItem.images.length > 0 && (
-                     <AspectRatio ratio={4/3} className="w-full rounded mb-4 overflow-hidden bg-gray-100">
-                       <ImageCarousel
-                         images={selectedItem.images}
-                         itemName={selectedItem.name}
-                         className="w-full h-full"
-                       />
-                     </AspectRatio>
-                   )}
+                  {selectedItem.images && selectedItem.images.length > 0 && (
+                    <AspectRatio
+                      ratio={4 / 3}
+                      className="w-full rounded mb-4 overflow-hidden bg-gray-100"
+                    >
+                      <ImageCarousel
+                        images={selectedItem.images}
+                        itemName={selectedItem.name}
+                        className="w-full h-full"
+                      />
+                    </AspectRatio>
+                  )}
                   <p className="text-gray-700 text-base mb-4 font-light text-center">
                     {selectedItem.description}
                   </p>
                   {selectedItem.sides && selectedItem.sides.length > 0 && (
                     <div className="mb-4 w-full">
-                      <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">Sides</h4>
+                      <h4 className="text-lg font-bold font-serif mb-2 text-irish-red">
+                        Sides
+                      </h4>
                       <ul className="list-disc list-inside text-sm text-gray-700">
                         {selectedItem.sides.map((s) => (
-                          <li key={s.id}>{s.name}{s.price ? ` — ${s.price}` : ''}</li>
+                          <li key={s.id}>
+                            {s.name}
+                            {s.price ? ` — ${s.price}` : ""}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -751,12 +863,13 @@ const MenuPage = () => {
             )}
           </section>
 
+          {/* Hours of Service Section */}
           <section className="py-12 bg-[#f8f5f2]">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-serif font-bold mb-8 text-irish-red">
                 Hours of Service
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white p-6 rounded-md shadow">
                   <h3 className="text-2xl font-serif font-bold mb-3 text-irish-gold">
                     BREAKFAST
@@ -782,6 +895,15 @@ const MenuPage = () => {
                   <p>THURSDAY 3PM-9PM</p>
                   <p>FRI & SAT 3PM-10PM</p>
                   <p>SUNDAY 6PM-8PM</p>
+                </div>
+                <div className="bg-white p-6 rounded-md shadow">
+                  <h3 className="text-2xl font-serif font-bold mb-3 text-irish-gold">
+                    PUB HOURS
+                  </h3>
+                  <p className="font-medium">SERVED</p>
+                  <p>MON-THU 9AM-11PM</p>
+                  <p>FRI & SAT 9AM-12:30AM</p>
+                  <p>SUNDAY 12PM-11PM</p>
                 </div>
               </div>
             </div>

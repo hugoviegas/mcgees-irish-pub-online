@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Switch } from '@/components/ui/switch';
-import { MenuItem, ALLERGEN_LIST, Side } from '@/types/menu';
-import { supabase } from '@/integrations/supabase/client';
-import { X, Upload, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
-import { toast } from 'sonner';
-import { useSidesData } from '@/hooks/useSidesData';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { MenuItem, ALLERGEN_LIST, Side } from "@/types/menu";
+import { supabase } from "@/integrations/supabase/client";
+import { X, Upload, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { toast } from "sonner";
+import { useSidesData } from "@/hooks/useSidesData";
 
 interface FormImage {
   id?: string;
@@ -26,93 +26,112 @@ interface MenuItemFormProps {
   onCancel: () => void;
 }
 
-const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categories, onSave, onCancel }) => {
+const MenuItemForm: React.FC<MenuItemFormProps> = ({
+  item,
+  categoryId,
+  categories,
+  onSave,
+  onCancel,
+}) => {
   // Helpers to handle datetime-local formatting
   const toInputValue = (iso?: string | null) => {
-    if (!iso) return '';
+    if (!iso) return "";
     try {
       const d = new Date(iso);
-      const pad = (n: number) => n.toString().padStart(2, '0');
+      const pad = (n: number) => n.toString().padStart(2, "0");
       const yyyy = d.getFullYear();
       const mm = pad(d.getMonth() + 1);
       const dd = pad(d.getDate());
       return `${yyyy}-${mm}-${dd}`;
     } catch {
-      return '';
+      return "";
     }
   };
 
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    tags: '',
+    name: "",
+    description: "",
+    price: "",
+    tags: "",
     hidden: false,
-    availableFrom: '',
-    availableTo: '',
+    availableFrom: "",
+    availableTo: "",
   });
 
   const [allergens, setAllergens] = useState<string[]>([]);
   const [selectedSides, setSelectedSides] = useState<Side[]>([]);
   const [images, setImages] = useState<FormImage[]>([]);
-  const [extras, setExtras] = useState<{ id?: string; name: string; price: string }[]>([]);
+  const [extras, setExtras] = useState<
+    { id?: string; name: string; price: string }[]
+  >([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || '');
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    categoryId || ""
+  );
   const { sides: availableSides, addSide: addGlobalSide } = useSidesData();
-  const [showSidesOutside, setShowSidesOutside] = useState<boolean>(item?.showSidesOutside || false);
-  const [newSideName, setNewSideName] = useState('');
-  const [newSidePrice, setNewSidePrice] = useState('');
+  const [showSidesOutside, setShowSidesOutside] = useState<boolean>(
+    item?.showSidesOutside || false
+  );
+  const [newSideName, setNewSideName] = useState("");
+  const [newSidePrice, setNewSidePrice] = useState("");
 
   // Sort allergens by number for display
-  const sortedAllergens = [...ALLERGEN_LIST].sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  const sortedAllergens = [...ALLERGEN_LIST].sort(
+    (a, b) => parseInt(a.id) - parseInt(b.id)
+  );
 
   useEffect(() => {
     if (item) {
       setFormData({
-        name: item.name || '',
-        description: item.description || '',
-        price: item.price || '',
-        tags: Array.isArray(item.tags) ? item.tags.join(', ') : '',
+        name: item.name || "",
+        description: item.description || "",
+        price: item.price || "",
+        tags: Array.isArray(item.tags) ? item.tags.join(", ") : "",
         hidden: item.hidden ?? false,
         availableFrom: toInputValue(item.availableFrom ?? null),
         availableTo: toInputValue(item.availableTo ?? null),
       });
       setAllergens(item.allergens || []);
       setSelectedSides(item.sides || []);
-      setExtras(item.extras?.map(e => ({ id: e.id, name: e.name, price: e.price })) || []);
+      setExtras(
+        item.extras?.map((e) => ({ id: e.id, name: e.name, price: e.price })) ||
+          []
+      );
       setShowSidesOutside(item.showSidesOutside ?? false);
       if (item.images) {
-        setImages(item.images.map(img => ({
-          id: img.id,
-          url: img.imageUrl,
-          displayOrder: img.displayOrder
-        })));
+        setImages(
+          item.images.map((img) => ({
+            id: img.id,
+            url: img.imageUrl,
+            displayOrder: img.displayOrder,
+          }))
+        );
       }
     }
   }, [item]);
-  
+
   useEffect(() => {
     if (categoryId) setSelectedCategory(categoryId);
   }, [categoryId]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleAllergenToggle = (allergenId: string) => {
-    setAllergens(prev =>
+    setAllergens((prev) =>
       prev.includes(allergenId)
-        ? prev.filter(id => id !== allergenId)
+        ? prev.filter((id) => id !== allergenId)
         : [...prev, allergenId]
     );
   };
 
   const handleSideToggle = (side: Side) => {
-    setSelectedSides(prev =>
-      prev.find(s => s.id === side.id)
-        ? prev.filter(s => s.id !== side.id)
+    setSelectedSides((prev) =>
+      prev.find((s) => s.id === side.id)
+        ? prev.filter((s) => s.id !== side.id)
         : [...prev, side]
     );
   };
@@ -121,51 +140,58 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
     const name = newSideName.trim();
     const price = newSidePrice.trim();
     if (!name) {
-      toast.error('Please enter a name for the new side');
+      toast.error("Please enter a name for the new side");
       return;
     }
     try {
-      const created = await addGlobalSide({ name, description: undefined, price: price || undefined });
+      const created = await addGlobalSide({
+        name,
+        description: undefined,
+        price: price || undefined,
+      });
       // add to selectedSides
-      setSelectedSides(prev => [...prev, created]);
-      setNewSideName('');
-      setNewSidePrice('');
-      toast.success('Side added');
+      setSelectedSides((prev) => [...prev, created]);
+      setNewSideName("");
+      setNewSidePrice("");
+      toast.success("Side added");
     } catch (err) {
-      console.error('Error creating side inline:', err);
-      toast.error('Failed to add side');
+      console.error("Error creating side inline:", err);
+      toast.error("Failed to add side");
     }
   };
 
   const handleImageUpload = async (file: File) => {
     try {
       setUploading(true);
-      
-      const fileExt = file.name.split('.').pop();
+
+      const fileExt = file.name.split(".").pop();
       const fileName = `menu-${Date.now()}.${fileExt}`;
-      
+
       const { error: uploadError } = await supabase.storage
-        .from('barpics')
+        .from("barpics")
         .upload(fileName, file);
-      
+
       if (uploadError) {
         throw uploadError;
       }
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('barpics')
-        .getPublicUrl(fileName);
-      
-      setImages(prev => [...prev, {
-        file,
-        url: publicUrl,
-        displayOrder: prev.length
-      }]);
 
-      toast.success('Image uploaded successfully');
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("barpics").getPublicUrl(fileName);
+
+      setImages((prev) => [
+        ...prev,
+        {
+          file,
+          url: publicUrl,
+          displayOrder: prev.length,
+        },
+      ]);
+
+      toast.success("Image uploaded successfully");
     } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
     } finally {
       setUploading(false);
     }
@@ -177,41 +203,49 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
     if (file) {
       await handleImageUpload(file);
       // Clear the input
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const moveImage = (index: number, direction: 'up' | 'down') => {
-    setImages(prev => {
+  const moveImage = (index: number, direction: "up" | "down") => {
+    setImages((prev) => {
       const newImages = [...prev];
-      const newIndex = direction === 'up' ? index - 1 : index + 1;
-      
+      const newIndex = direction === "up" ? index - 1 : index + 1;
+
       if (newIndex >= 0 && newIndex < newImages.length) {
-        [newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]];
+        [newImages[index], newImages[newIndex]] = [
+          newImages[newIndex],
+          newImages[index],
+        ];
         newImages.forEach((img, i) => {
           img.displayOrder = i;
         });
       }
-      
+
       return newImages;
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name.trim() || !formData.description.trim() || !formData.price.trim()) {
-      toast.error('Please fill in all required fields');
+
+    if (
+      !formData.name.trim() ||
+      !formData.description.trim() ||
+      !formData.price.trim()
+    ) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    const priceRegex = /^€?\d+(\.\d{2})?$/;
+    // Accept prices like: 9, 9.5, 9.50, €9, €9.5, 9,50 etc. (one or two decimal places allowed)
+    const priceRegex = /^€?\s*\d+(?:[.,]\d{1,2})?$/;
     if (!priceRegex.test(formData.price.trim())) {
-      toast.error('Please enter a valid price (e.g., €12.50 or 12.50)');
+      toast.error("Please enter a valid price (e.g., €12.50, 12.5 or 9.5)");
       return;
     }
 
@@ -219,7 +253,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       const fromDate = new Date(formData.availableFrom);
       const toDate = new Date(formData.availableTo);
       if (fromDate > toDate) {
-        toast.error('Available from date must be before available to date');
+        toast.error("Available from date must be before available to date");
         return;
       }
     }
@@ -236,29 +270,46 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: formData.price.trim(),
-        extras: extras.map(e => ({ id: e.id || '', name: e.name, price: e.price })),
-        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
+        extras: extras.map((e) => ({
+          id: e.id || "",
+          name: e.name,
+          price: e.price,
+        })),
+        tags: formData.tags
+          ? formData.tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean)
+          : [],
         allergens,
         hidden: formData.hidden,
-        availableFrom: formData.availableFrom ? new Date(formData.availableFrom).toISOString() : null,
-        availableTo: formData.availableTo ? new Date(formData.availableTo).toISOString() : null,
+        availableFrom: formData.availableFrom
+          ? new Date(formData.availableFrom).toISOString()
+          : null,
+        availableTo: formData.availableTo
+          ? new Date(formData.availableTo).toISOString()
+          : null,
         displayOrder: item?.displayOrder || 0,
         images: images.map((img, index) => ({
-          id: img.id || '',
+          id: img.id || "",
           menuItemId: item?.id || 0,
           imageUrl: img.url,
-          displayOrder: index
+          displayOrder: index,
         })),
         sides: selectedSides,
-        showSidesOutside
+        showSidesOutside,
       };
 
       await onSave(menuItem, selectedCategory);
-      
-      toast.success(item ? "Menu item updated successfully!" : "Menu item created successfully!");
+
+      toast.success(
+        item
+          ? "Menu item updated successfully!"
+          : "Menu item created successfully!"
+      );
     } catch (error) {
-      console.error('Error saving menu item:', error);
-      toast.error('Failed to save menu item');
+      console.error("Error saving menu item:", error);
+      toast.error("Failed to save menu item");
     } finally {
       setSaving(false);
     }
@@ -269,7 +320,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold">
-            {item ? 'Edit Menu Item' : 'Add New Menu Item'}
+            {item ? "Edit Menu Item" : "Add New Menu Item"}
           </h2>
           <Button variant="ghost" size="sm" onClick={onCancel}>
             <X className="h-4 w-4" />
@@ -289,11 +340,15 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                     onChange={(e) => setSelectedCategory(e.target.value)}
                   >
                     {categories && categories.length > 0 ? (
-                      categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
                       ))
                     ) : (
-                      <option value={selectedCategory}>{selectedCategory || 'Default'}</option>
+                      <option value={selectedCategory}>
+                        {selectedCategory || "Default"}
+                      </option>
                     )}
                   </select>
                 </div>
@@ -302,7 +357,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
                     placeholder="Item name"
                     required
                   />
@@ -313,7 +368,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("description", e.target.value)
+                    }
                     placeholder="Item description"
                     rows={3}
                     required
@@ -325,7 +382,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Input
                     id="price"
                     value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
                     placeholder="e.g., €12.50"
                     required
                   />
@@ -336,7 +393,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Input
                     id="tags"
                     value={formData.tags}
-                    onChange={(e) => handleInputChange('tags', e.target.value)}
+                    onChange={(e) => handleInputChange("tags", e.target.value)}
                     placeholder="e.g., popular, spicy, vegan"
                   />
                 </div>
@@ -358,15 +415,24 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   {images.length > 0 && (
                     <div className="mt-2 space-y-2">
                       {images.map((img, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                          <img src={img.url} alt="" className="w-12 h-12 object-cover rounded" />
-                          <span className="flex-1 text-sm truncate">{img.url.split('/').pop()}</span>
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 p-2 border rounded"
+                        >
+                          <img
+                            src={img.url}
+                            alt=""
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <span className="flex-1 text-sm truncate">
+                            {img.url.split("/").pop()}
+                          </span>
                           <div className="flex gap-1">
                             <Button
                               type="button"
                               size="sm"
                               variant="outline"
-                              onClick={() => moveImage(index, 'up')}
+                              onClick={() => moveImage(index, "up")}
                               disabled={index === 0}
                             >
                               <ArrowUp className="w-3 h-3" />
@@ -375,7 +441,7 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                               type="button"
                               size="sm"
                               variant="outline"
-                              onClick={() => moveImage(index, 'down')}
+                              onClick={() => moveImage(index, "down")}
                               disabled={index === images.length - 1}
                             >
                               <ArrowDown className="w-3 h-3" />
@@ -399,13 +465,21 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Label>Allergens</Label>
                   <div className="grid grid-cols-2 gap-2 mt-2 max-h-32 overflow-y-auto">
                     {sortedAllergens.map((allergen) => (
-                      <div key={allergen.id} className="flex items-center space-x-2">
+                      <div
+                        key={allergen.id}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           id={`allergen-${allergen.id}`}
                           checked={allergens.includes(allergen.id)}
-                          onCheckedChange={() => handleAllergenToggle(allergen.id)}
+                          onCheckedChange={() =>
+                            handleAllergenToggle(allergen.id)
+                          }
                         />
-                        <Label htmlFor={`allergen-${allergen.id}`} className="text-sm">
+                        <Label
+                          htmlFor={`allergen-${allergen.id}`}
+                          className="text-sm"
+                        >
                           {allergen.id}. {allergen.name}
                         </Label>
                       </div>
@@ -421,34 +495,77 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                         <input
                           className="flex-1 rounded border p-2"
                           value={ex.name}
-                          onChange={(e) => setExtras(prev => prev.map((p, i) => i === idx ? { ...p, name: e.target.value } : p))}
+                          onChange={(e) =>
+                            setExtras((prev) =>
+                              prev.map((p, i) =>
+                                i === idx ? { ...p, name: e.target.value } : p
+                              )
+                            )
+                          }
                           placeholder="Option name (e.g., Large)"
                         />
                         <input
                           className="w-28 rounded border p-2"
                           value={ex.price}
-                          onChange={(e) => setExtras(prev => prev.map((p, i) => i === idx ? { ...p, price: e.target.value } : p))}
+                          onChange={(e) =>
+                            setExtras((prev) =>
+                              prev.map((p, i) =>
+                                i === idx ? { ...p, price: e.target.value } : p
+                              )
+                            )
+                          }
                           placeholder="€0.00"
                         />
-                        <Button type="button" variant="ghost" size="sm" onClick={() => setExtras(prev => prev.filter((_, i) => i !== idx))}>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setExtras((prev) =>
+                              prev.filter((_, i) => i !== idx)
+                            )
+                          }
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     ))}
 
                     <div className="flex gap-2">
-                      <input id="newExtraName" className="flex-1 rounded border p-2" placeholder="New option name" />
-                      <input id="newExtraPrice" className="w-28 rounded border p-2" placeholder="€0.00" />
-                      <Button type="button" onClick={() => {
-                        const nameInput = (document.getElementById('newExtraName') as HTMLInputElement);
-                        const priceInput = (document.getElementById('newExtraPrice') as HTMLInputElement);
-                        const name = nameInput?.value?.trim() || '';
-                        const price = priceInput?.value?.trim() || '';
-                        if (!name) return;
-                        setExtras(prev => [...prev, { id: crypto?.randomUUID?.() || String(Date.now()), name, price }]);
-                        if (nameInput) nameInput.value = '';
-                        if (priceInput) priceInput.value = '';
-                      }}>
+                      <input
+                        id="newExtraName"
+                        className="flex-1 rounded border p-2"
+                        placeholder="New option name"
+                      />
+                      <input
+                        id="newExtraPrice"
+                        className="w-28 rounded border p-2"
+                        placeholder="€0.00"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const nameInput = document.getElementById(
+                            "newExtraName"
+                          ) as HTMLInputElement;
+                          const priceInput = document.getElementById(
+                            "newExtraPrice"
+                          ) as HTMLInputElement;
+                          const name = nameInput?.value?.trim() || "";
+                          const price = priceInput?.value?.trim() || "";
+                          if (!name) return;
+                          setExtras((prev) => [
+                            ...prev,
+                            {
+                              id: crypto?.randomUUID?.() || String(Date.now()),
+                              name,
+                              price,
+                            },
+                          ]);
+                          if (nameInput) nameInput.value = "";
+                          if (priceInput) priceInput.value = "";
+                        }}
+                      >
                         Add
                       </Button>
                     </div>
@@ -463,10 +580,15 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                         <div key={side.id} className="flex items-center gap-2">
                           <input
                             type="checkbox"
-                            checked={!!selectedSides.find(s => s.id === side.id)}
+                            checked={
+                              !!selectedSides.find((s) => s.id === side.id)
+                            }
                             onChange={() => handleSideToggle(side)}
                           />
-                          <span className="flex-1">{side.name}{side.price ? ` — ${side.price}` : ''}</span>
+                          <span className="flex-1">
+                            {side.name}
+                            {side.price ? ` — ${side.price}` : ""}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -483,7 +605,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                         onChange={(e) => setNewSidePrice(e.target.value)}
                       />
                       <div className="col-span-2 flex justify-end">
-                        <Button type="button" onClick={handleAddNewSide}>Add Side</Button>
+                        <Button type="button" onClick={handleAddNewSide}>
+                          Add Side
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -492,8 +616,14 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                     <Label>Side display</Label>
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-2">
-                        <Checkbox id="showOutside" checked={showSidesOutside} onCheckedChange={(v) => setShowSidesOutside(!!v)} />
-                        <Label htmlFor="showOutside">Show sides outside item</Label>
+                        <Checkbox
+                          id="showOutside"
+                          checked={showSidesOutside}
+                          onCheckedChange={(v) => setShowSidesOutside(!!v)}
+                        />
+                        <Label htmlFor="showOutside">
+                          Show sides outside item
+                        </Label>
                       </div>
                     </div>
                   </div>
@@ -503,7 +633,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                       id="availableFrom"
                       type="date"
                       value={formData.availableFrom}
-                      onChange={(e) => handleInputChange('availableFrom', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("availableFrom", e.target.value)
+                      }
                     />
                   </div>
 
@@ -513,7 +645,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                       id="availableTo"
                       type="date"
                       value={formData.availableTo}
-                      onChange={(e) => handleInputChange('availableTo', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("availableTo", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -522,7 +656,9 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
                   <Switch
                     id="hidden"
                     checked={formData.hidden}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, hidden: checked }))}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, hidden: checked }))
+                    }
                   />
                   <Label htmlFor="hidden">Hide from menu</Label>
                 </div>
@@ -530,15 +666,20 @@ const MenuItemForm: React.FC<MenuItemFormProps> = ({ item, categoryId, categorie
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={saving || uploading || !formData.name.trim()} 
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
                 className="flex-1"
               >
-                {saving ? 'Saving...' : (item ? 'Update Item' : 'Add Item')}
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving || uploading || !formData.name.trim()}
+                className="flex-1"
+              >
+                {saving ? "Saving..." : item ? "Update Item" : "Add Item"}
               </Button>
             </div>
           </form>

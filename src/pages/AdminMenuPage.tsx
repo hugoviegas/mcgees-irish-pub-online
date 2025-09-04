@@ -1,21 +1,54 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Settings, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
-import MenuItemForm from '../components/admin/MenuItemForm';
-import CategoryForm from '../components/admin/CategoryForm';
-import { useSupabaseMenuData } from '../hooks/useSupabaseMenuData';
-import { MenuItem, MenuCategory } from '../types/menu';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Settings,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { toast } from "sonner";
+import MenuItemForm from "../components/admin/MenuItemForm";
+import CategoryForm from "../components/admin/CategoryForm";
+import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
+import { MenuItem, MenuCategory } from "../types/menu";
 
 const AdminMenuPage = () => {
-  const { menuData, loading, error, addMenuItem, updateMenuItem, deleteMenuItem, addCategory, updateCategory, deleteCategory, updateCategoryOrder } = useSupabaseMenuData();
+  const {
+    menuData,
+    loading,
+    error,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    updateCategoryOrder,
+  } = useSupabaseMenuData();
+  const [editableCategories, setEditableCategories] = useState<MenuCategory[]>(
+    []
+  );
+  const [orderingDirty, setOrderingDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+
+  // Keep local editable copy in sync with fetched menuData
+  useEffect(() => {
+    setEditableCategories(menuData);
+    setOrderingDirty(false);
+  }, [menuData]);
   const [editingItem, setEditingItem] = useState<{
     item?: MenuItem;
     categoryId?: string;
   } | null>(null);
   const [showItemForm, setShowItemForm] = useState(false);
   const [addItemCategory, setAddItemCategory] = useState<string | null>(null);
-  const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(null);
+  const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(
+    null
+  );
   const [showCategoryForm, setShowCategoryForm] = useState(false);
 
   // Handle save item (add/edit)
@@ -84,41 +117,63 @@ const AdminMenuPage = () => {
     }
   };
 
-  const handleMoveCategoryUp = async (categoryIndex: number) => {
+  const handleMoveCategoryUp = (categoryIndex: number) => {
     if (categoryIndex > 0) {
-      const reorderedCategories = [...menuData];
-      [reorderedCategories[categoryIndex - 1], reorderedCategories[categoryIndex]] = 
-      [reorderedCategories[categoryIndex], reorderedCategories[categoryIndex - 1]];
-      
-      try {
-        await updateCategoryOrder(reorderedCategories);
-      } catch (error) {
-        console.error("Error reordering categories:", error);
-      }
+      setEditableCategories((prev) => {
+        const reordered = [...prev];
+        [reordered[categoryIndex - 1], reordered[categoryIndex]] = [
+          reordered[categoryIndex],
+          reordered[categoryIndex - 1],
+        ];
+        return reordered;
+      });
+      setOrderingDirty(true);
     }
   };
 
-  const handleMoveCategoryDown = async (categoryIndex: number) => {
-    if (categoryIndex < menuData.length - 1) {
-      const reorderedCategories = [...menuData];
-      [reorderedCategories[categoryIndex], reorderedCategories[categoryIndex + 1]] = 
-      [reorderedCategories[categoryIndex + 1], reorderedCategories[categoryIndex]];
-      
-      try {
-        await updateCategoryOrder(reorderedCategories);
-      } catch (error) {
-        console.error("Error reordering categories:", error);
+  const handleMoveCategoryDown = (categoryIndex: number) => {
+    setEditableCategories((prev) => {
+      if (categoryIndex < prev.length - 1) {
+        const reordered = [...prev];
+        [reordered[categoryIndex], reordered[categoryIndex + 1]] = [
+          reordered[categoryIndex + 1],
+          reordered[categoryIndex],
+        ];
+        setOrderingDirty(true);
+        return reordered;
       }
+      return prev;
+    });
+  };
+
+  const handleSaveOrder = async () => {
+    try {
+      setSavingOrder(true);
+      await updateCategoryOrder(editableCategories);
+      setOrderingDirty(false);
+      toast.success("Category order saved");
+    } catch (err) {
+      console.error("Error saving category order:", err);
+      toast.error("Failed to save order");
+    } finally {
+      setSavingOrder(false);
     }
+  };
+
+  const handleCancelOrder = () => {
+    setEditableCategories(menuData);
+    setOrderingDirty(false);
   };
 
   const toggleCategoryVisibility = async (category: MenuCategory) => {
     try {
-      await updateCategory({ 
-        ...category, 
-        hidden: !category.hidden 
+      await updateCategory({
+        ...category,
+        hidden: !category.hidden,
       });
-      toast.success(`Category ${category.hidden ? 'shown' : 'hidden'} successfully`);
+      toast.success(
+        `Category ${category.hidden ? "shown" : "hidden"} successfully`
+      );
     } catch (error) {
       console.error("Error toggling category visibility:", error);
       toast.error("Failed to update category visibility");
@@ -145,9 +200,14 @@ const AdminMenuPage = () => {
           Add Category
         </Button>
       </div>
-      
-      {menuData.map((category, categoryIndex) => (
-        <div key={category.id} className={`mb-8 border rounded-lg p-4 ${category.hidden ? 'bg-gray-100 opacity-75' : ''}`}>
+
+      {editableCategories.map((category, categoryIndex) => (
+        <div
+          key={category.id}
+          className={`mb-8 border rounded-lg p-4 ${
+            category.hidden ? "bg-gray-100 opacity-75" : ""
+          }`}
+        >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -175,7 +235,7 @@ const AdminMenuPage = () => {
                 size="sm"
                 variant="outline"
                 onClick={() => handleMoveCategoryDown(categoryIndex)}
-                disabled={categoryIndex === menuData.length - 1}
+                disabled={categoryIndex === editableCategories.length - 1}
               >
                 <ArrowDown className="w-4 h-4" />
               </Button>
@@ -183,9 +243,13 @@ const AdminMenuPage = () => {
                 size="sm"
                 variant="outline"
                 onClick={() => toggleCategoryVisibility(category)}
-                title={category.hidden ? 'Show category' : 'Hide category'}
+                title={category.hidden ? "Show category" : "Hide category"}
               >
-                {category.hidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                {category.hidden ? (
+                  <Eye className="w-4 h-4" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
               </Button>
               <Button
                 size="sm"
@@ -211,14 +275,16 @@ const AdminMenuPage = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {category.items.map((item) => (
               <div key={item.id} className="border rounded-lg p-4">
                 <h3 className="font-semibold">{item.name}</h3>
                 <p className="text-gray-600 text-sm mb-2">{item.description}</p>
-                {item.price && <p className="font-bold text-green-600">{item.price}</p>}
-                
+                {item.price && (
+                  <p className="font-bold text-green-600">{item.price}</p>
+                )}
+
                 <div className="flex gap-2 mt-4">
                   <Button
                     size="sm"
@@ -247,7 +313,11 @@ const AdminMenuPage = () => {
         <MenuItemForm
           item={editingItem?.item}
           categoryId={editingItem?.categoryId || addItemCategory || ""}
-          categories={menuData.map(c => ({ id: c.id, name: c.name, menu_type: c.menu_type }))}
+          categories={menuData.map((c) => ({
+            id: c.id,
+            name: c.name,
+            menu_type: c.menu_type,
+          }))}
           onSave={handleSaveItem}
           onCancel={() => {
             setShowItemForm(false);
@@ -262,7 +332,7 @@ const AdminMenuPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {editingCategory ? 'Edit Category' : 'Add Category'}
+              {editingCategory ? "Edit Category" : "Add Category"}
             </h3>
             <CategoryForm
               category={editingCategory || undefined}
@@ -273,6 +343,22 @@ const AdminMenuPage = () => {
               }}
             />
           </div>
+        </div>
+      )}
+
+      {/* Save/Cancel ordering controls */}
+      {orderingDirty && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-xl p-4 flex gap-3 z-50">
+          <Button
+            onClick={handleSaveOrder}
+            disabled={savingOrder}
+            className="bg-irish-gold text-irish-brown"
+          >
+            {savingOrder ? "Saving..." : "Save Order"}
+          </Button>
+          <Button onClick={handleCancelOrder} variant="outline">
+            Cancel
+          </Button>
         </div>
       )}
     </div>
