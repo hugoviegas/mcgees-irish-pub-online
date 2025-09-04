@@ -201,112 +201,146 @@ const AdminMenuPage = () => {
         </Button>
       </div>
 
-      {editableCategories.map((category, categoryIndex) => (
-        <div
-          key={category.id}
-          className={`mb-8 border rounded-lg p-4 ${
-            category.hidden ? "bg-gray-100 opacity-75" : ""
-          }`}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                {category.name}
-                {category.hidden && (
-                  <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                    Hidden
-                  </span>
-                )}
-              </h2>
-              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {category.menu_type}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleMoveCategoryUp(categoryIndex)}
-                disabled={categoryIndex === 0}
-              >
-                <ArrowUp className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleMoveCategoryDown(categoryIndex)}
-                disabled={categoryIndex === editableCategories.length - 1}
-              >
-                <ArrowDown className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => toggleCategoryVisibility(category)}
-                title={category.hidden ? "Show category" : "Hide category"}
-              >
-                {category.hidden ? (
-                  <Eye className="w-4 h-4" />
-                ) : (
-                  <EyeOff className="w-4 h-4" />
-                )}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleEditCategory(category)}
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleDeleteCategory(category.id)}
-                className="text-red-600 hover:text-red-700"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-              <Button
-                onClick={() => handleAddItem(category.id)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Item
-              </Button>
-            </div>
-          </div>
+      {/* Render categories grouped by menu type for easier scanning */}
+      {[
+        { id: "aLaCarte", name: "A La Carte" },
+        { id: "breakfast", name: "Breakfast" },
+        { id: "drinks", name: "Drinks" },
+        { id: "otherMenu", name: "Other Menu" },
+      ].map((menu) => {
+        const group = editableCategories.filter(
+          (c) => c.menu_type === (menu.id as any)
+        );
+        if (group.length === 0) return null;
+        return (
+          <section key={menu.id} className="mb-10">
+            <h2 className="text-2xl font-bold text-irish-red mb-4">
+              {menu.name}
+            </h2>
+            {group.map((category) => {
+              const categoryIndex = editableCategories.findIndex(
+                (c) => c.id === category.id
+              );
+              return (
+                <div
+                  key={category.id}
+                  className={`mb-8 border rounded-lg p-4 ${
+                    category.hidden ? "bg-gray-100 opacity-75" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <h2 className="text-xl font-semibold flex items-center gap-2">
+                        {category.name}
+                        {category.hidden && (
+                          <span className="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                            Hidden
+                          </span>
+                        )}
+                      </h2>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {category.menu_type}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleMoveCategoryUp(categoryIndex)}
+                        disabled={categoryIndex === 0}
+                      >
+                        <ArrowUp className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleMoveCategoryDown(categoryIndex)}
+                        disabled={
+                          categoryIndex === editableCategories.length - 1
+                        }
+                      >
+                        <ArrowDown className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toggleCategoryVisibility(category)}
+                        title={
+                          category.hidden ? "Show category" : "Hide category"
+                        }
+                      >
+                        {category.hidden ? (
+                          <Eye className="w-4 h-4" />
+                        ) : (
+                          <EyeOff className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditCategory(category)}
+                      >
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={() => handleAddItem(category.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Item
+                      </Button>
+                    </div>
+                  </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {category.items.map((item) => (
-              <div key={item.id} className="border rounded-lg p-4">
-                <h3 className="font-semibold">{item.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{item.description}</p>
-                {item.price && (
-                  <p className="font-bold text-green-600">{item.price}</p>
-                )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {category.items.map((item) => (
+                      <div key={item.id} className="border rounded-lg p-4">
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-gray-600 text-sm mb-2">
+                          {item.description}
+                        </p>
+                        {item.price && (
+                          <p className="font-bold text-green-600">
+                            {item.price}
+                          </p>
+                        )}
 
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEditItem(item, category.id)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteItem(category.id, item.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                        <div className="flex gap-2 mt-4">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditItem(item, category.id)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              handleDeleteItem(category.id, item.id)
+                            }
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+              );
+            })}
+          </section>
+        );
+      })}
 
       {/* Menu Item Form Modal */}
       {showItemForm && (
