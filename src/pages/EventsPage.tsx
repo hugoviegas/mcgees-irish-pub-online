@@ -14,6 +14,7 @@ import Footer from "../components/Footer";
 import { useEventsData } from "../hooks/useEventsData";
 import { Event as EventType } from "../types/events";
 import { format, isAfter, isSameDay, startOfToday } from "date-fns";
+import { parseServerDate } from "@/utils/dateUtils";
 import { getEventImageUrl } from "@/utils/eventImageUtils";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -32,10 +33,14 @@ const EventsPage = () => {
         .filter((event) => {
           // Exclude month poster entries from the upcoming events list
           if (event.is_month_poster) return false;
-          const eventDate = new Date(event.date);
+          const eventDate = parseServerDate(event.date);
           return isSameDay(eventDate, today) || isAfter(eventDate, today);
         })
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .sort(
+          (a, b) =>
+            parseServerDate(a.date).getTime() -
+            parseServerDate(b.date).getTime()
+        )
     : [];
 
   // Find month poster event (first one marked as poster)

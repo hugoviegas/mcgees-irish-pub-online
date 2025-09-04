@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
@@ -29,6 +29,41 @@ export function EventForm({
       is_month_poster: false,
     }
   );
+
+  // Helper: convert an ISO date string from server into a value suitable for <input type="datetime-local" />
+  const toLocalDateTimeInput = (iso?: string) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  // Helper: convert a datetime-local input value (local time) into an ISO UTC string for storage
+  const localInputToISOString = (localValue?: string) => {
+    if (!localValue) return "";
+    // new Date('YYYY-MM-DDTHH:mm') is treated as local time in modern browsers
+    const d = new Date(localValue);
+    return d.toISOString();
+  };
+
+  // When initialData changes (opening edit), ensure the date input shows local date/time
+  useEffect(() => {
+    if (initialData) {
+      setFormData((prev) => ({
+        ...prev,
+        title: initialData.title ?? "",
+        image_url: initialData.image_url ?? "",
+        is_month_poster: !!initialData.is_month_poster,
+        date: toLocalDateTimeInput(initialData.date),
+      }));
+    }
+  }, [initialData]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
 
@@ -53,7 +88,12 @@ export function EventForm({
       return;
     }
     try {
-      await onSubmit(formData);
+      // Convert local datetime-local value back to ISO string for storage
+      const payload = { ...formData } as EventFormData;
+      if (!payload.is_month_poster) {
+        payload.date = localInputToISOString(formData.date);
+      }
+      await onSubmit(payload);
       toast({
         title: "Success",
         description: `Event successfully ${initialData ? "updated" : "added"}`,

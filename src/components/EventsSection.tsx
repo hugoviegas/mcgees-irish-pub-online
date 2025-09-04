@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
@@ -13,7 +12,10 @@ import {
 } from "lucide-react";
 import { useEventsData } from "@/hooks/useEventsData";
 import { format, isAfter, isSameDay, startOfToday } from "date-fns";
+import { parseServerDate } from "@/utils/dateUtils";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { getEventImageUrl } from "@/utils/eventImageUtils";
+import { Event as EventType } from "@/types/events";
 import { useState, useEffect } from "react";
 
 const EventsSection = () => {
@@ -27,33 +29,44 @@ const EventsSection = () => {
   const upcomingEvents = events
     ? events
         .filter((event) => {
+          // Exclude month poster entries from the upcoming events list
+          if (event.is_month_poster) return false;
           const eventDate = new Date(event.date);
           return isSameDay(eventDate, today) || isAfter(eventDate, today);
         })
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     : [];
 
-  const handleSlide = (direction: 'prev' | 'next') => {
+  // Find month poster event (first one marked as poster)
+  const monthPoster = events?.find((e) => e.is_month_poster) ?? null;
+
+  const handleSlide = (direction: "prev" | "next") => {
     if (isSliding) return;
-    
+
     setIsSliding(true);
-    
-    if (direction === 'prev') {
-      setCurrentIndex((prev) => prev > 0 ? prev - 1 : upcomingEvents.length - 1);
+
+    if (direction === "prev") {
+      setCurrentIndex((prev) =>
+        prev > 0 ? prev - 1 : upcomingEvents.length - 1
+      );
     } else {
-      setCurrentIndex((prev) => prev < upcomingEvents.length - 1 ? prev + 1 : 0);
+      setCurrentIndex((prev) =>
+        prev < upcomingEvents.length - 1 ? prev + 1 : 0
+      );
     }
-    
+
     setTimeout(() => setIsSliding(false), 500);
   };
 
-  const handleAddToCalendar = (event: any) => {
+  const handleAddToCalendar = (event: EventType) => {
     const eventDate = new Date(event.date);
-    const startDate = eventDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const endDate = new Date(eventDate.getTime() + 3 * 60 * 60 * 1000)
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .split(".")[0] + "Z";
+    const startDate =
+      eventDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const endDate =
+      new Date(eventDate.getTime() + 3 * 60 * 60 * 1000)
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .split(".")[0] + "Z";
 
     const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
       event.title
@@ -63,7 +76,7 @@ const EventsSection = () => {
     window.open(calendarUrl, "_blank");
   };
 
-  const handleShare = (event: any) => {
+  const handleShare = (event: EventType) => {
     if (navigator.share) {
       navigator.share({
         title: event.title,
@@ -102,7 +115,8 @@ const EventsSection = () => {
     );
   }
 
-  if (error || !upcomingEvents.length) {
+  // If there are no upcoming events and no poster, show the empty state
+  if (error || (!upcomingEvents.length && !monthPoster)) {
     return (
       <section className="py-16 wood-bg min-h-[600px] flex items-center">
         <div className="container mx-auto px-4">
@@ -140,143 +154,180 @@ const EventsSection = () => {
             Upcoming Events
           </h2>
           <p className="text-gray-200 text-lg md:text-xl max-w-3xl mx-auto">
-            Join us for live music, cultural events, and special promotions at D'Arcy McGee's Irish Pub.
+            Join us for live music, cultural events, and special promotions at
+            D'Arcy McGee's Irish Pub.
           </p>
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          {/* Navigation Controls */}
-          {upcomingEvents.length > 1 && (
-            <>
-              <button
-                onClick={() => handleSlide('prev')}
-                disabled={isSliding}
-                className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 bg-irish-gold/95 hover:bg-irish-gold text-irish-red p-3 md:p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="h-6 w-6 md:h-8 md:w-8" />
-              </button>
-              <button
-                onClick={() => handleSlide('next')}
-                disabled={isSliding}
-                className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 bg-irish-gold/95 hover:bg-irish-gold text-irish-red p-3 md:p-4 rounded-full shadow-xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="h-6 w-6 md:h-8 md:w-8" />
-              </button>
-            </>
-          )}
+          {/* Navigation Controls are rendered below with the indicators to avoid overlapping the poster */}
 
-          {/* Event Card */}
-          <div className={`transition-all duration-500 ${isSliding ? 'opacity-80 scale-95' : 'opacity-100 scale-100'}`}>
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-irish-gold/80 mx-4 md:mx-8">
-              <div className="flex flex-col lg:flex-row min-h-[500px] md:min-h-[600px]">
-                {/* Event Image */}
-                <div className="lg:w-1/2 h-[300px] md:h-[400px] lg:h-auto relative group">
-                  <div
-                    className="h-full cursor-pointer overflow-hidden"
-                    onClick={() => setExpandedImage(getEventImageUrl(currentEvent.image_url))}
-                  >
-                    <img
-                      src={getEventImageUrl(currentEvent.image_url)}
-                      alt={currentEvent.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </div>
+          {/* Two-column layout: poster left, current event right */}
+          <div
+            className={`transition-all duration-500 ${
+              isSliding ? "opacity-80 scale-95" : "opacity-100 scale-100"
+            }`}
+          >
+            <div className="grid lg:grid-cols-[minmax(260px,380px)_1fr] gap-8 bg-transparent mx-4 md:mx-8 items-center">
+              {/* Left: poster (image-only) */}
+              {monthPoster && (
+                <div className="mb-6 lg:mb-0">
+                  <div className="lg:sticky lg:top-20 flex justify-center lg:justify-start">
+                    <div className="w-full max-w-full lg:max-w-[380px] mx-auto lg:mx-0">
+                      <AspectRatio
+                        ratio={420 / 594}
+                        className="rounded-xl overflow-hidden shadow-lg border border-irish-gold/40 bg-white"
+                      >
+                        <img
+                          src={getEventImageUrl(monthPoster.image_url)}
+                          alt="Month Poster"
+                          className="w-full h-full object-contain"
+                        />
+                      </AspectRatio>
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* Event Details */}
-                <div className="lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-                  <div className="flex items-start mb-8">
-                    <div className="mr-6 bg-irish-gold/20 text-irish-gold p-4 rounded-full flex-shrink-0">
-                      <Music className="h-8 w-8 md:h-10 md:w-10" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-irish-red mb-4 leading-tight">
-                        {currentEvent.title}
-                      </h3>
-                      <div className="flex flex-wrap gap-4 text-gray-600 text-lg md:text-xl mb-6">
-                        <span className="flex items-center">
-                          <Calendar className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                          {format(new Date(currentEvent.date), "MMM d, yyyy")}
-                        </span>
-                        <span className="flex items-center">
-                          <Clock className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                          {format(new Date(currentEvent.date), "h:mm a")}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-600 text-lg md:text-xl mb-8">
-                        <MapPin className="h-5 w-5 md:h-6 md:w-6 mr-2" />
-                        <span>D'Arcy McGee's Irish Pub</span>
+              {/* Right: smaller Event Card (match Events page) */}
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-irish-gold/60">
+                <div className="flex flex-col lg:flex-row min-h-[220px] md:min-h-[180px]">
+                  <div className="lg:w-1/2 h-[160px] md:h-[180px] lg:h-auto relative group">
+                    <div
+                      className="h-full cursor-pointer overflow-hidden"
+                      onClick={() =>
+                        setExpandedImage(
+                          getEventImageUrl(currentEvent.image_url)
+                        )
+                      }
+                    >
+                      <img
+                        src={getEventImageUrl(currentEvent.image_url)}
+                        alt={currentEvent.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-gray-600 text-lg md:text-xl mb-10 leading-relaxed">
-                    Join us for an unforgettable evening of entertainment in the heart of Dublin's authentic Irish pub atmosphere.
-                  </p>
+                  <div className="lg:w-1/2 p-4 md:p-6 lg:p-8 flex flex-col justify-center">
+                    <div className="flex items-start mb-6">
+                      <div className="mr-4 bg-irish-gold/20 text-irish-gold p-3 rounded-full flex-shrink-0">
+                        <Music className="h-6 w-6 md:h-8 md:w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg md:text-xl font-serif font-bold text-irish-red mb-1 leading-tight">
+                          {currentEvent.title}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 text-gray-600 text-sm md:text-base mb-3">
+                          <span className="flex items-center">
+                            <Calendar className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                            {format(
+                              parseServerDate(currentEvent.date),
+                              "MMM d, yyyy"
+                            )}
+                          </span>
+                          <span className="flex items-center">
+                            <Clock className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                            {format(
+                              parseServerDate(currentEvent.date),
+                              "h:mm a"
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-4 mb-8">
-                    <Button
-                      asChild
-                      className="bg-irish-red hover:bg-irish-red/90 text-white text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <Link to="/events">View All Events</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="border-2 border-irish-red text-irish-red hover:bg-irish-red hover:text-white text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold transition-all duration-300"
-                    >
-                      <a href="tel:+35314907727">Book Table</a>
-                    </Button>
-                  </div>
+                    <p className="text-gray-600 text-sm md:text-base mb-3 leading-relaxed">
+                      Join us for an unforgettable evening of entertainment.
+                    </p>
 
-                  {/* Interactive Buttons */}
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => handleShare(currentEvent)}
-                      className="flex items-center gap-2 p-3 md:p-4 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-300 hover:scale-105"
-                      title="Share event"
-                    >
-                      <Share2 className="h-5 w-5 md:h-6 md:w-6" />
-                      <span className="text-sm md:text-base font-medium">Share</span>
-                    </button>
-                    <button
-                      onClick={() => handleAddToCalendar(currentEvent)}
-                      className="flex items-center gap-2 p-3 md:p-4 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-300 hover:scale-105"
-                      title="Add to calendar"
-                    >
-                      <CalendarIcon className="h-5 w-5 md:h-6 md:w-6" />
-                      <span className="text-sm md:text-base font-medium">Add to Calendar</span>
-                    </button>
+                    <div className="flex gap-3 items-center">
+                      <Button
+                        asChild
+                        className="bg-irish-red hover:bg-irish-red/90 text-white text-sm px-4 py-2 rounded-full font-semibold shadow transition-all duration-200"
+                      >
+                        <a href="tel:+35314907727">Book Table</a>
+                      </Button>
+
+                      <button
+                        onClick={() => handleShare(currentEvent)}
+                        className="flex items-center gap-2 p-2 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-200"
+                        title="Share event"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        <span className="text-sm font-medium">Share</span>
+                      </button>
+                      <button
+                        onClick={() => handleAddToCalendar(currentEvent)}
+                        className="flex items-center gap-2 p-2 text-irish-gold hover:bg-irish-gold/10 rounded-full transition-all duration-200"
+                        title="Add to calendar"
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                        <span className="text-sm font-medium">
+                          Add to Calendar
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Event Indicators */}
+          {/* Event Indicators + inline arrows (centered under the card) */}
           {upcomingEvents.length > 1 && (
-            <div className="flex justify-center mt-8 space-x-3">
-              {upcomingEvents.map((_, index) => (
+            <div className="flex flex-col items-center mt-8">
+              <div className="flex items-center gap-4 mb-3">
                 <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-3 w-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex
-                      ? "bg-irish-gold w-8 shadow-lg"
-                      : "bg-white/50 hover:bg-white/70"
-                  }`}
-                />
-              ))}
+                  onClick={() => handleSlide("prev")}
+                  disabled={isSliding}
+                  className="bg-white/90 text-irish-red p-2 rounded-full shadow hover:scale-105 transition-all disabled:opacity-50"
+                  aria-label="Previous event"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+
+                <div className="flex items-center space-x-2">
+                  {upcomingEvents.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentIndex(index)}
+                      className={`h-3 rounded-full transition-all duration-300 ${
+                        index === currentIndex
+                          ? "bg-irish-gold w-8 shadow-lg"
+                          : "bg-white/50 hover:bg-white/70 w-3"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => handleSlide("next")}
+                  disabled={isSliding}
+                  className="bg-white/90 text-irish-red p-2 rounded-full shadow hover:scale-105 transition-all disabled:opacity-50"
+                  aria-label="Next event"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -298,8 +349,18 @@ const EventsSection = () => {
                 onClick={() => setExpandedImage(null)}
                 className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full p-3 transition-colors backdrop-blur-sm"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>

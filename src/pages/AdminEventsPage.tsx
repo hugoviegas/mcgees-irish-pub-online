@@ -5,6 +5,7 @@ import { EventForm } from "../components/admin/EventForm";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { format } from "date-fns";
+import { parseServerDate } from "@/utils/dateUtils";
 import { getEventImageUrl } from "@/utils/eventImageUtils";
 
 export default function AdminEventsPage() {
@@ -72,7 +73,7 @@ export default function AdminEventsPage() {
                   <div>
                     <h3 className="font-semibold text-lg">{event.title}</h3>
                     <p className="text-sm text-gray-600">
-                      {format(new Date(event.date), "PPpp")}
+                      {format(parseServerDate(event.date), "PPpp")}
                     </p>
                   </div>
                 </div>
