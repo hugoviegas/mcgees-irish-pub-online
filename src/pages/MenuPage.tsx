@@ -5,12 +5,18 @@ import Footer from "../components/Footer";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { useAuth } from "../contexts/AuthContext";
 import MenuItemForm from "../components/admin/MenuItemForm";
-import { MenuCategory, MenuItem, ALLERGEN_LIST } from "../types/menu";
+import {
+  MenuCategory,
+  MenuItem,
+  ALLERGEN_LIST,
+  ExtraOption,
+} from "../types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { ALLERGEN_ICON_COMPONENTS } from "../components/icons/AllergenIcons";
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import SpecialsModal from "@/components/SpecialsModal";
 import { useLocation } from "react-router-dom";
 import { ImageCarousel } from "@/components/ImageCarousel";
 import MenuNavigation from "@/components/MenuNavigation";
@@ -74,12 +80,15 @@ const MenuPage = () => {
   const [showItemForm, setShowItemForm] = useState(false);
   const [addItemCategory, setAddItemCategory] = useState<string | null>(null);
 
-  const menus = [
-    { id: "aLaCarte" as const, name: "A La Carte" },
-    { id: "breakfast" as const, name: "Breakfast" },
-    { id: "drinks" as const, name: "Drinks" },
-    { id: "otherMenu" as const, name: "Other Menu" },
-  ];
+  const menus = React.useMemo(
+    () => [
+      { id: "aLaCarte" as const, name: "A La Carte" },
+      { id: "breakfast" as const, name: "Breakfast" },
+      { id: "drinks" as const, name: "Drinks" },
+      { id: "otherMenu" as const, name: "Other Menu" },
+    ],
+    []
+  );
 
   // Filter out hidden categories for non-authenticated users
   const visibleMenuData = isAuthenticated
@@ -133,20 +142,21 @@ const MenuPage = () => {
     }
   };
 
-  const handleMenuSelect = (
-    menuId: "aLaCarte" | "breakfast" | "drinks" | "otherMenu"
-  ) => {
-    setActiveMenu(menuId);
-    // Find first category for this menu and set it as active section
-    const firstCategory = menuData.find((cat) => cat.menu_type === menuId);
-    if (firstCategory) {
-      setActiveSection(firstCategory.id);
-    } else {
-      setActiveSection("");
-    }
-    // Update URL hash
-    window.location.hash = menuId;
-  };
+  const handleMenuSelect = React.useCallback(
+    (menuId: "aLaCarte" | "breakfast" | "drinks" | "otherMenu") => {
+      setActiveMenu(menuId);
+      // Find first category for this menu and set it as active section
+      const firstCategory = menuData.find((cat) => cat.menu_type === menuId);
+      if (firstCategory) {
+        setActiveSection(firstCategory.id);
+      } else {
+        setActiveSection("");
+      }
+      // Update URL hash
+      window.location.hash = menuId;
+    },
+    [menuData]
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -253,7 +263,7 @@ const MenuPage = () => {
     setMenuFromHash();
     window.addEventListener("hashchange", setMenuFromHash);
     return () => window.removeEventListener("hashchange", setMenuFromHash);
-  }, [menus, menuData]);
+  }, [menus, menuData, handleMenuSelect]);
 
   // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
@@ -292,43 +302,6 @@ const MenuPage = () => {
     setEditingItem({ categoryId });
     setShowItemForm(true);
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="pt-16">
-          <main className="flex-grow">
-            <section className="py-12 bg-[#f8f5f2]">
-              <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                  {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 p-5"
-                    >
-                      <Skeleton className="w-full h-40 rounded-md" />
-                      <div className="mt-4 flex items-start justify-between">
-                        <Skeleton className="h-5 w-2/3" />
-                        <Skeleton className="h-5 w-16" />
-                      </div>
-                      <Skeleton className="h-4 w-full mt-3" />
-                      <Skeleton className="h-4 w-5/6 mt-2" />
-                      <div className="mt-4 flex gap-2">
-                        <Skeleton className="h-9 w-20 rounded-full" />
-                        <Skeleton className="h-9 w-24 rounded-full" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          </main>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -477,12 +450,14 @@ const MenuPage = () => {
                                 <div>{formatPrice(item.price)}</div>
                                 {item.extras && item.extras.length > 0 && (
                                   <div className="text-sm font-medium mt-1">
-                                    {item.extras.map((ex: any, i: number) => (
-                                      <span key={i} className="block">
-                                        {formatPrice(ex.price)}{" "}
-                                        {ex.name ? `(${ex.name})` : ""}
-                                      </span>
-                                    ))}
+                                    {item.extras.map(
+                                      (ex: ExtraOption, i: number) => (
+                                        <span key={i} className="block">
+                                          {formatPrice(ex.price)}{" "}
+                                          {ex.name ? `(${ex.name})` : ""}
+                                        </span>
+                                      )
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -707,56 +682,10 @@ const MenuPage = () => {
               </div>
             )}
 
-            {/* Chef's Specials Modal */}
-            {showSpecialsModal && (
-              <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-                onClick={() => setShowSpecialsModal(false)}
-              >
-                <div
-                  className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] max-w-md relative animate-fade-in"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="absolute top-2 right-2 text-irish-red text-xl font-bold hover:text-irish-gold"
-                    onClick={() => setShowSpecialsModal(false)}
-                    aria-label="Close specials modal"
-                  >
-                    ×
-                  </button>
-                  <h4 className="text-xl font-bold font-serif mb-4 text-irish-red text-center">
-                    Chef's Specials
-                  </h4>
-                  <div className="space-y-4">
-                    {getVisibleSpecialItems().length > 0 ? (
-                      getVisibleSpecialItems().map((item, index) => (
-                        <div
-                          key={item.id}
-                          className="border-b pb-4 last:border-b-0"
-                        >
-                          <h5 className="font-semibold text-irish-brown mb-2">
-                            {item.name}
-                          </h5>
-                          <p className="text-gray-700 text-sm mb-2">
-                            {item.description}
-                          </p>
-                          <p className="text-irish-red font-semibold">
-                            {formatPrice(item.price)}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center text-gray-600">
-                        <p>No specials available at the moment.</p>
-                        <p className="text-sm mt-2">
-                          Check back later for our chef's recommendations!
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            <SpecialsModal
+              open={showSpecialsModal}
+              onClose={() => setShowSpecialsModal(false)}
+            />
 
             {/* Updated Item Details Popup Modal */}
             {selectedItem && (
