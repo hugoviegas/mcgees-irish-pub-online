@@ -9,10 +9,12 @@ import {
   Settings,
   Eye,
   EyeOff,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
+import AIMenuExtractor from "../components/admin/AIMenuExtractor";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { MenuItem, MenuCategory } from "../types/menu";
 
@@ -50,6 +52,8 @@ const AdminMenuPage = () => {
     null
   );
   const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showAIExtractor, setShowAIExtractor] = useState(false);
+  const [aiTargetCategoryId, setAiTargetCategoryId] = useState<string | null>(null);
 
   // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
@@ -87,6 +91,29 @@ const AdminMenuPage = () => {
     setAddItemCategory(categoryId);
     setEditingItem({ categoryId });
     setShowItemForm(true);
+  };
+
+  // Handle AI extraction for menu specials
+  const handleAddWithAI = (categoryId: string) => {
+    setAiTargetCategoryId(categoryId);
+    setShowAIExtractor(true);
+  };
+
+  // Handle extracted items from AI
+  const handleAIExtracted = async (items: MenuItem[]) => {
+    if (!aiTargetCategoryId) return;
+    
+    try {
+      for (const item of items) {
+        await addMenuItem(aiTargetCategoryId, item);
+      }
+      toast.success(`Successfully added ${items.length} item(s) from AI extraction`);
+      setShowAIExtractor(false);
+      setAiTargetCategoryId(null);
+    } catch (error) {
+      console.error("Error adding AI-extracted items:", error);
+      toast.error("Failed to add some items. Please try again.");
+    }
   };
 
   // Handle category management
@@ -290,6 +317,16 @@ const AdminMenuPage = () => {
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
+                      {/* Show "Add with AI" button for specials categories */}
+                      {category.name.toLowerCase().includes("special") && (
+                        <Button
+                          onClick={() => handleAddWithAI(category.id)}
+                          className="flex items-center gap-2 bg-irish-gold hover:bg-irish-gold/90 text-irish-brown"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Add with AI
+                        </Button>
+                      )}
                       <Button
                         onClick={() => handleAddItem(category.id)}
                         className="flex items-center gap-2"
@@ -394,6 +431,18 @@ const AdminMenuPage = () => {
             Cancel
           </Button>
         </div>
+      )}
+
+      {/* AI Menu Extractor Modal */}
+      {showAIExtractor && aiTargetCategoryId && (
+        <AIMenuExtractor
+          categoryId={aiTargetCategoryId}
+          onExtracted={handleAIExtracted}
+          onCancel={() => {
+            setShowAIExtractor(false);
+            setAiTargetCategoryId(null);
+          }}
+        />
       )}
     </div>
   );
