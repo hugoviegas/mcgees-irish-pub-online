@@ -16,20 +16,30 @@ export interface ExtractionResult {
 }
 
 /**
- * Calculate the next Friday date (week + 7 days from current date)
+ * Calculate the next Friday date (at least 7 days from current date)
  * Returns ISO date string in YYYY-MM-DD format
  */
 export const getNextFriday = (): string => {
   const today = new Date();
-  const dayOfWeek = today.getDay();
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 5 = Friday
+  
   // Calculate days until next Friday (Friday is day 5)
-  // If today is Friday, get next week's Friday
-  const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 7 - dayOfWeek + 5;
-  // Add 7 more days for "week + 7 days"
-  const daysToAdd = daysUntilFriday === 0 ? 7 : daysUntilFriday;
+  let daysUntilFriday: number;
+  if (dayOfWeek <= 5) {
+    daysUntilFriday = 5 - dayOfWeek;
+  } else {
+    // Saturday (6) or Sunday (0 after wrap)
+    daysUntilFriday = 5 + (7 - dayOfWeek);
+  }
+  
+  // If today is Friday (daysUntilFriday = 0), we need next Friday (7 days)
+  // Ensure the result is at least 7 days away per requirements
+  if (daysUntilFriday < 7) {
+    daysUntilFriday += 7;
+  }
   
   const nextFriday = new Date(today);
-  nextFriday.setDate(today.getDate() + daysToAdd + 7);
+  nextFriday.setDate(today.getDate() + daysUntilFriday);
   
   return nextFriday.toISOString().split('T')[0];
 };
@@ -168,7 +178,8 @@ Example output format:
       items: validatedItems,
       rawResponse: textContent,
     };
-  } catch {
-    throw new Error(`Failed to parse Gemini response: ${textContent}`);
+  } catch (parseError) {
+    const errorDetails = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+    throw new Error(`Failed to parse Gemini response (${errorDetails}): ${textContent}`);
   }
 };

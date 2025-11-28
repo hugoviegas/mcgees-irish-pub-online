@@ -25,8 +25,8 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
   onCancel,
 }) => {
   const [apiKey, setApiKey] = useState<string>(() => {
-    // Try to get cached API key from localStorage
-    return localStorage.getItem("gemini_api_key") || "";
+    // Try to get cached API key from sessionStorage (clears when browser closes for security)
+    return sessionStorage.getItem("gemini_api_key") || "";
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -71,8 +71,8 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
     setError(null);
 
     try {
-      // Cache the API key for convenience
-      localStorage.setItem("gemini_api_key", apiKey);
+      // Cache the API key in sessionStorage for convenience (clears when browser closes for security)
+      sessionStorage.setItem("gemini_api_key", apiKey);
 
       const result = await extractMenuFromImage(imageFile, apiKey);
 
