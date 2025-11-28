@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import {
   extractMenuFromImage,
   getNextFriday,
+  getTodayDate,
   ExtractedMenuItem,
 } from "@/services/geminiService";
 import { MenuItem, ALLERGEN_LIST } from "@/types/menu";
@@ -124,6 +125,8 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
     }
 
     // Convert extracted items to MenuItem format
+    // Start date (availableFrom) = today, End date (availableTo) = next Friday
+    const todayDate = getTodayDate();
     const nextFriday = getNextFriday();
     const menuItems: MenuItem[] = extractedItems.map((item, index) => ({
       id: 0, // Will be assigned by the backend
@@ -131,8 +134,8 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
       description: item.description,
       price: item.price,
       allergens: item.allergens,
-      availableFrom: nextFriday,
-      availableTo: null,
+      availableFrom: todayDate,
+      availableTo: nextFriday,
       tags: [],
       hidden: false,
       displayOrder: index,
@@ -268,7 +271,7 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
                   Extracted Items ({extractedItems.length})
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Available from: {getNextFriday()} (next Friday)
+                  Available: {getTodayDate()} to {getNextFriday()} (next Friday)
                 </p>
               </div>
 

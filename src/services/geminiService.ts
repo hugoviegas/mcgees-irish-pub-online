@@ -16,6 +16,15 @@ export interface ExtractionResult {
 }
 
 /**
+ * Get today's date in ISO format (YYYY-MM-DD)
+ * Used for the start date (availableFrom) of menu specials
+ */
+export const getTodayDate = (): string => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+/**
  * Calculate the next Friday date (at least 7 days from current date)
  * Returns ISO date string in YYYY-MM-DD format
  */
