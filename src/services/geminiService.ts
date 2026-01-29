@@ -34,27 +34,21 @@ export const getNextFriday = (): string => {
   const dayOfWeek = today.getDay(); // 0 = Sunday, 5 = Friday
 
   // Calculate days until next Friday (Friday is day 5)
-  let daysUntilFriday: number;
-  if (dayOfWeek <= 5) {
-    daysUntilFriday = 5 - dayOfWeek;
-  } else {
-    // Saturday (6) or Sunday (0 after wrap)
-    daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-  }
+  let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
 
-  // Always go at least 7 days from today
-  if (daysUntilFriday <= 0) {
+  // Ensure the result is at least 7 days away per requirements
+  if (daysUntilFriday < 7) {
     daysUntilFriday += 7;
   }
 
-  const nextFridayDate = new Date(today);
-  nextFridayDate.setDate(today.getDate() + daysUntilFriday);
+  const nextFriday = new Date(today);
+  nextFriday.setDate(today.getDate() + daysUntilFriday);
 
-  return nextFridayDate.toISOString().split("T")[0];
+  return nextFriday.toISOString().split("T")[0];
 };
 
 /**
- * Convert file to base64 string
+ * Convert a File to base64 string for API submission
  */
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -62,6 +56,7 @@ const fileToBase64 = (file: File): Promise<string> => {
     reader.readAsDataURL(file);
     reader.onload = () => {
       const result = reader.result as string;
+      // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
       const base64 = result.split(",")[1];
       resolve(base64);
     };
@@ -131,7 +126,6 @@ Example output format:
   };
 
   // Use Gemini 2.5 Flash (replaces deprecated Gemini 2.0 Flash)
-  // Fallback to Flash Lite if needed
   const modelId = "gemini-2.5-flash";
 
   const response = await fetch(
@@ -192,10 +186,11 @@ Example output format:
       items: validatedItems,
       rawResponse: textContent,
     };
-  } catch (error) {
-    console.error("Error parsing Gemini response:", error);
+  } catch (parseError) {
+    const errorDetails =
+      parseError instanceof Error ? parseError.message : "Unknown parse error";
     throw new Error(
-      `Failed to parse menu data: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Failed to parse Gemini response (${errorDetails}): ${textContent}`,
     );
   }
 };

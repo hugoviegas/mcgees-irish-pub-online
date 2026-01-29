@@ -53,9 +53,9 @@ const AdminMenuPage = () => {
   );
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [showAIExtractor, setShowAIExtractor] = useState(false);
-  const [aiExtractorCategoryId, setAiExtractorCategoryId] = useState<
-    string | null
-  >(null);
+  const [aiTargetCategoryId, setAiTargetCategoryId] = useState<string | null>(
+    null,
+  );
 
   // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
@@ -95,27 +95,28 @@ const AdminMenuPage = () => {
     setShowItemForm(true);
   };
 
-  // Handle AI extraction
-  const handleOpenAIExtractor = (categoryId: string) => {
-    setAiExtractorCategoryId(categoryId);
+  // Handle AI extraction for menu specials
+  const handleAddWithAI = (categoryId: string) => {
+    setAiTargetCategoryId(categoryId);
     setShowAIExtractor(true);
   };
 
+  // Handle extracted items from AI
   const handleAIExtracted = async (items: MenuItem[]) => {
+    if (!aiTargetCategoryId) return;
+
     try {
-      if (!aiExtractorCategoryId) return;
-
-      // Add each extracted item to the category
       for (const item of items) {
-        await addMenuItem(aiExtractorCategoryId, item);
+        await addMenuItem(aiTargetCategoryId, item);
       }
-
+      toast.success(
+        `Successfully added ${items.length} item(s) from AI extraction`,
+      );
       setShowAIExtractor(false);
-      setAiExtractorCategoryId(null);
-      toast.success(`Added ${items.length} item(s) from AI extraction`);
+      setAiTargetCategoryId(null);
     } catch (error) {
-      console.error("Error adding AI extracted items:", error);
-      toast.error("Failed to add items");
+      console.error("Error adding AI-extracted items:", error);
+      toast.error("Failed to add some items. Please try again.");
     }
   };
 
@@ -320,9 +321,10 @@ const AdminMenuPage = () => {
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
-                      {category.menu_type === "aLaCarte" && (
+                      {/* Show "Add with AI" button for specials categories */}
+                      {category.name.toLowerCase().includes("special") && (
                         <Button
-                          onClick={() => handleOpenAIExtractor(category.id)}
+                          onClick={() => handleAddWithAI(category.id)}
                           className="flex items-center gap-2 bg-irish-gold hover:bg-irish-gold/90 text-irish-brown"
                         >
                           <Sparkles className="w-4 h-4" />
@@ -400,18 +402,6 @@ const AdminMenuPage = () => {
         />
       )}
 
-      {/* AI Menu Extractor Modal */}
-      {showAIExtractor && aiExtractorCategoryId && (
-        <AIMenuExtractor
-          categoryId={aiExtractorCategoryId}
-          onExtracted={handleAIExtracted}
-          onCancel={() => {
-            setShowAIExtractor(false);
-            setAiExtractorCategoryId(null);
-          }}
-        />
-      )}
-
       {/* Category Form Modal */}
       {showCategoryForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -445,6 +435,18 @@ const AdminMenuPage = () => {
             Cancel
           </Button>
         </div>
+      )}
+
+      {/* AI Menu Extractor Modal */}
+      {showAIExtractor && aiTargetCategoryId && (
+        <AIMenuExtractor
+          categoryId={aiTargetCategoryId}
+          onExtracted={handleAIExtracted}
+          onCancel={() => {
+            setShowAIExtractor(false);
+            setAiTargetCategoryId(null);
+          }}
+        />
       )}
     </div>
   );
