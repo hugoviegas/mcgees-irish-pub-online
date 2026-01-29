@@ -28,7 +28,7 @@ const SpecialsModal: React.FC<SpecialsModalProps> = ({ open, onClose }) => {
   // and that are not hidden and are currently available.
   const now = new Date();
   const specialsCategory = menuData.find(
-    (c) => (c.name || "").toLowerCase().trim() === "week specials"
+    (c) => (c.name || "").toLowerCase().trim() === "week specials",
   );
 
   const itemsToShow = (specialsCategory?.items || [])
@@ -73,8 +73,10 @@ const SpecialsModal: React.FC<SpecialsModalProps> = ({ open, onClose }) => {
             {itemsToShow.map((item) => {
               // Get image URL from the images array
               const imageUrl =
-                item.images && item.images.length > 0
-                  ? item.images[0].imageUrl
+                item.images &&
+                Array.isArray(item.images) &&
+                item.images.length > 0
+                  ? item.images[0]?.imageUrl || null
                   : null;
 
               return (
