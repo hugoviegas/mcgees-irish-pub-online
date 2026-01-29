@@ -41,10 +41,10 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 overflow-x-hidden">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-8 pt-24">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-grow container mx-auto w-full max-w-screen-2xl px-3 sm:px-4 py-6 sm:py-8 pt-24 overflow-x-hidden">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <h1 className="text-3xl font-bold text-irish-red">Admin Panel</h1>
           <Button
             onClick={async () => {
@@ -58,7 +58,7 @@ const AdminPage: React.FC = () => {
           </Button>
         </div>
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="flex justify-center mb-8">
+          <TabsList className="flex flex-wrap justify-center gap-2 mb-8">
             <TabsTrigger value="menu">Menu</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="gallery">Gallery Images</TabsTrigger>

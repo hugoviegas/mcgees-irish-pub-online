@@ -220,8 +220,8 @@ const AdminMenuPage = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-6 max-w-full overflow-x-hidden">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-bold">Menu Administration</h1>
         <Button
           onClick={() => setShowCategoryForm(true)}
@@ -259,8 +259,8 @@ const AdminMenuPage = () => {
                     category.hidden ? "bg-gray-100 opacity-75" : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                       <h2 className="text-xl font-semibold flex items-center gap-2">
                         {category.name}
                         {category.hidden && (
@@ -273,7 +273,7 @@ const AdminMenuPage = () => {
                         {category.menu_type}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         size="sm"
                         variant="outline"

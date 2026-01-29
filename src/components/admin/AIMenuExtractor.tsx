@@ -25,7 +25,7 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
   onExtracted,
   onCancel,
 }) => {
-  const envApiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
+  const envApiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
   const [apiKey, setApiKey] = useState<string>(() => {
     // Prefer environment variable; fallback to sessionStorage for local testing
     return envApiKey || sessionStorage.getItem("gemini_api_key") || "";
@@ -161,31 +161,37 @@ const AIMenuExtractor: React.FC<AIMenuExtractorProps> = ({
 
         <div className="overflow-y-auto max-h-[calc(90vh-8rem)] p-6">
           {/* API Key Input */}
-          <div className="mb-6">
-            <Label htmlFor="apiKey">Gemini API Key</Label>
-            <Input
-              id="apiKey"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your Google Gemini API key"
-              className="mt-1"
-              disabled={Boolean(envApiKey)}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Get a free API key from{" "}
-              <a
-                href="https://aistudio.google.com/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-irish-red hover:underline"
-              >
-                Google AI Studio
-              </a>
-              . Using Gemini 2.5 Flash (updated from deprecated 2.0 models).
-              {envApiKey ? " API key loaded from environment variables." : ""}
-            </p>
-          </div>
+          {!envApiKey ? (
+            <div className="mb-6">
+              <Label htmlFor="apiKey">Gemini API Key</Label>
+              <Input
+                id="apiKey"
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter your Google Gemini API key"
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Get a free API key from{" "}
+                <a
+                  href="https://aistudio.google.com/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-irish-red hover:underline"
+                >
+                  Google AI Studio
+                </a>
+                . Using Gemini 2.5 Flash (updated from deprecated 2.0 models).
+              </p>
+            </div>
+          ) : (
+            <div className="mb-6 rounded-lg border border-irish-gold/40 bg-irish-gold/10 p-4">
+              <p className="text-sm text-irish-brown">
+                Using Gemini API key from environment variables.
+              </p>
+            </div>
+          )}
 
           {/* Image Upload */}
           <div className="mb-6">
