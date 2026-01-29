@@ -9,10 +9,12 @@ import {
   Settings,
   Eye,
   EyeOff,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import MenuItemForm from "../components/admin/MenuItemForm";
 import CategoryForm from "../components/admin/CategoryForm";
+import AIMenuExtractor from "../components/admin/AIMenuExtractor";
 import { useSupabaseMenuData } from "../hooks/useSupabaseMenuData";
 import { MenuItem, MenuCategory } from "../types/menu";
 
@@ -30,7 +32,7 @@ const AdminMenuPage = () => {
     updateCategoryOrder,
   } = useSupabaseMenuData();
   const [editableCategories, setEditableCategories] = useState<MenuCategory[]>(
-    []
+    [],
   );
   const [orderingDirty, setOrderingDirty] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
@@ -47,9 +49,13 @@ const AdminMenuPage = () => {
   const [showItemForm, setShowItemForm] = useState(false);
   const [addItemCategory, setAddItemCategory] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<MenuCategory | null>(
-    null
+    null,
   );
   const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showAIExtractor, setShowAIExtractor] = useState(false);
+  const [aiExtractorCategoryId, setAiExtractorCategoryId] = useState<
+    string | null
+  >(null);
 
   // Handle save item (add/edit)
   const handleSaveItem = async (item: MenuItem, categoryId: string) => {
@@ -87,6 +93,30 @@ const AdminMenuPage = () => {
     setAddItemCategory(categoryId);
     setEditingItem({ categoryId });
     setShowItemForm(true);
+  };
+
+  // Handle AI extraction
+  const handleOpenAIExtractor = (categoryId: string) => {
+    setAiExtractorCategoryId(categoryId);
+    setShowAIExtractor(true);
+  };
+
+  const handleAIExtracted = async (items: MenuItem[]) => {
+    try {
+      if (!aiExtractorCategoryId) return;
+
+      // Add each extracted item to the category
+      for (const item of items) {
+        await addMenuItem(aiExtractorCategoryId, item);
+      }
+
+      setShowAIExtractor(false);
+      setAiExtractorCategoryId(null);
+      toast.success(`Added ${items.length} item(s) from AI extraction`);
+    } catch (error) {
+      console.error("Error adding AI extracted items:", error);
+      toast.error("Failed to add items");
+    }
   };
 
   // Handle category management
@@ -172,7 +202,7 @@ const AdminMenuPage = () => {
         hidden: !category.hidden,
       });
       toast.success(
-        `Category ${category.hidden ? "shown" : "hidden"} successfully`
+        `Category ${category.hidden ? "shown" : "hidden"} successfully`,
       );
     } catch (error) {
       console.error("Error toggling category visibility:", error);
@@ -209,7 +239,7 @@ const AdminMenuPage = () => {
         { id: "otherMenu", name: "Other Menu" },
       ].map((menu) => {
         const group = editableCategories.filter(
-          (c) => c.menu_type === (menu.id as any)
+          (c) => c.menu_type === (menu.id as any),
         );
         if (group.length === 0) return null;
         return (
@@ -219,7 +249,7 @@ const AdminMenuPage = () => {
             </h2>
             {group.map((category) => {
               const categoryIndex = editableCategories.findIndex(
-                (c) => c.id === category.id
+                (c) => c.id === category.id,
               );
               return (
                 <div
@@ -290,6 +320,15 @@ const AdminMenuPage = () => {
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
+                      {category.menu_type === "aLaCarte" && (
+                        <Button
+                          onClick={() => handleOpenAIExtractor(category.id)}
+                          className="flex items-center gap-2 bg-irish-gold hover:bg-irish-gold/90 text-irish-brown"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Add with AI
+                        </Button>
+                      )}
                       <Button
                         onClick={() => handleAddItem(category.id)}
                         className="flex items-center gap-2"
@@ -357,6 +396,18 @@ const AdminMenuPage = () => {
             setShowItemForm(false);
             setEditingItem(null);
             setAddItemCategory(null);
+          }}
+        />
+      )}
+
+      {/* AI Menu Extractor Modal */}
+      {showAIExtractor && aiExtractorCategoryId && (
+        <AIMenuExtractor
+          categoryId={aiExtractorCategoryId}
+          onExtracted={handleAIExtracted}
+          onCancel={() => {
+            setShowAIExtractor(false);
+            setAiExtractorCategoryId(null);
           }}
         />
       )}
